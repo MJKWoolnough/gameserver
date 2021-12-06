@@ -111,6 +111,21 @@ func (r *room) leave(conn *conn) {
 	}
 }
 
+func (r *room) promote(conn *conn) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.admin != nil {
+		return errAdminExists
+	}
+	if _, ok := r.users[conn]; !ok {
+		return errNotUser
+	}
+	delete(r.users, conn)
+	r.admin = conn
+	broadcast(r.users, broadcastAdmin, strconv.AppendQuote(json.RawMessage{}, conn.name))
+	return nil
+}
+
 type roomUser struct {
 	Room string `json:"room"`
 	User string `json:"user"`
@@ -175,13 +190,23 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 	case "leaveRoom":
 		c.mu.Lock()
 		defer c.mu.Unlock()
-		if c.room != nil {
-			c.room.leave(c)
-			c.room = nil
-			c.name = ""
+		if c.room == nil {
+			return nil, errNotInRoom
 		}
+		c.room.leave(c)
+		c.room = nil
+		c.name = ""
 		return nil, nil
 	case "adminRoom":
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		if err := c.room.promote(c); err != nil {
+			return nil, err
+		}
+		return nil, nil
 	case "spectateRoom":
 	case "toAdmin":
 	case "toUsers":
@@ -235,4 +260,7 @@ var (
 	errRoomExists     = errors.New("room exists")
 	errNameExists     = errors.New("name exists")
 	errUnknownRoom    = errors.New("unknown room")
+	errAdminExists    = errors.New("admin exists")
+	errNotUser        = errors.New("not user")
+	errNotInRoom      = errors.New("not in room")
 )
