@@ -11,6 +11,7 @@ import (
 	"vimagination.zapto.org/jsonrpc"
 )
 
+// New create a new gameserver mux
 func New() *http.ServeMux {
 	m := http.NewServeMux()
 	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
