@@ -246,7 +246,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errNotUser
 		}
 		if c.room.admin != nil {
-			go c.room.admin.rpc.SendData(buildBroadcast(broadcastToAdmin, data))
+			go c.room.admin.rpc.SendData(buildBroadcast(broadcastToAdmin, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
 		}
 		return nil, nil
 	case "toUsers":
