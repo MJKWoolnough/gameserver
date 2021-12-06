@@ -276,7 +276,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		broadcast(c.room.spectators, broadcastToUsers, data)
 		return nil, nil
 	}
-	return nil, errUnkownEndpoint
+	return nil, errUnknownEndpoint
 }
 
 const (
@@ -321,12 +321,12 @@ func broadcast(conns conns, broadcastID uint8, message json.RawMessage) {
 }
 
 var (
-	errUnkownEndpoint = errors.New("unknown endpoint")
-	errRoomExists     = errors.New("room exists")
-	errNameExists     = errors.New("name exists")
-	errUnknownRoom    = errors.New("unknown room")
-	errAdminExists    = errors.New("admin exists")
-	errNotUser        = errors.New("not user")
-	errNotInRoom      = errors.New("not in room")
-	errNotAdmin       = errors.New("not admin")
+	errUnknownEndpoint = errors.New("unknown endpoint")
+	errRoomExists      = errors.New("room exists")
+	errNameExists      = errors.New("name exists")
+	errUnknownRoom     = errors.New("unknown room")
+	errAdminExists     = errors.New("admin exists")
+	errNotUser         = errors.New("not user")
+	errNotInRoom       = errors.New("not in room")
+	errNotAdmin        = errors.New("not admin")
 )
