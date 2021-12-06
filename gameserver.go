@@ -49,15 +49,6 @@ func (s *server) ServeConn(wconn *websocket.Conn) {
 	s.mu.Unlock()
 }
 
-type role uint8
-
-const (
-	roleNone role = iota
-	roleAdmin
-	roleUser
-	roleSpectator
-)
-
 type conn struct {
 	rpc    *jsonrpc.Server
 	server *server
@@ -65,7 +56,6 @@ type conn struct {
 	mu   sync.RWMutex
 	name string
 	room *room
-	role role
 }
 
 type room struct {
