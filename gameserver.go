@@ -20,6 +20,7 @@ func New() *http.ServeMux {
 type server struct {
 	mu    sync.RWMutex
 	rooms map[string]*room
+	conns map[*conn]struct{}
 }
 
 func newServer() *server {
@@ -27,6 +28,7 @@ func newServer() *server {
 		rooms: map[string]*room{
 			"default": newRoom("default"),
 		},
+		conns: make(map[*conn]struct{}),
 	}
 }
 
@@ -34,8 +36,14 @@ func (s *server) ServeConn(wconn *websocket.Conn) {
 	c := &conn{
 		server: s,
 	}
+	s.mu.Lock()
+	s.conns[c] = struct{}{}
+	s.mu.Unlock()
 	c.rpc = jsonrpc.New(wconn, c)
 	c.rpc.Handle()
+	s.mu.Lock()
+	delete(s.conns, c)
+	s.mu.Unlock()
 }
 
 type role uint8
