@@ -85,13 +85,25 @@ func (r *room) join(conn *conn) error {
 	}
 	r.names[conn.name] = struct{}{}
 	r.users[r.admin] = struct{}{}
-	broadcast(r.users, broadcastUser, strconv.AppendQuote(json.RawMessage{}, conn.name))
+	broadcast(r.users, broadcastUserJoin, strconv.AppendQuote(json.RawMessage{}, conn.name))
 	delete(r.users, r.admin)
 	r.users[conn] = struct{}{}
 	return nil
 }
 
 func (r *room) leave(conn *conn) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.names, conn.name)
+	if r.admin == conn {
+		r.admin = nil
+		broadcast(r.users, broadcastAdminNone, json.RawMessage{'0'})
+	} else if _, ok := r.users[conn]; ok {
+		delete(r.users, conn)
+		broadcast(r.users, broadcastUserLeave, strconv.AppendQuote(json.RawMessage{}, conn.name))
+	} else {
+		delete(r.spectators, conn)
+	}
 }
 
 func newRoom(name string, admin *conn) *room {
@@ -166,6 +178,14 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.room = room
 		return nil, nil
 	case "leaveRoom":
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.room != nil {
+			c.room.leave(c)
+			c.room = nil
+			c.name = ""
+		}
+		return nil, nil
 	case "adminRoom":
 	case "spectateRoom":
 	case "toAdmin":
@@ -180,7 +200,8 @@ const (
 	broadcastRoomRemove
 	broadcastAdminNone
 	broadcastAdmin
-	broadcastUser
+	broadcastUserJoin
+	broadcastUserLeave
 	broadcastToUsers
 	broadcastToSpectators
 )
