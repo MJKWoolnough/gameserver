@@ -78,6 +78,20 @@ type room struct {
 	names      map[string]struct{}
 }
 
+func newRoom(name string, admin *conn) *room {
+	names := make(map[string]struct{})
+	if admin != nil {
+		names[admin.name] = struct{}{}
+	}
+	return &room{
+		Name:       name,
+		admin:      admin,
+		users:      make(conns),
+		spectators: make(conns),
+		names:      names,
+	}
+}
+
 func (r *room) join(conn *conn) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -104,16 +118,6 @@ func (r *room) leave(conn *conn) {
 		broadcast(r.users, broadcastUserLeave, strconv.AppendQuote(json.RawMessage{}, conn.name))
 	} else {
 		delete(r.spectators, conn)
-	}
-}
-
-func newRoom(name string, admin *conn) *room {
-	return &room{
-		Name:       name,
-		admin:      admin,
-		users:      make(conns),
-		spectators: make(conns),
-		names:      map[string]struct{}{admin.name: {}},
 	}
 }
 
