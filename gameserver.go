@@ -17,10 +17,12 @@ func New() *http.ServeMux {
 	return m
 }
 
+type conns map[*conn]struct{}
+
 type server struct {
 	mu    sync.RWMutex
 	rooms map[string]*room
-	conns map[*conn]struct{}
+	conns conns
 }
 
 func newServer() *server {
@@ -28,7 +30,7 @@ func newServer() *server {
 		rooms: map[string]*room{
 			"default": newRoom("default"),
 		},
-		conns: make(map[*conn]struct{}),
+		conns: make(conns),
 	}
 }
 
@@ -69,15 +71,15 @@ type room struct {
 
 	mu         sync.RWMutex
 	admin      *conn
-	users      map[*conn]struct{}
-	spectators map[*conn]struct{}
+	users      conns
+	spectators conns
 }
 
 func newRoom(name string) *room {
 	return &room{
 		Name:       name,
-		users:      make(map[*conn]struct{}),
-		spectators: make(map[*conn]struct{}),
+		users:      make(conns),
+		spectators: make(conns),
 	}
 }
 
@@ -138,7 +140,7 @@ func buildBroadcast(id uint8, data json.RawMessage) json.RawMessage {
 	return dat
 }
 
-func broadcast(conns map[*conn]struct{}, broadcastID uint8, message json.RawMessage) {
+func broadcast(conns conns, broadcastID uint8, message json.RawMessage) {
 	if len(conns) == 0 {
 		return
 	}
