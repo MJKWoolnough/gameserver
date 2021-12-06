@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"golang.org/x/net/websocket"
@@ -75,6 +76,19 @@ func newRoom(name string) *room {
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
 	switch method {
 	case "listRooms":
+		rooms := json.RawMessage{'['}
+		c.server.mu.RLock()
+		first := true
+		for room := range c.server.rooms {
+			if first {
+				first = false
+			} else {
+				rooms = append(rooms, ',')
+			}
+			strconv.AppendQuote(rooms, room)
+		}
+		c.server.mu.RUnlock()
+		return append(rooms, ']'), nil
 	case "addRoom":
 	case "joinRoom":
 	case "leaveRoom":
