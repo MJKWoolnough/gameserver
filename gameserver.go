@@ -61,7 +61,8 @@ type conn struct {
 	rpc    *jsonrpc.Server
 	server *server
 
-	sync.RWMutex
+	mu   sync.RWMutex
+	name string
 	room *room
 	role role
 }
@@ -73,6 +74,24 @@ type room struct {
 	admin      *conn
 	users      conns
 	spectators conns
+	names      map[string]struct{}
+}
+
+func (r *room) join(conn *conn) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.names[conn.name]; ok {
+		return errNameExists
+	}
+	r.names[conn.name] = struct{}{}
+	r.users[r.admin] = struct{}{}
+	broadcast(r.users, broadcastUser, strconv.AppendQuote(json.RawMessage{}, conn.name))
+	delete(r.users, r.admin)
+	r.users[conn] = struct{}{}
+	return nil
+}
+
+func (r *room) leave(conn *conn) {
 }
 
 func newRoom(name string, admin *conn) *room {
@@ -81,7 +100,13 @@ func newRoom(name string, admin *conn) *room {
 		admin:      admin,
 		users:      make(conns),
 		spectators: make(conns),
+		names:      map[string]struct{}{admin.name: {}},
 	}
+}
+
+type roomUser struct {
+	Room string `json:"room"`
+	User string `json:"user"`
 }
 
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
@@ -89,6 +114,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 	case "listRooms":
 		rooms := json.RawMessage{'['}
 		c.server.mu.RLock()
+		defer c.server.mu.RUnlock()
 		first := true
 		for room := range c.server.rooms {
 			if first {
@@ -98,23 +124,47 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			}
 			strconv.AppendQuote(rooms, room)
 		}
-		c.server.mu.RUnlock()
 		return append(rooms, ']'), nil
 	case "addRoom":
-		var name string
-		if err := json.Unmarshal(data, &name); err != nil {
+		var names roomUser
+		if err := json.Unmarshal(data, &names); err != nil {
 			return nil, err
 		}
+		c.mu.Lock()
+		defer c.mu.Unlock()
 		c.server.mu.Lock()
-		if _, ok := c.server.rooms[name]; ok {
-			c.server.mu.Unlock()
+		defer c.server.mu.Unlock()
+		if _, ok := c.server.rooms[names.Room]; ok {
 			return nil, errRoomExists
 		}
-		c.server.rooms[name] = newRoom(name, c)
+		c.name = names.User
+		c.room = newRoom(names.Room, c)
+		c.server.rooms[names.Room] = c.room
 		broadcast(c.server.conns, broadcastRoomAdd, data)
-		c.server.mu.Unlock()
 		return nil, nil
 	case "joinRoom":
+		var names roomUser
+		if err := json.Unmarshal(data, &names); err != nil {
+			return nil, err
+		}
+		c.server.mu.RLock()
+		defer c.server.mu.RUnlock()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.room != nil {
+			c.room.leave(c)
+		}
+		c.room = nil
+		c.name = names.User
+		room, ok := c.server.rooms[names.Room]
+		if !ok {
+			return nil, errUnknownRoom
+		}
+		if err := room.join(c); err != nil {
+			return nil, err
+		}
+		c.room = room
+		return nil, nil
 	case "leaveRoom":
 	case "adminRoom":
 	case "spectateRoom":
@@ -158,11 +208,15 @@ func broadcast(conns conns, broadcastID uint8, message json.RawMessage) {
 	}
 	dat := buildBroadcast(broadcastID, message)
 	for conn := range conns {
-		go conn.rpc.SendData(dat)
+		if conn != nil {
+			go conn.rpc.SendData(dat)
+		}
 	}
 }
 
 var (
 	errUnkownEndpoint = errors.New("unknown endpoint")
 	errRoomExists     = errors.New("room exists")
+	errNameExists     = errors.New("name exists")
+	errUnknownRoom    = errors.New("unknown room")
 )
