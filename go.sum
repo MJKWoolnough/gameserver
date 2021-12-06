@@ -13,6 +13,7 @@ vimagination.zapto.org/byteio v1.0.1/go.mod h1:/cW+WW89mJiuXV8qy34hxPInzIiq6TW4D
 vimagination.zapto.org/form v1.1.0/go.mod h1:8h9s+F3k5O3a1xr4f4IlZlxPWZvKrUyeiiBsIoXfh+Y=
 vimagination.zapto.org/httpencoding v1.0.0/go.mod h1:J2hxhPn3VjWestQQ036OYpDwwerfvIHmbtmTqpKVe0w=
 vimagination.zapto.org/httpgzip v1.0.0/go.mod h1:4/pyxYYHgAgP4V0u+lbqbvKiM+XlQdSkiSxty0EJl2I=
+vimagination.zapto.org/jsonrpc v1.0.0 h1:4+0vmKCGGHKQv6/3W9q7rkxZ7myig7LCIqJwgok9pOY=
 vimagination.zapto.org/jsonrpc v1.0.0/go.mod h1:CEbi2Dg3ZtGWqEzqfj9HG/7XIuOxRoSBzeqVz2iLG5E=
 vimagination.zapto.org/memio v1.0.0/go.mod h1:zHGDKp2tyvF4IAfLti4pKYqCJucXYmmKMb3UMrCHK/4=
 vimagination.zapto.org/reverseproxy v0.0.0-20211201080344-fe2730135c76 h1:Cm0G58uM1/C87lhJFf50Wyy+NMnQsz/ovFBSnljIfKw=
