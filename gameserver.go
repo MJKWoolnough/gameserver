@@ -250,6 +250,18 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		return nil, nil
 	case "toUsers":
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		c.room.mu.RLock()
+		defer c.room.mu.RUnlock()
+		if c.room.admin != c {
+			return nil, errNotAdmin
+		}
+		broadcast(c.room.users, broadcastToUsers, data)
+		return nil, nil
 	case "toSpectators":
 	}
 	return nil, errUnkownEndpoint
@@ -304,4 +316,5 @@ var (
 	errAdminExists    = errors.New("admin exists")
 	errNotUser        = errors.New("not user")
 	errNotInRoom      = errors.New("not in room")
+	errNotAdmin       = errors.New("not admin")
 )
