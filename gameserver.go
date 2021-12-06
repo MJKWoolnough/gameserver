@@ -15,6 +15,7 @@ import (
 func New(dataDir http.FileSystem) *http.ServeMux {
 	m := http.NewServeMux()
 	m.Handle("/data", http.FileServer(dataDir))
+	m.Handle("/", index)
 	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
 	return m
 }
