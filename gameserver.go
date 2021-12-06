@@ -235,6 +235,20 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.room = room
 		return nil, nil
 	case "toAdmin":
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		c.room.mu.RLock()
+		defer c.room.mu.RUnlock()
+		if _, ok := c.room.users[c]; !ok {
+			return nil, errNotUser
+		}
+		if c.room.admin != nil {
+			go c.room.admin.rpc.SendData(buildBroadcast(broadcastToAdmin, data))
+		}
+		return nil, nil
 	case "toUsers":
 	case "toSpectators":
 	}
@@ -248,6 +262,7 @@ const (
 	broadcastAdmin
 	broadcastUserJoin
 	broadcastUserLeave
+	broadcastToAdmin
 	broadcastToUsers
 	broadcastToSpectators
 )
