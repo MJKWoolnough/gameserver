@@ -12,8 +12,9 @@ import (
 )
 
 // New create a new gameserver mux
-func New() *http.ServeMux {
+func New(dataDir http.FileSystem) *http.ServeMux {
 	m := http.NewServeMux()
+	m.Handle("/data", http.FileServer(dataDir))
 	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
 	return m
 }
