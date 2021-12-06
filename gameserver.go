@@ -110,3 +110,40 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 }
 
 var errUnkownEndpoint = errors.New("unknown endpoint")
+
+const (
+	broadcastRoomAdd uint8 = iota
+	broadcastRoomRemove
+	broadcastAdminNone
+	broadcastAdmin
+	broadcastUser
+	broadcastToUsers
+	broadcastToSpectators
+)
+
+const broadcastStart = "{\"id\": -0,\"result\":"
+
+func buildBroadcast(id uint8, data json.RawMessage) json.RawMessage {
+	l := len(broadcastStart) + len(data) + 1
+	dat := make(json.RawMessage, l)
+	copy(dat, broadcastStart)
+	copy(dat[len(broadcastStart):], data)
+	id = -id
+	if id > 9 {
+		dat[6] = '-'
+		dat[7] = byte('0' + id/10)
+	}
+	dat[8] = byte('0' + id%10)
+	dat[l-1] = '}'
+	return dat
+}
+
+func broadcast(conns map[*conn]struct{}, broadcastID uint8, message json.RawMessage) {
+	if len(conns) == 0 {
+		return
+	}
+	dat := buildBroadcast(broadcastID, message)
+	for conn := range conns {
+		go conn.rpc.SendData(dat)
+	}
+}
