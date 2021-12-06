@@ -263,6 +263,18 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		broadcast(c.room.users, broadcastToUsers, data)
 		return nil, nil
 	case "toSpectators":
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		c.room.mu.RLock()
+		defer c.room.mu.RUnlock()
+		if c.room.admin != c {
+			return nil, errNotAdmin
+		}
+		broadcast(c.room.spectators, broadcastToUsers, data)
+		return nil, nil
 	}
 	return nil, errUnkownEndpoint
 }
