@@ -12,31 +12,29 @@ import (
 
 func New() *http.ServeMux {
 	m := http.NewServeMux()
-	m.Handle("/socket", websocket.Handler(newSocket().ServeConn))
+	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
 	return m
 }
 
-type socket struct {
+type server struct {
 	mu    sync.RWMutex
-	conns map[*conn]struct{}
+	rooms map[string]*room
 }
 
-func newSocket() *socket {
-	return &socket{
-		conns: make(map[*conn]struct{}),
+func newServer() *server {
+	return &server{
+		rooms: map[string]*room{
+			"default": newRoom("default"),
+		},
 	}
 }
 
-func (s *socket) ServeConn(wconn *websocket.Conn) {
-	c := new(conn)
-	s.mu.Lock()
-	s.conns[c] = struct{}{}
-	s.mu.Unlock()
+func (s *server) ServeConn(wconn *websocket.Conn) {
+	c := &conn{
+		server: s,
+	}
 	c.rpc = jsonrpc.New(wconn, c)
 	c.rpc.Handle()
-	s.mu.Lock()
-	delete(s.conns, c)
-	s.mu.Unlock()
 }
 
 type role uint8
@@ -49,7 +47,8 @@ const (
 )
 
 type conn struct {
-	rpc *jsonrpc.Server
+	rpc    *jsonrpc.Server
+	server *server
 
 	sync.RWMutex
 	room *room
@@ -57,10 +56,20 @@ type conn struct {
 }
 
 type room struct {
-	Name       string
+	Name string
+
+	mu         sync.RWMutex
 	admin      *conn
-	users      []*conn
-	spectators []*conn
+	users      map[*conn]struct{}
+	spectators map[*conn]struct{}
+}
+
+func newRoom(name string) *room {
+	return &room{
+		Name:       name,
+		users:      make(map[*conn]struct{}),
+		spectators: make(map[*conn]struct{}),
+	}
 }
 
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
