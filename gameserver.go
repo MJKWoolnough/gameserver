@@ -28,7 +28,7 @@ type server struct {
 func newServer() *server {
 	return &server{
 		rooms: map[string]*room{
-			"default": newRoom("default"),
+			"default": newRoom("default", nil),
 		},
 		conns: make(conns),
 	}
@@ -75,9 +75,10 @@ type room struct {
 	spectators conns
 }
 
-func newRoom(name string) *room {
+func newRoom(name string, admin *conn) *room {
 	return &room{
 		Name:       name,
+		admin:      admin,
 		users:      make(conns),
 		spectators: make(conns),
 	}
@@ -100,6 +101,19 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.server.mu.RUnlock()
 		return append(rooms, ']'), nil
 	case "addRoom":
+		var name string
+		if err := json.Unmarshal(data, &name); err != nil {
+			return nil, err
+		}
+		c.server.mu.Lock()
+		if _, ok := c.server.rooms[name]; ok {
+			c.server.mu.Unlock()
+			return nil, errRoomExists
+		}
+		c.server.rooms[name] = newRoom(name, c)
+		broadcast(c.server.conns, broadcastRoomAdd, data)
+		c.server.mu.Unlock()
+		return nil, nil
 	case "joinRoom":
 	case "leaveRoom":
 	case "adminRoom":
@@ -110,8 +124,6 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 	}
 	return nil, errUnkownEndpoint
 }
-
-var errUnkownEndpoint = errors.New("unknown endpoint")
 
 const (
 	broadcastRoomAdd uint8 = iota
@@ -149,3 +161,8 @@ func broadcast(conns conns, broadcastID uint8, message json.RawMessage) {
 		go conn.rpc.SendData(dat)
 	}
 }
+
+var (
+	errUnkownEndpoint = errors.New("unknown endpoint")
+	errRoomExists     = errors.New("room exists")
+)
