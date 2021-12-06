@@ -96,6 +96,12 @@ func (r *room) join(conn *conn) error {
 	return nil
 }
 
+func (r *room) spectate(conn *conn) {
+	r.mu.Lock()
+	r.spectators[conn] = struct{}{}
+	r.mu.Unlock()
+}
+
 func (r *room) leave(conn *conn) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -208,6 +214,26 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		return nil, nil
 	case "spectateRoom":
+		var roomName string
+		if err := json.Unmarshal(data, &roomName); err != nil {
+			return nil, err
+		}
+		c.server.mu.RLock()
+		defer c.server.mu.RUnlock()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.room != nil {
+			c.room.leave(c)
+		}
+		c.room = nil
+		c.name = ""
+		room, ok := c.server.rooms[roomName]
+		if !ok {
+			return nil, errUnknownRoom
+		}
+		room.spectate(c)
+		c.room = room
+		return nil, nil
 	case "toAdmin":
 	case "toUsers":
 	case "toSpectators":
