@@ -3,7 +3,6 @@ package gameserver
 import (
 	"encoding/json"
 	"errors"
-	"strings"
 	"sync"
 
 	"golang.org/x/net/websocket"
@@ -11,9 +10,8 @@ import (
 )
 
 type socket struct {
-	mu     sync.RWMutex
-	conns  map[*conn]struct{}
-	nextID uint64
+	mu    sync.RWMutex
+	conns map[*conn]struct{}
 }
 
 func newSocket() *socket {
@@ -25,11 +23,8 @@ func newSocket() *socket {
 func (s *socket) ServeConn(wconn *websocket.Conn) {
 	c := new(conn)
 	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
 	s.conns[c] = struct{}{}
 	s.mu.Unlock()
-	c.ID = id
 	c.rpc = jsonrpc.New(wconn, c)
 	c.rpc.Handle()
 	s.mu.Lock()
@@ -37,28 +32,43 @@ func (s *socket) ServeConn(wconn *websocket.Conn) {
 	s.mu.Unlock()
 }
 
+type role uint8
+
+const (
+	roleNone role = iota
+	roleAdmin
+	roleUser
+	roleSpectator
+)
+
 type conn struct {
 	rpc *jsonrpc.Server
-	ID  uint64
+
+	sync.RWMutex
+	room *room
+	role role
+}
+
+type room struct {
+	Name       string
+	admin      *conn
+	users      []*conn
+	spectators []*conn
 }
 
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
 	switch method {
-	default:
-		pos := strings.IndexByte(method, '.')
-		if pos < 0 {
-			return nil, ErrUnkownEndpoint
-		}
-		submethod := method[pos+1:]
-		method = method[:pos]
-		switch method {
-		}
-		_ = submethod
+	case "listRooms":
+	case "addRoom":
+	case "joinRoom":
+	case "leaveRoom":
+	case "adminRoom":
+	case "spectateRoom":
+	case "toAdmin":
+	case "toUsers":
+	case "toSpectators":
 	}
-	return nil, ErrUnkownEndpoint
+	return nil, errUnkownEndpoint
 }
 
-// Errors
-var (
-	ErrUnkownEndpoint = errors.New("unknown endpoint")
-)
+var errUnkownEndpoint = errors.New("unknown endpoint")
