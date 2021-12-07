@@ -46,10 +46,12 @@ func (s *server) ServeConn(wconn *websocket.Conn) {
 	s.mu.Unlock()
 	c.rpc = jsonrpc.New(wconn, c)
 	c.rpc.Handle()
-	if c.room != nil {
-		c.room.leave(c)
-	}
 	s.mu.Lock()
+	if c.room != nil {
+		if c.room.leave(c) {
+			delete(s.rooms, c.room.Name)
+		}
+	}
 	delete(s.conns, c)
 	s.mu.Unlock()
 }
@@ -125,7 +127,7 @@ func (r *room) spectate(conn *conn) {
 	r.mu.Unlock()
 }
 
-func (r *room) leave(conn *conn) {
+func (r *room) leave(conn *conn) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	delete(r.names, conn.name)
@@ -138,6 +140,7 @@ func (r *room) leave(conn *conn) {
 	} else {
 		delete(r.spectators, conn)
 	}
+	return len(r.names) == 0 && r.Name != "default"
 }
 
 func (r *room) promote(conn *conn) error {
@@ -223,12 +226,16 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.room = room
 		return nameJSON, nil
 	case "leaveRoom":
+		c.server.mu.Lock()
+		defer c.server.mu.Unlock()
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.room == nil {
 			return nil, errNotInRoom
 		}
-		c.room.leave(c)
+		if c.room.leave(c) {
+			delete(c.server.rooms, c.room.Name)
+		}
 		c.room = nil
 		c.name = ""
 		return nil, nil
