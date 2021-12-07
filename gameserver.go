@@ -173,7 +173,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			} else {
 				rooms = append(rooms, ',')
 			}
-			strconv.AppendQuote(rooms, room)
+			rooms = strconv.AppendQuote(rooms, room)
 		}
 		return append(rooms, ']'), nil
 	case "addRoom":
