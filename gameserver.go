@@ -46,6 +46,9 @@ func (s *server) ServeConn(wconn *websocket.Conn) {
 	s.mu.Unlock()
 	c.rpc = jsonrpc.New(wconn, c)
 	c.rpc.Handle()
+	if c.room != nil {
+		c.room.leave(c)
+	}
 	s.mu.Lock()
 	delete(s.conns, c)
 	s.mu.Unlock()
