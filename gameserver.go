@@ -203,8 +203,8 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if err := json.Unmarshal(data, &names); err != nil {
 			return nil, err
 		}
-		c.server.mu.RLock()
-		defer c.server.mu.RUnlock()
+		c.server.mu.Lock()
+		defer c.server.mu.Unlock()
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.room != nil {
