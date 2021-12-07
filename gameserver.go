@@ -185,6 +185,11 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		defer c.mu.Unlock()
 		c.server.mu.Lock()
 		defer c.server.mu.Unlock()
+		if c.room != nil {
+			c.room.leave(c)
+		}
+		c.room = nil
+		c.name = ""
 		if _, ok := c.server.rooms[names.Room]; ok {
 			return nil, errRoomExists
 		}
@@ -206,11 +211,11 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			c.room.leave(c)
 		}
 		c.room = nil
-		c.name = names.User
 		room, ok := c.server.rooms[names.Room]
 		if !ok {
 			return nil, errUnknownRoom
 		}
+		c.name = names.User
 		nameJSON, err := room.join(c)
 		if err != nil {
 			return nil, err
