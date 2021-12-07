@@ -33,6 +33,8 @@ export const room = {} as {
 	messageHandler: (fn: (data: any) => void) => void;
 	adminChange: (fn: (data: string) => void) => void;
 	username: () => string;
+	userFormatter: (fn: (username: string) => HTMLLIElement) => void;
+	roomFormatter: (fn: (room: string) => HTMLLIElement) => void;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const messages = new Requester(),
@@ -40,7 +42,9 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	      rooms = new NodeArray<RoomNode>(ul()),
 	      users = new NodeArray<UserNode>(ul());
 	let admin = "",
-	    username = "";
+	    username = "",
+	    userFormatter: (username: string) => HTMLLIElement = li,
+	    roomFormatter: (room: string) => HTMLLIElement = li;
 	messages.responder(() => {});
 	adminChange.responder("");
 	Object.assign(room, {
@@ -60,7 +64,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				admin = a;
 				username = user;
 				for (const user of u) {
-					users.push({user, [node]: li(user)});
+					users.push({user, [node]: userFormatter(user)});
 				}
 			});
 		},
@@ -72,11 +76,23 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"toSpectators": rpc.request.bind(rpc, "toSpectators"),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
-		"username": () => username
+		"username": () => username,
+		"userFormatter": (fn: (username: string) => HTMLLIElement) => {
+			userFormatter = fn;
+			for (const user of users) {
+				user[node] = fn(user.user);
+			}
+		},
+		"roomFormatter": (fn: (room: string) => HTMLLIElement) => {
+			roomFormatter = fn;
+			for (const room of rooms) {
+				room[node] = fn(room.room);
+			}
+		}
 	});
 	rpc.request("listRooms").then(r => {
 		for (const room of r) {
-			rooms.push({room, [node]: li(room)});
+			rooms.push({room, [node]: roomFormatter(room)});
 		}
 	});
 	rpc.await(broadcastRoomAdd, true).then(r => rooms.push(r));
@@ -88,7 +104,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	});
 	rpc.await(broadcastAdminNone, true).then(() => adminChange.request(admin = ""));
 	rpc.await(broadcastAdmin, true).then((a: string) => adminChange.request(admin = a));
-	rpc.await(broadcastUserJoin, true).then((user: string) => users.push({user, [node]: li(user)}));
+	rpc.await(broadcastUserJoin, true).then((user: string) => users.push({user, [node]: userFormatter(user)}));
 	rpc.await(broadcastUserLeave, true).then(user => {
 		const pos = rooms.indexOf(user);
 		if (pos >= 0) {
