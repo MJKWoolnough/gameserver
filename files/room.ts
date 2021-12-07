@@ -21,7 +21,8 @@ type UserNode = {
 
 export const room = {} as {
 	admin: () => string;
-	list: () => NodeArray<RoomNode>;
+	rooms: () => NodeArray<RoomNode>;
+	users: () => NodeArray<UserNode>;
 	new: (room: string, user: string) => Promise<void>;
 	join: (room: string, user: string) => Promise<void>;
 	spectate: (room: string) => Promise<void>;
@@ -49,7 +50,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	adminChange.responder("");
 	Object.assign(room, {
 		"admin": () => admin,
-		"list": () => rooms,
+		"rooms": () => rooms,
+		"users": () => users,
 		"new": (room: string, user: string) => {
 			admin = "";
 			users.splice(0, users.length);
