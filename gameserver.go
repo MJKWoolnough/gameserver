@@ -275,7 +275,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errNotUser
 		}
 		if c.room.admin != nil {
-			go c.room.admin.rpc.SendData(buildBroadcast(broadcastToAdmin, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
+			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessage, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
 		}
 		return nil, nil
 	case "toUsers":
@@ -289,7 +289,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room.admin != c {
 			return nil, errNotAdmin
 		}
-		broadcast(c.room.users, broadcastToUsers, data)
+		broadcast(c.room.users, broadcastMessage, data)
 		return nil, nil
 	case "toSpectators":
 		c.mu.RLock()
@@ -302,7 +302,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room.admin != c {
 			return nil, errNotAdmin
 		}
-		broadcast(c.room.spectators, broadcastToUsers, data)
+		broadcast(c.room.spectators, broadcastMessage, data)
 		return nil, nil
 	}
 	return nil, errUnknownEndpoint
@@ -315,9 +315,7 @@ const (
 	broadcastAdmin
 	broadcastUserJoin
 	broadcastUserLeave
-	broadcastToAdmin
-	broadcastToUsers
-	broadcastToSpectators
+	broadcastMessage
 )
 
 const broadcastStart = "{\"id\": -0,\"result\":"
