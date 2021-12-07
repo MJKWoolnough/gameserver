@@ -67,13 +67,13 @@ type room struct {
 	admin      *conn
 	users      conns
 	spectators conns
-	names      map[string]struct{}
+	names      map[string]*conn
 }
 
 func newRoom(name string, admin *conn) *room {
-	names := make(map[string]struct{})
+	names := make(map[string]*conn)
 	if admin != nil {
-		names[admin.name] = struct{}{}
+		names[admin.name] = admin
 	}
 	return &room{
 		Name:       name,
@@ -84,18 +84,36 @@ func newRoom(name string, admin *conn) *room {
 	}
 }
 
-func (r *room) join(conn *conn) error {
+func (r *room) join(conn *conn) (json.RawMessage, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, ok := r.names[conn.name]; ok {
-		return errNameExists
+		return nil, errNameExists
 	}
-	r.names[conn.name] = struct{}{}
+	var (
+		adminName string
+		data      = json.RawMessage{'{', 'u', 's', 'e', 'r', 's', ':', '['}
+		first     = true
+	)
+	for name, c := range r.names {
+		if r.admin == c {
+			adminName = name
+			continue
+		}
+		if first {
+			first = false
+		} else {
+			data = append(data, ',')
+		}
+		data = strconv.AppendQuote(data, name)
+	}
+	data = append(strconv.AppendQuote(append(data, "],\"admin\":"...), adminName), '}')
+	r.names[conn.name] = conn
 	r.users[r.admin] = struct{}{}
 	broadcast(r.users, broadcastUserJoin, strconv.AppendQuote(json.RawMessage{}, conn.name))
 	delete(r.users, r.admin)
 	r.users[conn] = struct{}{}
-	return nil
+	return data, nil
 }
 
 func (r *room) spectate(conn *conn) {
@@ -190,11 +208,12 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if !ok {
 			return nil, errUnknownRoom
 		}
-		if err := room.join(c); err != nil {
+		nameJSON, err := room.join(c)
+		if err != nil {
 			return nil, err
 		}
 		c.room = room
-		return nil, nil
+		return nameJSON, nil
 	case "leaveRoom":
 		c.mu.Lock()
 		defer c.mu.Unlock()
