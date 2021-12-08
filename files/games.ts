@@ -7,7 +7,7 @@ import {room, ready} from './room.js';
 const lobby = () => {
 	const rooms = room.rooms(),
 	      username = input({"type": "text", "id": "username", "placeholder": "Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
-	      error = span();
+	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li([
 		span({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r),

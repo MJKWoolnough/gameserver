@@ -21,3 +21,7 @@ body {
 #username:placeholder-shown ~ div {
 	display: none;
 }
+
+#error {
+	color: #f00;
+}
