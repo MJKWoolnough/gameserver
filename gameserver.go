@@ -51,11 +51,16 @@ func (s *server) ServeConn(wconn *websocket.Conn) {
 	s.mu.Lock()
 	if c.room != nil {
 		if c.room.leave(c) {
-			delete(s.rooms, c.room.Name)
+			s.removeRoom(c.room.Name)
 		}
 	}
 	delete(s.conns, c)
 	s.mu.Unlock()
+}
+
+func (s *server) removeRoom(name string) {
+	delete(s.rooms, name)
+	broadcast(s.conns, broadcastRoomRemove, strconv.AppendQuote(json.RawMessage{}, name))
 }
 
 type conn struct {
@@ -191,7 +196,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.server.mu.Lock()
 		defer c.server.mu.Unlock()
 		if c.room != nil {
-			c.room.leave(c)
+			if c.room.leave(c) {
+				c.server.removeRoom(c.room.Name)
+			}
 		}
 		c.room = nil
 		c.name = ""
@@ -213,7 +220,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.room != nil {
-			c.room.leave(c)
+			if c.room.leave(c) {
+				c.server.removeRoom(c.room.Name)
+			}
 		}
 		c.room = nil
 		room, ok := c.server.rooms[names.Room]
@@ -236,7 +245,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errNotInRoom
 		}
 		if c.room.leave(c) {
-			delete(c.server.rooms, c.room.Name)
+			c.server.removeRoom(c.room.Name)
 		}
 		c.room = nil
 		c.name = ""
@@ -261,7 +270,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.room != nil {
-			c.room.leave(c)
+			c.server.removeRoom(c.room.Name)
 		}
 		c.room = nil
 		c.name = ""
