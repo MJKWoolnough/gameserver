@@ -324,7 +324,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 }
 
 const (
-	broadcastRoomAdd uint8 = iota
+	broadcastRoomAdd int8 = -1 - iota
 	broadcastRoomRemove
 	broadcastAdminNone
 	broadcastAdmin
@@ -335,7 +335,7 @@ const (
 
 const broadcastStart = "{\"id\": -0,\"result\":"
 
-func buildBroadcast(id uint8, data json.RawMessage) json.RawMessage {
+func buildBroadcast(id int8, data json.RawMessage) json.RawMessage {
 	l := len(broadcastStart) + len(data) + 1
 	dat := make(json.RawMessage, l)
 	copy(dat, broadcastStart)
@@ -350,7 +350,7 @@ func buildBroadcast(id uint8, data json.RawMessage) json.RawMessage {
 	return dat
 }
 
-func broadcast(conns conns, broadcastID uint8, message json.RawMessage) {
+func broadcast(conns conns, broadcastID int8, message json.RawMessage) {
 	if len(conns) == 0 {
 		return
 	}
