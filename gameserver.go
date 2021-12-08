@@ -291,7 +291,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.room.status = roomStatus.Status
 		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
 		return nil, nil
-	case "toAdmin":
+	case "message":
 		c.mu.RLock()
 		defer c.mu.RUnlock()
 		if c.room == nil {
@@ -299,25 +299,13 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		c.room.mu.RLock()
 		defer c.room.mu.RUnlock()
-		if _, ok := c.room.users[c]; !ok {
+		if c.room.admin == c {
+			broadcast(c.room.users, broadcastMessage, data)
+		} else if _, ok := c.room.names[c.name]; ok {
+			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessage, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
+		} else {
 			return nil, errNotUser
 		}
-		if c.room.admin != nil {
-			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessage, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
-		}
-		return nil, nil
-	case "toUsers":
-		c.mu.RLock()
-		defer c.mu.RUnlock()
-		if c.room == nil {
-			return nil, errNotInRoom
-		}
-		c.room.mu.RLock()
-		defer c.room.mu.RUnlock()
-		if c.room.admin != c {
-			return nil, errNotAdmin
-		}
-		broadcast(c.room.users, broadcastMessage, data)
 		return nil, nil
 	}
 	return nil, errUnknownEndpoint
