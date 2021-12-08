@@ -68,11 +68,10 @@ type conn struct {
 type room struct {
 	Name string
 
-	mu         sync.RWMutex
-	admin      *conn
-	users      conns
-	spectators conns
-	names      map[string]*conn
+	mu    sync.RWMutex
+	admin *conn
+	users conns
+	names map[string]*conn
 }
 
 func newRoom(name string, admin *conn) *room {
@@ -81,11 +80,10 @@ func newRoom(name string, admin *conn) *room {
 		names[admin.name] = admin
 	}
 	return &room{
-		Name:       name,
-		admin:      admin,
-		users:      make(conns),
-		spectators: make(conns),
-		names:      names,
+		Name:  name,
+		admin: admin,
+		users: make(conns),
+		names: names,
 	}
 }
 
@@ -123,7 +121,7 @@ func (r *room) join(conn *conn) (json.RawMessage, error) {
 
 func (r *room) spectate(conn *conn) {
 	r.mu.Lock()
-	r.spectators[conn] = struct{}{}
+	r.users[conn] = struct{}{}
 	r.mu.Unlock()
 }
 
@@ -131,14 +129,12 @@ func (r *room) leave(conn *conn) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	delete(r.names, conn.name)
+	delete(r.users, conn)
 	if r.admin == conn {
 		r.admin = nil
 		broadcast(r.users, broadcastAdminNone, json.RawMessage{'0'})
-	} else if _, ok := r.users[conn]; ok {
-		delete(r.users, conn)
+	} else if conn.name != "" {
 		broadcast(r.users, broadcastUserLeave, strconv.AppendQuote(json.RawMessage{}, conn.name))
-	} else {
-		delete(r.spectators, conn)
 	}
 	return len(r.names) == 0 && r.Name != "default"
 }
@@ -149,7 +145,7 @@ func (r *room) promote(conn *conn) error {
 	if r.admin != nil {
 		return errAdminExists
 	}
-	if _, ok := r.users[conn]; !ok {
+	if _, ok := r.users[conn]; !ok || conn.name == "" {
 		return errNotUser
 	}
 	delete(r.users, conn)
@@ -297,19 +293,6 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errNotAdmin
 		}
 		broadcast(c.room.users, broadcastMessage, data)
-		return nil, nil
-	case "toSpectators":
-		c.mu.RLock()
-		defer c.mu.RUnlock()
-		if c.room == nil {
-			return nil, errNotInRoom
-		}
-		c.room.mu.RLock()
-		defer c.room.mu.RUnlock()
-		if c.room.admin != c {
-			return nil, errNotAdmin
-		}
-		broadcast(c.room.spectators, broadcastMessage, data)
 		return nil, nil
 	}
 	return nil, errUnknownEndpoint
