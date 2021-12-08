@@ -75,11 +75,11 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				}
 			});
 		},
-		"spectate": rpc.request.bind(rpc, "spectateRoom"),
-		"leave": rpc.request.bind(rpc, "leaveRoom"),
+		"spectate": () => rpc.request("spectateRoom"),
+		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
-		"setStatus": rpc.request.bind(rpc, "setStatus"),
-		"message": rpc.request.bind(rpc, "message"),
+		"setStatus": (status: any) => rpc.request("setStatus", status),
+		"message": (message: any) => rpc.request("message", message),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
 		"username": () => username,
