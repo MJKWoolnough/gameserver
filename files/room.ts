@@ -19,18 +19,24 @@ type UserNode = {
 	[node]: HTMLLIElement;
 }
 
+type RoomEntry = {
+	admin: string;
+	users: string[];
+	status: any;
+}
+
 export const room = {} as {
 	admin: () => string;
 	rooms: () => NodeArray<RoomNode>;
 	users: () => NodeArray<UserNode>;
 	new: (room: string, user: string) => Promise<void>;
-	join: (room: string, user: string) => Promise<void>;
-	spectate: (room: string) => Promise<void>;
+	join: (room: string, user: string) => Promise<RoomEntry>;
+	spectate: (room: string) => Promise<any>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
+	setAtatus: (data: any) => Promise<void>;
 	toAdmin: (msg: any) => Promise<void>;
 	toUsers: (msg: any) => Promise<void>;
-	toSpectators: (msg: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	adminChange: (fn: (data: string) => void) => void;
 	username: () => string;
@@ -73,9 +79,9 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"spectate": rpc.request.bind(rpc, "spectateRoom"),
 		"leave": rpc.request.bind(rpc, "leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
+		"setStatus": rpc.request.bind(rpc, "setStatus"),
 		"toAdmin": rpc.request.bind(rpc, "toAdmin"),
 		"toUsers": rpc.request.bind(rpc, "toUsers"),
-		"toSpectators": rpc.request.bind(rpc, "toSpectators"),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
 		"username": () => username,
