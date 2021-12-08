@@ -121,10 +121,11 @@ func (r *room) join(conn *conn) (json.RawMessage, error) {
 	return data, nil
 }
 
-func (r *room) spectate(conn *conn) {
+func (r *room) spectate(conn *conn) json.RawMessage {
 	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.users[conn] = struct{}{}
-	r.mu.Unlock()
+	return r.status
 }
 
 func (r *room) leave(conn *conn) bool {
@@ -265,9 +266,8 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if !ok {
 			return nil, errUnknownRoom
 		}
-		room.spectate(c)
 		c.room = room
-		return nil, nil
+		return room.spectate(c), nil
 	case "setStatus":
 		var roomStatus struct {
 			Room   string          `json:"room"`
