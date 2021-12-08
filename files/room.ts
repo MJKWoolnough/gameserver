@@ -22,7 +22,11 @@ type UserNode = {
 type RoomEntry = {
 	admin: string;
 	users: string[];
-	status: any;
+	status: GameMessage;
+}
+
+type GameMessage = {
+	game: string;
 }
 
 export const room = {} as {
@@ -34,7 +38,7 @@ export const room = {} as {
 	spectate: (room: string) => Promise<any>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
-	setStatus: (data: any) => Promise<void>;
+	setStatus: (data: GameMessage) => Promise<void>;
 	message: (msg: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	adminChange: (fn: (data: string) => void) => void;
@@ -77,8 +81,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"spectate": (room: string) => rpc.request("spectateRoom", room),
 		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
-		"setStatus": (status: any) => rpc.request("setStatus", status),
-		"message": (message: any) => rpc.request("message", message),
+		"setStatus": (status: GameMessage) => rpc.request("setStatus", status),
+		"message": (message: GameMessage) => rpc.request("message", message),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
 		"username": () => username,
