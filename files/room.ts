@@ -102,8 +102,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			rooms.push({room, [node]: roomFormatter(room)});
 		}
 	});
-	rpc.await(broadcastRoomAdd, true).then(r => rooms.push(r));
-	rpc.await(broadcastRoomRemove, true).then(r => rooms.filterRemove(room => room.room === r));
+	rpc.await(broadcastRoomAdd, true).then(room => rooms.push({room, [node]: roomFormatter(room)}));
+	rpc.await(broadcastRoomRemove, true).then(room => rooms.filterRemove(r => r.room === room));
 	rpc.await(broadcastAdminNone, true).then(() => adminChange.request(admin = ""));
 	rpc.await(broadcastAdmin, true).then((a: string) => adminChange.request(admin = a));
 	rpc.await(broadcastUserJoin, true).then((user: string) => users.push({user, [node]: userFormatter(user)}));
