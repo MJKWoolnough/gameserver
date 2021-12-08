@@ -270,7 +270,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		if c.room != nil {
-			c.server.removeRoom(c.room.Name)
+			if c.room.leave(c) {
+				c.server.removeRoom(c.room.Name)
+			}
 		}
 		c.room = nil
 		c.name = ""
