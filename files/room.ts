@@ -35,8 +35,7 @@ export const room = {} as {
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
 	setAtatus: (data: any) => Promise<void>;
-	toAdmin: (msg: any) => Promise<void>;
-	toUsers: (msg: any) => Promise<void>;
+	message: (msg: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	adminChange: (fn: (data: string) => void) => void;
 	username: () => string;
@@ -80,8 +79,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"leave": rpc.request.bind(rpc, "leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
 		"setStatus": rpc.request.bind(rpc, "setStatus"),
-		"toAdmin": rpc.request.bind(rpc, "toAdmin"),
-		"toUsers": rpc.request.bind(rpc, "toUsers"),
+		"message": rpc.request.bind(rpc, "message"),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
 		"username": () => username,
