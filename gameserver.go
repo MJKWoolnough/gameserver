@@ -20,6 +20,8 @@ func New(dataDir http.FileSystem) *http.ServeMux {
 	return m
 }
 
+var noData = json.RawMessage{'{', '}'}
+
 type conns map[*conn]struct{}
 
 type server struct {
@@ -135,7 +137,8 @@ func (r *room) leave(conn *conn) bool {
 	delete(r.users, conn)
 	if r.admin == conn {
 		r.admin = nil
-		broadcast(r.users, broadcastAdminNone, json.RawMessage{'0'})
+		r.status = noData
+		broadcast(r.users, broadcastAdminNone, noData)
 	} else if conn.name != "" {
 		broadcast(r.users, broadcastUserLeave, strconv.AppendQuote(json.RawMessage{}, conn.name))
 	}
