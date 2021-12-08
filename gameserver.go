@@ -290,6 +290,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if err := json.Unmarshal(data, &roomStatus); err != nil {
 			return nil, err
 		}
+		if len(roomStatus.Status) == 0 || roomStatus.Status[0] != '{' {
+			return nil, errInvalidStatus
+		}
 		c.server.mu.RLock()
 		defer c.server.mu.RUnlock()
 		c.mu.Lock()
@@ -302,11 +305,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room.admin != c {
 			return nil, errNotAdmin
 		}
-		if len(roomStatus.Status) == 0 {
-			c.room.status = noData
-		} else {
-			c.room.status = roomStatus.Status
-		}
+		c.room.status = roomStatus.Status
 		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
 		return nil, nil
 	case "message":
@@ -377,4 +376,5 @@ var (
 	errNotUser         = errors.New("not user")
 	errNotInRoom       = errors.New("not in room")
 	errNotAdmin        = errors.New("not admin")
+	errInvalidStatus   = errors.New("invalid status")
 )
