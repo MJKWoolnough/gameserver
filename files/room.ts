@@ -65,12 +65,13 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
 			admin = "";
-			return rpc.request("joinRoom", {room, user}).then(({"admin": a, "users": u}) => {
+			return rpc.request("joinRoom", {room, user}).then(({"admin": a, "users": u, status}) => {
 				admin = a;
 				username = user;
 				for (const user of u) {
 					users.push({user, [node]: userFormatter(user)});
 				}
+				return status;
 			});
 		},
 		"spectate": (room: string) => rpc.request("spectateRoom", room),
