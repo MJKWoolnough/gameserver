@@ -208,7 +208,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.name = names.User
 		c.room = newRoom(names.Room, c)
 		c.server.rooms[names.Room] = c.room
-		broadcast(c.server.conns, broadcastRoomAdd, data)
+		broadcast(c.server.conns, broadcastRoomAdd, strconv.AppendQuote(data[:0], names.Room))
 		return nil, nil
 	case "joinRoom":
 		var names roomUser
