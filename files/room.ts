@@ -76,7 +76,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				}
 			});
 		},
-		"spectate": () => rpc.request("spectateRoom"),
+		"spectate": (room: string) => rpc.request("spectateRoom", room),
 		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
 		"setStatus": (status: any) => rpc.request("setStatus", status),
