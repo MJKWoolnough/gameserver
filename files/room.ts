@@ -34,7 +34,7 @@ export const room = {} as {
 	spectate: (room: string) => Promise<any>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
-	setAtatus: (data: any) => Promise<void>;
+	setStatus: (data: any) => Promise<void>;
 	message: (msg: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	adminChange: (fn: (data: string) => void) => void;
