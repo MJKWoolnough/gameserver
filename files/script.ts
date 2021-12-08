@@ -1,8 +1,14 @@
 import {clearElement} from './lib/dom.js';
-import {createHTML, button, div, h1, input, label, li, span} from './lib/html.js';
-import {node, stringSort} from './lib/nodes.js';
+import {createHTML, button, div, h1, input, label, li, span, ul} from './lib/html.js';
+import {node, NodeArray, stringSort} from './lib/nodes.js';
 import {circle, ellipse, svg, symbol, title, use} from './lib/svg.js';
+import {games} from './games.js';
 import {room, ready} from './room.js';
+
+type GameNode = {
+	game: string;
+	[node]: HTMLLIElement;
+}
 
 const lobby = () => {
 	const rooms = room.rooms(),
@@ -39,7 +45,27 @@ const lobby = () => {
       },
       enterRoom = (status?: any) => {
 	if (status) {
+		const game = games.get(status.game);
+		if (game) {
+			game(false, status);
+		} else {
+			room.messageHandler(status => {
+				const game = games.get(status.game);
+				if (game) {
+					game(false, status);
+				}
+			});
+			createHTML(clearElement(document.body), h1("Waiting for Game"));
+		}
 	} else {
+		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a: GameNode, b: GameNode) => stringSort(a.game, b.game));
+		for (const [game, fn] of games) {
+			gameList.push({game, [node]: li(span({"onclick": () => fn(true)}, game))});
+		}
+		createHTML(clearElement(document.body), [
+			h1("Choose Game"),
+			gameList[node]
+		]);
 	}
       };
 
