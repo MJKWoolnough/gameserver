@@ -62,13 +62,13 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"rooms": () => rooms,
 		"users": () => users,
 		"new": (room: string, user: string) => {
-			admin = "";
+			admin = username = "";
 			users.splice(0, users.length);
 			return rpc.request("addRoom", {room, user}).then(() => {username = admin = user});
 		},
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
-			admin = "";
+			admin = username = "";
 			return rpc.request("joinRoom", {room, user}).then(({"admin": a, "users": u, status}) => {
 				admin = a;
 				username = user;
@@ -78,7 +78,11 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				return status;
 			});
 		},
-		"spectate": (room: string) => rpc.request("spectateRoom", room),
+		"spectate": (room: string) => {
+			users.splice(0, users.length);
+			admin =  username = "";
+			return rpc.request("spectateRoom", room)
+		},
 		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
 		"setStatus": (status: GameMessage) => rpc.request("setStatus", status),
