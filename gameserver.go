@@ -68,10 +68,11 @@ type conn struct {
 type room struct {
 	Name string
 
-	mu    sync.RWMutex
-	admin *conn
-	users conns
-	names map[string]*conn
+	mu     sync.RWMutex
+	status json.RawMessage
+	admin  *conn
+	users  conns
+	names  map[string]*conn
 }
 
 func newRoom(name string, admin *conn) *room {
@@ -80,10 +81,11 @@ func newRoom(name string, admin *conn) *room {
 		names[admin.name] = admin
 	}
 	return &room{
-		Name:  name,
-		admin: admin,
-		users: make(conns),
-		names: names,
+		Name:   name,
+		status: json.RawMessage{'{', '}'},
+		admin:  admin,
+		users:  make(conns),
+		names:  names,
 	}
 }
 
@@ -110,7 +112,7 @@ func (r *room) join(conn *conn) (json.RawMessage, error) {
 		}
 		data = strconv.AppendQuote(data, name)
 	}
-	data = append(strconv.AppendQuote(append(data, "],\"admin\":"...), adminName), '}')
+	data = append(append(append(strconv.AppendQuote(append(data, "],\"admin\":"...), adminName), ",\"status\":"...), r.status...), '}')
 	r.names[conn.name] = conn
 	r.users[r.admin] = struct{}{}
 	broadcast(r.users, broadcastUserJoin, strconv.AppendQuote(json.RawMessage{}, conn.name))
@@ -215,12 +217,12 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errUnknownRoom
 		}
 		c.name = names.User
-		nameJSON, err := room.join(c)
+		roomJSON, err := room.join(c)
 		if err != nil {
 			return nil, err
 		}
 		c.room = room
-		return nameJSON, nil
+		return roomJSON, nil
 	case "leaveRoom":
 		c.server.mu.Lock()
 		defer c.server.mu.Unlock()
@@ -265,6 +267,29 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		room.spectate(c)
 		c.room = room
+		return nil, nil
+	case "setStatus":
+		var roomStatus struct {
+			Room   string          `json:"room"`
+			Status json.RawMessage `json:"status"`
+		}
+		if err := json.Unmarshal(data, &roomStatus); err != nil {
+			return nil, err
+		}
+		c.server.mu.RLock()
+		defer c.server.mu.RUnlock()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		c.room.mu.Lock()
+		defer c.room.mu.Unlock()
+		if c.room.admin != c {
+			return nil, errNotAdmin
+		}
+		c.room.status = roomStatus.Status
+		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
 		return nil, nil
 	case "toAdmin":
 		c.mu.RLock()
