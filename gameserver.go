@@ -104,7 +104,7 @@ func (r *room) join(conn *conn) (json.RawMessage, error) {
 	}
 	var (
 		adminName string
-		data      = json.RawMessage{'{', 'u', 's', 'e', 'r', 's', ':', '['}
+		data      = json.RawMessage{'{', '"', 'u', 's', 'e', 'r', 's', '"', ':', '['}
 		first     = true
 	)
 	for name, c := range r.names {
