@@ -300,7 +300,11 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room.admin != c {
 			return nil, errNotAdmin
 		}
-		c.room.status = roomStatus.Status
+		if len(roomStatus.Status) == 0 {
+			c.room.status = noData
+		} else {
+			c.room.status = roomStatus.Status
+		}
 		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
 		return nil, nil
 	case "message":
