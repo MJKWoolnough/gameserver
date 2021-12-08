@@ -60,10 +60,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"new": (room: string, user: string) => {
 			admin = "";
 			users.splice(0, users.length);
-			return rpc.request("addRoom", {room, user}).then(() => {
-				rooms.push({room, [node]: roomFormatter(room)});
-				username = admin = user;
-			});
+			return rpc.request("addRoom", {room, user}).then(() => {username = admin = user});
 		},
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
