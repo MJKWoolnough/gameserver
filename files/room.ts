@@ -84,7 +84,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
 		"setStatus": (status: GameMessage) => rpc.request("setStatus", status),
-		"message": (message: GameMessage) => rpc.request("message", message),
+		"message": (message: any) => rpc.request("message", message),
 		"messageHandler": messages.responder.bind(messages),
 		"adminChange": adminChange.responder.bind(adminChange),
 		"username": () => username,
