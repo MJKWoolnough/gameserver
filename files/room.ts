@@ -38,7 +38,7 @@ export const room = {} as {
 	join: (room: string, user: string) => Promise<RoomEntry>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
-	setStatus: (data: GameMessage) => Promise<void>;
+	setStatus: <T extends GameMessage>(data: T) => Promise<void>;
 	message: (msg: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	username: () => string;
