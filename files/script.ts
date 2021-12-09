@@ -2,13 +2,14 @@ import {clearElement} from './lib/dom.js';
 import {createHTML, button, div, h1, input, label, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
 import {circle, ellipse, svg, symbol, title, use} from './lib/svg.js';
-import {games} from './games.js';
 import {room, ready} from './room.js';
 
 type GameNode = {
 	game: string;
 	[node]: HTMLLIElement;
 }
+
+export const games = new Map<string, (isAdmin: boolean, status?: Object) => void>();
 
 const lobby = () => {
 	const rooms = room.rooms(),
