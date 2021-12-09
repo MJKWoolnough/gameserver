@@ -16,7 +16,7 @@ const lobby = () => {
 	      username = input({"type": "text", "id": "username", "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
-	room.roomFormatter((r: string) => li({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r));
+	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r)));
 	createHTML(clearElement(document.body), [
 		h1("Game Server"),
 		label({"for": "username"}, "Username: "),
@@ -48,7 +48,7 @@ const lobby = () => {
 	} else {
 		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a: GameNode, b: GameNode) => stringSort(a.game, b.game));
 		for (const [game, fn] of games) {
-			gameList.push({game, [node]: li(span({"onclick": () => fn(true)}, game))});
+			gameList.push({game, [node]: li(button({"onclick": () => fn(true)}, game))});
 		}
 		createHTML(clearElement(document.body), [
 			h1("Choose Game"),

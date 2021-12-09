@@ -6,16 +6,24 @@ body {
 #roomList, #gameList {
 	padding: 0;
 	list-style: none;
+	display: grid;
+	grid-gap: 2px;
+	grid-template-columns: repeat(auto-fit, minmax(20em, 1fr))
 }
 
-:is(#roomList, #gameList) > li > span:hover {
-	background-color: #fff;
-	color: #000;
+:is(#roomList, #gameList) > li > button {
+	text-align: center;
+	height: 25vh;
+	width: 100%;
+	background-color: #080;
 	cursor: pointer;
+	border-color: #0a0;
+	font-size: 2vmax;
+	border-width: 1vmax;
 }
 
-#roomList > li > svg {
-	cursor: pointer;
+:is(#roomList, #gameList) > li > button:hover {
+	background-color: #090;
 }
 
 #error {
