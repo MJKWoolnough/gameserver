@@ -12,6 +12,10 @@ type GameNode = {
 export const becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin().then(enterRoom)}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 
 const lobby = () => {
+	if (Array.from(new URL(window.location + "").searchParams.keys()).some(k => k === "monitor")) {
+		room.join("default", "").then(enterRoom);
+		return;
+	}
 	const rooms = room.rooms(),
 	      username = input({"type": "text", "id": "username", "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
 	      error = span({"id": "error"});
