@@ -30,6 +30,19 @@ body {
 	color: #f00;
 }
 
+#roomList + button {
+	width: 100%;
+	height: 25vh;
+	background-color: #800;
+	border-color: #a00;
+	font-size: 2vmax;
+	border-width: 1vmax;
+}
+
+#roomList + button:hover {
+	background-color: #900;
+}
+
 #becomeAdmin {
 	position: absolute;
 	top: 0;
