@@ -25,3 +25,20 @@ body {
 #error {
 	color: #f00;
 }
+
+#becomeAdmin {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(63, 0, 0, 0.75);
+	cursor: pointer;
+	right: 0;
+	bottom: 0;
+}
+
+#becomeAdmin > h1 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
