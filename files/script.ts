@@ -2,6 +2,7 @@ import {clearElement} from './lib/dom.js';
 import {createHTML, button, div, h1, input, label, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
 import {circle, ellipse, svg, symbol, title, use} from './lib/svg.js';
+import games from './games.js';
 import {room, ready} from './room.js';
 
 type GameNode = {
@@ -9,8 +10,7 @@ type GameNode = {
 	[node]: HTMLLIElement;
 }
 
-export const games = new Map<string, (isAdmin: boolean, status?: Object) => void>(),
-       becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin().then(enterRoom)}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
+export const becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin().then(enterRoom)}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 
 const lobby = () => {
 	const rooms = room.rooms(),
