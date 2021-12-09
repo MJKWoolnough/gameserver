@@ -17,7 +17,7 @@ const lobby = () => {
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li([
 		span({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r),
-		svg({"style": "height: 1em; width: 2em", "onclick": () => room.spectate(r).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, use({"href": "#spectate"}))
+		svg({"style": "height: 1em; width: 2em", "onclick": () => room.join(r, "").then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, use({"href": "#spectate"}))
 	]));
 	createHTML(clearElement(document.body), [
 		svg({"style": "width: 0; height: 0"}, [

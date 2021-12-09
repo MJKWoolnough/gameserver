@@ -35,7 +35,6 @@ export const room = {} as {
 	users: () => NodeArray<UserNode>;
 	new: (room: string, user: string) => Promise<void>;
 	join: (room: string, user: string) => Promise<RoomEntry>;
-	spectate: (room: string) => Promise<any>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
 	setStatus: (data: GameMessage) => Promise<void>;
@@ -69,7 +68,11 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
 			admin = username = "";
-			return rpc.request("joinRoom", {room, user}).then(({"admin": a, "users": u, status}) => {
+			return rpc.request("joinRoom", {room, user}).then((resp: any) => {
+				if (!user) {
+					return resp;
+				}
+				const {"admin": a, "users": u, status} = resp;
 				admin = a;
 				username = user;
 				for (const user of u) {
@@ -77,11 +80,6 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				}
 				return status;
 			});
-		},
-		"spectate": (room: string) => {
-			users.splice(0, users.length);
-			admin =  username = "";
-			return rpc.request("spectateRoom", room)
 		},
 		"leave": () => rpc.request("leaveRoom"),
 		"makeAdmin": () => rpc.request("adminRoom").then(() => admin = username),
