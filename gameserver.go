@@ -269,15 +269,8 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		return nil, nil
 	case "setStatus":
-		var roomStatus struct {
-			Room   string          `json:"room"`
-			Status json.RawMessage `json:"status"`
-		}
-		if err := json.Unmarshal(data, &roomStatus); err != nil {
-			return nil, err
-		}
-		if len(roomStatus.Status) == 0 || roomStatus.Status[0] != '{' {
-			return nil, errInvalidStatus
+		if len(data) == 0 || data[0] != '{' {
+			data = noData
 		}
 		c.server.mu.RLock()
 		defer c.server.mu.RUnlock()
@@ -291,8 +284,8 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room.admin != c {
 			return nil, errNotAdmin
 		}
-		c.room.status = roomStatus.Status
-		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
+		c.room.status = data
+		broadcast(c.room.users, broadcastMessage, data)
 		return nil, nil
 	case "message":
 		if len(data) == 0 {
@@ -365,5 +358,4 @@ var (
 	errNotUser         = errors.New("not user")
 	errNotInRoom       = errors.New("not in room")
 	errNotAdmin        = errors.New("not admin")
-	errInvalidStatus   = errors.New("invalid status")
 )
