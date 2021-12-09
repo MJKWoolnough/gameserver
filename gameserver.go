@@ -230,7 +230,15 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errUnknownRoom
 		}
 		c.name = names.User
-		roomJSON, err := room.join(c)
+		var (
+			roomJSON json.RawMessage
+			err      error
+		)
+		if c.name == "" {
+			roomJSON = room.spectate(c)
+		} else {
+			roomJSON, err = room.join(c)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -260,28 +268,6 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, err
 		}
 		return nil, nil
-	case "spectateRoom":
-		var roomName string
-		if err := json.Unmarshal(data, &roomName); err != nil {
-			return nil, err
-		}
-		c.server.mu.RLock()
-		defer c.server.mu.RUnlock()
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if c.room != nil {
-			if c.room.leave(c) {
-				c.server.removeRoom(c.room.Name)
-			}
-		}
-		c.room = nil
-		c.name = ""
-		room, ok := c.server.rooms[roomName]
-		if !ok {
-			return nil, errUnknownRoom
-		}
-		c.room = room
-		return room.spectate(c), nil
 	case "setStatus":
 		var roomStatus struct {
 			Room   string          `json:"room"`
