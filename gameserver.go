@@ -295,6 +295,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		broadcast(c.room.users, broadcastMessage, roomStatus.Status)
 		return nil, nil
 	case "message":
+		if len(data) == 0 {
+			data = noData
+		}
 		c.mu.RLock()
 		defer c.mu.RUnlock()
 		if c.room == nil {
