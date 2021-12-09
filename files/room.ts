@@ -99,13 +99,17 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"userFormatter": (fn: (username: string) => HTMLLIElement) => {
 			userFormatter = fn;
 			for (const user of users) {
-				user[node] = fn(user.user);
+				const n = fn(user.user);
+				users[node].replaceChild(n, user[node]);
+				user[node] = n;
 			}
 		},
 		"roomFormatter": (fn: (room: string) => HTMLLIElement) => {
 			roomFormatter = fn;
 			for (const room of rooms) {
-				room[node] = fn(room.room);
+				const n = fn(room.room);
+				rooms[node].replaceChild(n, room[node]);
+				room[node] = n;
 			}
 		}
 	});
