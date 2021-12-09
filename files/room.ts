@@ -122,7 +122,9 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	rpc.await(broadcastRoomRemove, true).then(room => rooms.filterRemove(r => r.room === room));
 	rpc.await(broadcastAdminNone, true).then(() => {
 		admin = "";
-		createHTML(document.body, becomeAdmin);
+		if (username) {
+			createHTML(document.body, becomeAdmin);
+		}
 	});
 	rpc.await(broadcastAdmin, true).then((a: string) => {
 		becomeAdmin.remove();
