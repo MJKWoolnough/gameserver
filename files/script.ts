@@ -9,7 +9,8 @@ type GameNode = {
 	[node]: HTMLLIElement;
 }
 
-export const games = new Map<string, (isAdmin: boolean, status?: Object) => void>();
+export const games = new Map<string, (isAdmin: boolean, status?: Object) => void>(),
+       becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin().then(enterRoom)}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 
 const lobby = () => {
 	const rooms = room.rooms(),
