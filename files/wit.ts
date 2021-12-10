@@ -5,7 +5,7 @@ import {room} from './room.js';
 import {files} from './wit_data.js';
 
 const name = "What is That?",
-      boxes = Array.from({"length": 15}, (_, n) => (n + 1) * 5);
+      boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82];
 
 type Message = {
 	url: string;
