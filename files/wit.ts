@@ -25,11 +25,14 @@ games.set(name, (admin: boolean, status?: any) => {
 			      if (step === boxes.length) {
 				      data["title"] = shuffledFiles[image][0];
 			      }
+			      createHTML(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
 			      room.setStatus(data);
-		      };
+		      },
+		      progress = div({"style": "text-align: center; font-size: 2em"});
 		sendStatus();
 		createHTML(clearElement(document.body), [
 			h1({"style": "text-align: center"}, name),
+			progress,
 			button({"style": "width: 100%; background-color: #f80; height: 10vh; border-width: 1vmax; border-color: #f90; font-size: 2vmax", "onclick": () => {
 				image--;
 				step = 0;
