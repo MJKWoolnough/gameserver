@@ -52,7 +52,7 @@ games.set(name, (admin: boolean, status?: any) => {
 	} else {
 		const title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}}),
 		      mh = (message: Message) => {
-			const c = canvas({"style": {"width": "100%", "image-rendering": "pixelated"}}),
+			const c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}}),
 			      ctx = c.getContext("2d")!;
 			img({"src": message.url, "onload": function(this: HTMLImageElement) {
 				const {naturalWidth: width, naturalHeight: height} = this;
@@ -65,7 +65,7 @@ games.set(name, (admin: boolean, status?: any) => {
 					ctx.drawImage(this, 0, 0, c.width = width / factor, c.height = height / factor);
 				}
 			}});
-			createHTML(clearElement(document.body), {"style": "cursor: none; margin: 0"}, div({"style": "width: 100%; height: 100%; display: flex; align-items: center; justify-content: center"}, c));
+			createHTML(clearElement(document.body), {"style": "cursor: none; margin: 0"}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
 		      };
 		room.messageHandler(mh);
 		mh(status);
