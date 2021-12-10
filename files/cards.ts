@@ -11,6 +11,7 @@ export const cards = svg({"style": "width: 0; height: 0"}, [
 		[
 			"M10,76 v-2.5 l25,-64 l25,64 v2.5 M22,50 h26",
 			"M58,76 h-35 q-6,0 -6,-6 c0,-20 35,-20 35,-35 a4,5 0,0,0 -35,-5 v1",
+			"M20,27 c0,-25 35,-25 35,0 q0,15 -20,15 q20,0 20,15 c0,25 -35,25 -35,0",
 		].map((d, n) => path({d, "id": `num_${n+1}`, "stroke": "#000", "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"}))
 	])
 ]),
