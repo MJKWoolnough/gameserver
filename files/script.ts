@@ -22,7 +22,7 @@ const lobby = () => {
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r)));
-	createHTML(clearElement(document.body), [
+	createHTML(clearElement(document.body), {"style": "margin: 0"}, [
 		h1("Game Server"),
 		label({"for": "username"}, "Username: "),
 		username,
