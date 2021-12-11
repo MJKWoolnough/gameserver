@@ -40,6 +40,7 @@ export const room = {} as {
 	makeAdmin: () => Promise<void>;
 	setStatus: <T extends GameMessage>(data: T) => Promise<void>;
 	message: (msg: any) => Promise<void>;
+	messageTo: (user: string, message: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
 	username: () => string;
 	userFormatter: (fn: (username: string) => HTMLLIElement) => void;
@@ -94,6 +95,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}),
 		"setStatus": (status: GameMessage) => rpc.request("setStatus", status),
 		"message": (message: any) => rpc.request("message", message),
+		"messageTo": (to: string, message: any) => rpc.request("messageTo", {to, message}),
 		"messageHandler": messages.responder.bind(messages),
 		"username": () => username,
 		"userFormatter": (fn: (username: string) => HTMLLIElement) => {
