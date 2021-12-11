@@ -1,5 +1,5 @@
 import {clearElement} from './lib/dom.js';
-import {createHTML, button, div, h1, input, label, li, span, ul} from './lib/html.js';
+import {createHTML, button, div, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
 import games from './games.js';
 import {room, ready} from './room.js';
@@ -18,13 +18,12 @@ const lobby = () => {
 		return;
 	}
 	const rooms = room.rooms(),
-	      username = input({"type": "text", "id": "username", "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
+	      username = input({"type": "text", "placeholder": "Spectate or Enter Username Here", "style": "font-size: 3em; width: 100%", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r)));
 	createHTML(clearElement(document.body), {"style": "margin: 0"}, [
 		h1("Game Server"),
-		label({"for": "username"}, "Username: "),
 		username,
 		error,
 		createHTML(rooms[node], {"id": "roomList"}),
