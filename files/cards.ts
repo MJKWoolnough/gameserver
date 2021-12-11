@@ -43,4 +43,5 @@ cards = svg({"style": "width: 0; height: 0"}, [
 		})
 	])
 ]),
-cardSymbol = (id: number) => svg({"viewBox": "0 0 250 350"}, use({"href": "#card_" + id}));
+cardSymbol = (id: number) => svg({"viewBox": "0 0 250 350"}, use({"href": "#card_" + id})),
+cardBack = () => svg({"viewBox": "0 0 250 350"}, use({"href": "#cardBack"}));
