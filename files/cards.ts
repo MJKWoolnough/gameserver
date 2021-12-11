@@ -1,5 +1,5 @@
 import type {Props} from './lib/dom.js';
-import {defs, path, svg, use} from './lib/svg.js';
+import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
 export const cards = svg({"style": "width: 0; height: 0"}, [
 	defs([
@@ -21,7 +21,13 @@ export const cards = svg({"style": "width: 0; height: 0"}, [
 			"M25,8 h40 M45,8 v50 a1,1 0,0,1 -30,0",
 			"M36,10 a3,4 0,0,0 0,64 a3,4 0,0,0 0,-64 M36,48 c10,0 20,25 30,25",
 			"M20,5 v75 M20,48 l33,-39 v-4 M30,42 l25,33 v4"
-		].map((d, n) => path({d, "id": `num_${n+1}`, "stroke": "#000", "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"}))
+		].map((d, n) => path({d, "id": `num_${n+1}`, "stroke": "#000", "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"})),
+		rect({"id": "card", "width": 250, "height": 350, "rx": 15, "fill": "#fff", "stroke": "#000"}),
+		pattern({"id": "backPattern", "patternUnits": "userSpaceOnUse", "width": 10, "height": 10}, path({"d": "M0,0 l10,10 M10,0 l-10,10", "stroke": "#f00", "fill": "none"})),
+		g({"id": "cardBack"}, [
+			use({"href": "#card"}),
+			rect({"x": 10, "y": 10, "width": 230, "height": 330, "fill": "url(#backPattern)", "stroke": "#f00"})
+		]),
 	])
 ]),
 cardSymbol = (props: Props = {}, id: number) => svg(props, use({"href": "#card_" + id})),
