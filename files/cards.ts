@@ -44,4 +44,8 @@ cards = svg({"style": "width: 0; height: 0"}, [
 	])
 ]),
 cardSymbol = (id: number) => svg({"viewBox": "0 0 250 350"}, use({"href": "#card_" + id})),
-cardBack = () => svg({"viewBox": "0 0 250 350"}, use({"href": "#cardBack"}));
+cardBack = () => svg({"viewBox": "0 0 250 350"}, use({"href": "#cardBack"})),
+shuffledDeck = (n = 1) => {
+	const deck = Array.from({length: Math.floor(n) * 52}, (_, n) => n % 52);
+	return Array.from({"length": deck.length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]) as number[];
+};
