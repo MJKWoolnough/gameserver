@@ -1,7 +1,8 @@
 import type {Props} from './lib/dom.js';
 import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
-export const cards = svg({"style": "width: 0; height: 0"}, [
+export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
+cards = svg({"style": "width: 0; height: 0"}, [
 	defs([
 		path({"id": "suit_0", "d": "M37,0 l32,42 -32,42 -32,-42 z", "fill": "#f00"}),
 		path({"id": "suit_1", "d": "M25,84 q10,-10 7,-20 c-25,10 -32,-5 -32,-13 0,-20 20,-20 22,-17 -10,-10 0,-28 14,-28 14,0 24,18 14,28 2,-3 22,-3 22,17 0,8 -7,23 -32,13 q-3,10 7,20 z", "fill": "#000"}),
@@ -21,7 +22,7 @@ export const cards = svg({"style": "width: 0; height: 0"}, [
 			"M25,8 h40 M45,8 v50 a1,1 0,0,1 -30,0",
 			"M36,10 a3,4 0,0,0 0,64 a3,4 0,0,0 0,-64 M36,48 c10,0 20,25 30,25",
 			"M20,5 v75 M20,48 l33,-39 v-4 M30,42 l25,33 v4"
-		].map((d, n) => path({d, "id": `num_${n+1}`, "stroke": "#000", "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"})),
+		].map((d, n) => path({d, "id": `num_${n}`, "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"})),
 		rect({"id": "card", "width": 250, "height": 350, "rx": 15, "fill": "#fff", "stroke": "#000"}),
 		pattern({"id": "backPattern", "patternUnits": "userSpaceOnUse", "width": 10, "height": 10}, path({"d": "M0,0 l10,10 M10,0 l-10,10", "stroke": "#f00", "fill": "none"})),
 		g({"id": "cardBack"}, [
@@ -30,5 +31,4 @@ export const cards = svg({"style": "width: 0; height: 0"}, [
 		]),
 	])
 ]),
-cardSymbol = (props: Props = {}, id: number) => svg(props, use({"href": "#card_" + id})),
-cardSuitNum = (id: number) => [id / 4, id % 13] as const;
+cardSymbol = (props: Props = {}, id: number) => svg(props, use({"href": "#card_" + id}));
