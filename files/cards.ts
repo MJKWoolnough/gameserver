@@ -1,6 +1,8 @@
 import type {Props} from './lib/dom.js';
 import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
+const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40], [100, 145], [100, 250]], [[60, 40], [60, 250], [140, 40], [140, 250]], [[60, 40], [60, 250], [140, 40], [140, 250], [100, 145]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250], [100, 92.5]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75], [100, 215]]];
+
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
 cards = svg({"style": "width: 0; height: 0"}, [
 	defs([
@@ -29,6 +31,17 @@ cards = svg({"style": "width: 0; height: 0"}, [
 			use({"href": "#card"}),
 			rect({"x": 10, "y": 10, "width": 230, "height": 330, "fill": "url(#backPattern)", "stroke": "#f00"})
 		]),
+		Array.from({"length": 52}, (_, n) => {
+			const [suit, num] = cardSuitNum(n);
+			return g({"id": `card_${n}`}, [
+				use({"href": "#card"}),
+				use({"href": `#num_${num}`, "transform": "translate(2, 10) scale(0.5)", "stroke": suit % 2 === 0 ? "#f00" : "#000"}),
+				use({"href": `#num_${num}`, "transform": "rotate(180, 125, 175) translate(2, 10) scale(0.5)", "stroke": suit % 2 === 0 ? "#f00" : "#000"}),
+				use({"href": `#suit_${suit}`, "transform": "translate(6, 55) scale(0.4)"}),
+				use({"href": `#suit_${suit}`, "transform": "rotate(180, 125, 175) translate(6, 55) scale(0.4)"}),
+				num === 0 ? use({"href": `#suit_${suit}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#suit_${suit}`, "transform": `scale(0.7) translate(${(placement[0] + (placement[1] > 175 ? 1 : 0)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#num_${num}`, "transform": "translate(53, 91) scale(2)", "stroke": suit % 2 === 0 ? "#f00" : "#000"})
+			]);
+		})
 	])
 ]),
 cardSymbol = (props: Props = {}, id: number) => svg(props, use({"href": "#card_" + id}));
