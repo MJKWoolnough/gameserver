@@ -306,6 +306,30 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, errNotUser
 		}
 		return nil, nil
+	case "messageTo":
+		var messageTo struct {
+			To      string          `json:"to"`
+			Message json.RawMessage `json:"message"`
+		}
+		if err := json.Unmarshal(data, &messageTo); err != nil {
+			return nil, err
+		}
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+		if c.room == nil {
+			return nil, errNotInRoom
+		}
+		c.room.mu.RLock()
+		defer c.room.mu.RUnlock()
+		if c.room.admin != c {
+			return nil, errNotAdmin
+		}
+		userConn, ok := c.room.names[messageTo.To]
+		if !ok {
+			return nil, errNoUser
+		}
+		userConn.rpc.SendData(buildBroadcast(broadcastMessage, messageTo.Message))
+		return nil, nil
 	}
 	return nil, errUnknownEndpoint
 }
@@ -358,4 +382,5 @@ var (
 	errNotUser         = errors.New("not user")
 	errNotInRoom       = errors.New("not in room")
 	errNotAdmin        = errors.New("not admin")
+	errNoUser          = errors.New("no user")
 )
