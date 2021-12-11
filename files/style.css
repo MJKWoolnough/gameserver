@@ -18,7 +18,7 @@ body {
 	background-color: #080;
 	cursor: pointer;
 	border-color: #0a0;
-	font-size: 2vmax;
+	font-size: 3em;
 	border-width: 1vmax;
 }
 
@@ -35,7 +35,7 @@ body {
 	height: 25vh;
 	background-color: #800;
 	border-color: #a00;
-	font-size: 2vmax;
+	font-size: 3em;
 	border-width: 1vmax;
 }
 
