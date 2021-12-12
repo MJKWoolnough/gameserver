@@ -3,6 +3,10 @@ body {
 	background-color: #000;
 }
 
+input::placeholder {
+	text-align: center;
+}
+
 #roomList, #gameList {
 	padding: 0;
 	list-style: none;
