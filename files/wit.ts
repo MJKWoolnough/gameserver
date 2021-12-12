@@ -28,7 +28,7 @@ games.set(name, (admin: boolean, status?: any) => {
 			      createHTML(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
 			      room.setStatus(data);
 		      },
-		      progress = div({"style": "text-align: center; font-size: 2em"});
+		      progress = div({"style": {"text-align": "center", "font-size": "2em"}});
 		sendStatus();
 		createHTML(clearElement(document.body), [
 			h1({"style": "text-align: center"}, name),
@@ -68,7 +68,7 @@ games.set(name, (admin: boolean, status?: any) => {
 					ctx.drawImage(this, 0, 0, c.width = width / factor, c.height = height / factor);
 				}
 			}});
-			createHTML(clearElement(document.body), {"style": "cursor: none; margin: 0"}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
+			createHTML(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
 		      };
 		room.messageHandler(mh);
 		mh(status);
