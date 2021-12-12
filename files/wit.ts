@@ -33,20 +33,20 @@ games.set(name, (admin: boolean, status?: any) => {
 		createHTML(clearElement(document.body), [
 			h1({"style": "text-align: center"}, name),
 			progress,
-			button({"style": "width: 100%; background-color: #f80; height: 10vh; border-width: 1vmax; border-color: #f90; font-size: 2vmax", "onclick": () => {
+			button({"class": "witButton", "onclick": () => {
 				image--;
 				step = 0;
 				sendStatus();
 			}}, "Previous Image"),
-			button({"style": "width: 50%; background-color: #aa0; height: 40vh; border-width: 1vmax; border-color: #bb0; font-size: 2vmax", "onclick": () => {
+			button({"class": "witButton big", "onclick": () => {
 				step--;
 				sendStatus();
 			}}, "Previous Step"),
-			button({"style": "width: 50%; background-color: #08f; height: 40vh; border-width: 1vmax; border-color: #09f; font-size: 2vmax", "onclick": () => {
+			button({"class": "witButton big", "onclick": () => {
 				step++;
 				sendStatus();
 			}}, "Next Step"),
-			button({"style": "width: 100%; background-color: #080; height: 10vh; border-width: 1vmax; border-color: #090; font-size: 2vmax", "onclick": () => {
+			button({"class": "witButton", "onclick": () => {
 				image++;
 				step = 0;
 				sendStatus();
