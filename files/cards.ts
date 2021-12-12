@@ -4,7 +4,7 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
       viewBox = "0 0 250 350";
 
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
-cards = svg({"style": "width: 0; height: 0"}, [
+cards = svg({"style": {"width": 0, "height": 0}}, [
 	defs([
 		[
 			"M37,0 l32,42 -32,42 -32,-42 z",
