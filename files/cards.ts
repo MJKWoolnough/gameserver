@@ -113,7 +113,8 @@ best5Hand = (cards: number[]) => {
 	for (let n = 0; n < 10; n++) {
 		let count = 0;
 		for (let i = 0; i < 5; i++) {
-			count += +myCards.has(nums[n + i]);
+			const num = nums[n + i];
+			count += +(myCards.has(num) || myCards.has(num + 13) || myCards.has(num + 26) || myCards.has(num + 39));
 		}
 		if (count === 5) {
 			return  [4, nums[n] || 13]; // Straight
