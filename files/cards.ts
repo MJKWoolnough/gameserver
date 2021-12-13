@@ -3,6 +3,21 @@ import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40], [100, 145], [100, 250]], [[60, 40], [60, 250], [140, 40], [140, 250]], [[60, 40], [60, 250], [140, 40], [140, 250], [100, 145]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250], [100, 92.5]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75], [100, 215]]],
       numNames = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"],
       plural = (n: number) => numNames[n] + (n === 5 ? "e": "") + "s",
+      highest = (nums: number[], n: number) => {
+	const toRet: number[] = [];
+	while (toRet.length < n) {
+		const c = nums.pop();
+		if (c === undefined) {
+			break;
+		}
+		if (c > 0) {
+			while (toRet.length < n) {
+				toRet.push(c + 1);
+			}
+		}
+	}
+	return toRet;
+      },
       viewBox = "0 0 250 350";
 
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
@@ -97,26 +112,26 @@ best5Hand = (cards: number[]) => {
 		s = 13;
 	}
 	if (s !== -1 && f !== -1) {
-		return `${foak === 13 ? "Royal" : numNames[s]}-high Straight Flush`;
+		return [8, s];
 	} else if (foak !== -1) {
-		return `Four ${plural(foak)})`;
+		return [7, foak, ...highest(nums, 1)];
 	} else if (toak !== -1 && p !== -1) {
-		return `Full House, ${plural(toak)} full of ${plural(tp !== -1 ? tp : p)}`;
+		return [6, toak, tp !== -1 ? tp : p];
 	} else if (f !== -1) {
-		return `${numNames[f]}-High Flush`;
+		return [5, f];
 	} else if (s !== -1) {
-		return `${numNames[s]}-High Straight`;
+		return [4, s];
 	} else if (toak !== -1) {
-		return `Three ${plural(toak)}`;
+		return [3, toak, ...highest(nums, 2)];
 	} else if (tp !== -1) {
 		if (p === 0) {
 			p = tp;
 			tp = 0;
 		}
-		return `Two Pair, ${plural(tp)} over ${plural(p)}`;
+		return [2, tp, p, ...highest(nums, 1)];
 	} else if (p !== -1) {
-		return `Pair of ${plural(p)}`;
+		return [1, p, ...highest(nums, 3)];
 	} else {
-		return "High Card";
+		return [0, ...highest(nums, 5)];
 	}
 };
