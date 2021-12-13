@@ -175,9 +175,9 @@ win2String = (hand: number[]) => {
 	case 3:
 		return `Trip ${plural(hand[1])}`;
 	case 4:
-		return `${numNames[hand[1]]}-high Straight`;
+		return `${numNames[hand[1]]}-High Straight`;
 	case 5:
-		return "Flush";
+		return `${numNames[hand[1]]}-High Flush`;
 	case 6:
 		return `Full House, ${plural(hand[1])} over ${plural(hand[2])}`;
 	case 7:
