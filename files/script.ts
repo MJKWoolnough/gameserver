@@ -3,6 +3,7 @@ import {createHTML, button, div, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
 import games from './games.js';
 import {room, ready} from './room.js';
+import './holdem.js';
 import './wit.js';
 
 type GameNode = {
