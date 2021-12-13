@@ -107,7 +107,14 @@ best5Hand = (cards: number[]) => {
 			count += +myCards.has(base + n);
 		}
 		if (count >= 5) {
-			return [5]; // Flush
+			const min = s * 13,
+			      max = (s + 1) * 13;
+			for (const c of myCards) {
+				if (c < min || c >= max) {
+					myCards.delete(c);
+				}
+			}
+			return [5, ...highest(myCards, 5)]; // Flush
 		}
 	}
 	for (let n = 0; n < 10; n++) {
