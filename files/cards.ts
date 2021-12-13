@@ -155,4 +155,27 @@ best5Hand = (cards: number[]) => {
 		}
 	}
 	return [0, ...highest(myCards, 5)];
+},
+win2String = (hand: number[]) => {
+	switch (hand[0]) {
+	case 0:
+		return `${numNames[hand[1]]} High Card`;
+	case 1:
+		return `Pair of ${plural(hand[1])}`;
+	case 2:
+		return `Two Pair, ${plural(hand[1])} over ${plural(hand[2])}`;
+	case 3:
+		return `Trip ${plural(hand[1])}`;
+	case 4:
+		return `${numNames[hand[1]]}-high Straight`;
+	case 5:
+		return "Flush";
+	case 6:
+		return `Full House, ${plural(hand[1])} over ${plural(hand[2])}`;
+	case 7:
+		return `Quad ${plural(hand[1])}`;
+	case 8:
+		return `${hand[1] === 13 ? "Royal" : `${numNames[hand[1]]}-High Straight`} Flush`;
+	}
+	return "";
 };
