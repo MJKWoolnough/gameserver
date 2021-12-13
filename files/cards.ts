@@ -1,23 +1,21 @@
 import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
 const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40], [100, 145], [100, 250]], [[60, 40], [60, 250], [140, 40], [140, 250]], [[60, 40], [60, 250], [140, 40], [140, 250], [100, 145]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250], [100, 92.5]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75], [100, 215]]],
+      nums = [0, 12, 11, 10, 9, 8 ,7, 6, 5, 4, 3, 2, 1, 0],
       numNames = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"],
-      plural = (n: number) => numNames[n] + (n === 5 ? "e": "") + "s",
-      highest = (nums: number[], n: number) => {
+      highest = (myCards: Set<number>, n: number) => {
 	const toRet: number[] = [];
-	while (toRet.length < n) {
-		const c = nums.pop();
-		if (c === undefined) {
-			break;
+	for (const num of nums) {
+		for (let total = +myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39); toRet.length < n && total > 0; total--) {
+			toRet.push(num || 13);
 		}
-		if (c > 0) {
-			while (toRet.length < n) {
-				toRet.push(c + 1);
-			}
+		if (toRet.length >= n) {
+			break;
 		}
 	}
 	return toRet;
       },
+      plural = (n: number) => numNames[n] + (n === 5 ? "es": "s"),
       viewBox = "0 0 250 350";
 
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
@@ -71,68 +69,90 @@ shuffledDeck = (n = 1): number[] => {
 	return Array.from({length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]);
 },
 best5Hand = (cards: number[]) => {
-	const nums = Array.from({"length": 14}, () => 0),
-	      suits = Array.from({"length": 4}, () => 0);
-	let foak = -1, toak = -1, p = -1, tp = -1, s = -1, f = -1, l = 0;
-	for (const card of cards) {
-		const [suit, num] = cardSuitNum(card);
-		nums[num || 13]++;
-		suits[suit]++;
-		if (suits[suit] === 5) {
-			f = suit;
-		}
-	}
-	l = nums[13] > 0 ? 1 : 0;
-	for (let i = 1; i < 14; i++) {
-		l++;
-		switch (nums[i]) {
-		case 0:
-			l = 0;
-			break;
-		case 2:
-			if (p === -1) {
-				p = i;
-			} else if (tp === -1) {
-				tp = i;
-			} else {
-				p = tp;
-				tp = i;
+	const myCards = new Set(cards);
+	SF:
+	for (let n = 0; n < 10; n++) {
+		for (let s = 0; s < 4; s++) {
+			const base = 13 * s;
+			for (let i = 0; i < 5; i++) {
+				if (!myCards.has(base + nums[n + i])) {
+					continue SF;
+				}
 			}
-			break;
-		case 3:
-			toak = i;
-			break;
-		case 4:
-			foak = i;
-		}
-		if (l >= 5) {
-			s = i;
+			return [8, nums[n] || 13]; // Straight Flush
 		}
 	}
-	if (l >= 4 && nums[0]) {
-		s = 13;
-	}
-	if (s !== -1 && f !== -1) {
-		return [8, s];
-	} else if (foak !== -1) {
-		return [7, foak, ...highest(nums, 1)];
-	} else if (toak !== -1 && p !== -1) {
-		return [6, toak, tp !== -1 ? tp : p];
-	} else if (f !== -1) {
-		return [5, f];
-	} else if (s !== -1) {
-		return [4, s];
-	} else if (toak !== -1) {
-		return [3, toak, ...highest(nums, 2)];
-	} else if (tp !== -1) {
-		if (p === 0) {
-			p = tp;
-			tp = 0;
+	for (const num of nums) {
+		if (myCards.has(num) && myCards.has(num + 13) && myCards.has(num + 26) && myCards.has(num + 39)) {
+			myCards.delete(num);
+			myCards.delete(num + 13);
+			myCards.delete(num + 26);
+			myCards.delete(num + 39);
+			return [7, num || 13, ...highest(myCards, 1)]; // Four of a Kind
 		}
-		return [2, tp, p, ...highest(nums, 1)];
-	} else if (p !== -1) {
-		return [1, p, ...highest(nums, 3)];
-	} else {
-		return [0, ...highest(nums, 5)];
 	}
+	for (const anum of nums) {
+		if (+myCards.has(anum) + +myCards.has(anum + 13) + +myCards.has(anum + 26) + +myCards.has(anum + 39) === 3) {
+			for (const bnum of nums) {
+				if (+myCards.has(bnum) + +myCards.has(bnum + 13) + +myCards.has(bnum + 26) + +myCards.has(bnum + 39) === 2) {
+					return [6, anum, bnum]; // Full House
+				}
+			}
+		}
+	}
+	for (let s = 0; s < 4; s++) {
+		const base = 13 * s;
+		let count = 0;
+		for (let n = 0; n < 13; n++) {
+			count += +myCards.has(base + n);
+		}
+		if (count >= 5) {
+			return [5]; // Flush
+		}
+	}
+	for (let n = 0; n < 10; n++) {
+		let count = 0;
+		for (let i = 0; i < 5; i++) {
+			count += +myCards.has(nums[n + i]);
+		}
+		if (count === 5) {
+			return  [4, nums[n] || 13]; // Straight
+		}
+	}
+	for (const num of nums) {
+		if (+myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39) === 3) {
+			myCards.delete(num);
+			myCards.delete(num + 13);
+			myCards.delete(num + 26);
+			myCards.delete(num + 39);
+			return [3, num || 13, ...highest(myCards, 2)]; // Three of a Kind
+		}
+	}
+	for (const anum of nums) {
+		if (+myCards.has(anum) + +myCards.has(anum + 13) + +myCards.has(anum + 26) + +myCards.has(anum + 39) === 2) {
+			for (const bnum of nums) {
+				if (anum !== bnum && +myCards.has(bnum) + +myCards.has(bnum + 13) + +myCards.has(bnum + 26) + +myCards.has(bnum + 39) === 2) {
+					myCards.delete(anum);
+					myCards.delete(anum + 13);
+					myCards.delete(anum + 26);
+					myCards.delete(anum + 39);
+					myCards.delete(bnum);
+					myCards.delete(bnum + 13);
+					myCards.delete(bnum + 26);
+					myCards.delete(bnum + 39);
+					return [2, anum || 13, bnum || 13, ...highest(myCards, 1)]; // Two-Pair
+				}
+			}
+		}
+	}
+	for (const num of nums) {
+		if (+myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39) === 2) {
+			myCards.delete(num);
+			myCards.delete(num + 13);
+			myCards.delete(num + 26);
+			myCards.delete(num + 39);
+			return [1, num || 13, ...highest(myCards, 3)]; // Pair
+		}
+	}
+	return [0, ...highest(myCards, 5)];
 };
