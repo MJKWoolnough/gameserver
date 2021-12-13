@@ -1,6 +1,8 @@
 import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
 const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40], [100, 145], [100, 250]], [[60, 40], [60, 250], [140, 40], [140, 250]], [[60, 40], [60, 250], [140, 40], [140, 250], [100, 145]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250], [100, 92.5]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75], [100, 215]]],
+      numNames = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"],
+      plural = (n: number) => numNames[n] + (n === 5 ? "e": "") + "s",
       viewBox = "0 0 250 350";
 
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
@@ -52,4 +54,69 @@ shuffledDeck = (n = 1): number[] => {
 	const length = Math.floor(n) * 52,
 	      deck = Array.from({length}, (_, n) => n % 52);
 	return Array.from({length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]);
+},
+best5Hand = (cards: number[]) => {
+	const nums = Array.from({"length": 13}, () => 0),
+	      suits = Array.from({"length": 4}, () => 0);
+	let foak = -1, toak = -1, p = -1, tp = -1, s = -1, f = -1, l = 0;
+	for (const card of cards) {
+		const [suit, num] = cardSuitNum(card);
+		nums[num]++;
+		suits[suit]++;
+		if (suits[suit] === 5) {
+			f = suit;
+		}
+	}
+	for (let i = 0; i < 13; i++) {
+		l++;
+		switch (nums[i]) {
+		case 0:
+			l = 0;
+			break;
+		case 2:
+			if (p === -1) {
+				p = i;
+			} else if (tp === -1) {
+				tp = i;
+			} else {
+				p = tp;
+				tp = i;
+			}
+			break;
+		case 3:
+			toak = i;
+			break;
+		case 4:
+			foak = i;
+		}
+		if (l >= 5) {
+			s = i;
+		}
+	}
+	if (l >= 4 && nums[0]) {
+		s = 13;
+	}
+	if (s !== -1 && f !== -1) {
+		return `${foak === 13 ? "Royal" : numNames[s]}-high Straight Flush`;
+	} else if (foak !== -1) {
+		return `Four ${plural(foak)})`;
+	} else if (toak !== -1 && p !== -1) {
+		return `Full House, ${plural(toak)} full of ${plural(tp !== -1 ? tp : p)}`;
+	} else if (f !== -1) {
+		return `${numNames[f]}-High Flush`;
+	} else if (s !== -1) {
+		return `${numNames[s]}-High Straight`;
+	} else if (toak !== -1) {
+		return `Three ${plural(toak)}`;
+	} else if (tp !== -1) {
+		if (p === 0) {
+			p = tp;
+			tp = 0;
+		}
+		return `Two Pair, ${plural(tp)} over ${plural(p)}`;
+	} else if (p !== -1) {
+		return `Pair of ${plural(p)}`;
+	} else {
+		return "High Card";
+	}
 };
