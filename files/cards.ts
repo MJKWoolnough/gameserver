@@ -71,18 +71,19 @@ shuffledDeck = (n = 1): number[] => {
 	return Array.from({length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]);
 },
 best5Hand = (cards: number[]) => {
-	const nums = Array.from({"length": 13}, () => 0),
+	const nums = Array.from({"length": 14}, () => 0),
 	      suits = Array.from({"length": 4}, () => 0);
 	let foak = -1, toak = -1, p = -1, tp = -1, s = -1, f = -1, l = 0;
 	for (const card of cards) {
 		const [suit, num] = cardSuitNum(card);
-		nums[num]++;
+		nums[num || 13]++;
 		suits[suit]++;
 		if (suits[suit] === 5) {
 			f = suit;
 		}
 	}
-	for (let i = 0; i < 13; i++) {
+	l = nums[13] > 0 ? 1 : 0;
+	for (let i = 1; i < 14; i++) {
 		l++;
 		switch (nums[i]) {
 		case 0:
