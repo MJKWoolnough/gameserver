@@ -23,6 +23,10 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
 	}
       };
 
+type Cards = number[];
+
+type Win = [0 | 5, number, number, number, number, number] | [1, number, number, number, number] | [2 | 3, number, number, number] | [4 | 8, number] | [6 | 7, number, number];
+
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
 cards = svg({"style": {"width": 0, "height": 0}}, [
 	defs([
@@ -73,7 +77,7 @@ shuffledDeck = (n = 1): number[] => {
 	      deck = Array.from({length}, (_, n) => n % 52);
 	return Array.from({length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]);
 },
-best5Hand = (cards: number[]) => {
+best5Hand = (cards: Cards): Win => {
 	const myCards = new Set(cards);
 	SF:
 	for (let n = 0; n < 10; n++) {
@@ -105,7 +109,7 @@ best5Hand = (cards: number[]) => {
 			break;
 		case 4:
 			removeCards(myCards, num);
-			return [7, num || 13, ...highest(myCards, 1)]; // Four of a Kind
+			return [7, num || 13, highest(myCards, 1)[0]]; // Four of a Kind
 		}
 	}
 	if (trip >= 0 && p >= 0) {
@@ -125,7 +129,7 @@ best5Hand = (cards: number[]) => {
 					myCards.delete(c);
 				}
 			}
-			return [5, ...highest(myCards, 5)]; // Flush
+			return [5, ...highest(myCards, 5)] as Win; // Flush
 		}
 	}
 	for (let n = 0; n < 10; n++) {
@@ -140,19 +144,19 @@ best5Hand = (cards: number[]) => {
 	}
 	if (trip >= 0) {
 		removeCards(myCards, trip);
-		return [3, trip || 13, ...highest(myCards, 2)]; // Three of a Kind
+		return [3, trip || 13, ...highest(myCards, 2)] as Win; // Three of a Kind
 	}
 	if (p >= 0) {
 		removeCards(myCards, p);
 		if (tp >= 0) {
 			removeCards(myCards, tp);
-			return [2, p || 13, tp || 13, ...highest(myCards, 1)]; // Two-Pair
+			return [2, p || 13, tp || 13, highest(myCards, 1)[0]]; // Two-Pair
 		}
-		return [1, p || 13, ...highest(myCards, 3)]; // Pair
+		return [1, p || 13, ...highest(myCards, 3)] as Win; // Pair
 	}
-	return [0, ...highest(myCards, 5)];
+	return [0, ...highest(myCards, 5)] as Win;
 },
-win2String = (hand: number[]) => {
+win2String = (hand: Win) => {
 	switch (hand[0]) {
 	case 0:
 		return `${numNames[hand[1]]} High Card`;
@@ -175,7 +179,7 @@ win2String = (hand: number[]) => {
 	}
 	return "";
 },
-sortHands = (hands: number[][]) => hands.sort((a: number[], b: number[]) => {
+sortHands = (hands: Win[]) => hands.sort((a: Win, b: Win) => {
 	for (let i = 0; i < a.length; i++) {
 		const c = b[i] - a[i];
 		if (c === 0) {
