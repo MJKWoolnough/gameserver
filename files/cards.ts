@@ -18,7 +18,7 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
       plural = (n: number) => numNames[n] + (n === 5 ? "es": "s"),
       viewBox = "0 0 250 350",
       removeCards = (s: Set<number>, num: number) => {
-	for (let i = num; num < 52; num += 13) {
+	for (let i = num; i < 52; i += 13) {
 		s.delete(i);
 	}
       };
