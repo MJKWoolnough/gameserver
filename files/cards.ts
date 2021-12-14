@@ -16,7 +16,12 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
 	return toRet;
       },
       plural = (n: number) => numNames[n] + (n === 5 ? "es": "s"),
-      viewBox = "0 0 250 350";
+      viewBox = "0 0 250 350",
+      removeCards = (s: Set<number>, num: number) => {
+	for (let i = num; num < 52; num += 13) {
+		s.delete(i);
+	}
+      };
 
 export const cardSuitNum = (id: number) => [id / 13 | 0, id % 13] as const,
 cards = svg({"style": {"width": 0, "height": 0}}, [
@@ -99,10 +104,7 @@ best5Hand = (cards: number[]) => {
 			}
 			break;
 		case 4:
-			myCards.delete(num);
-			myCards.delete(num + 13);
-			myCards.delete(num + 26);
-			myCards.delete(num + 39);
+			removeCards(myCards, num);
 			return [7, num || 13, ...highest(myCards, 1)]; // Four of a Kind
 		}
 	}
@@ -137,22 +139,13 @@ best5Hand = (cards: number[]) => {
 		}
 	}
 	if (trip >= 0) {
-		myCards.delete(trip);
-		myCards.delete(trip + 13);
-		myCards.delete(trip + 26);
-		myCards.delete(trip + 39);
+		removeCards(myCards, trip);
 		return [3, trip || 13, ...highest(myCards, 2)]; // Three of a Kind
 	}
 	if (p >= 0) {
-		myCards.delete(p);
-		myCards.delete(p + 13);
-		myCards.delete(p + 26);
-		myCards.delete(p + 39);
+		removeCards(myCards, p);
 		if (tp >= 0) {
-			myCards.delete(tp);
-			myCards.delete(tp + 13);
-			myCards.delete(tp + 26);
-			myCards.delete(tp + 39);
+			removeCards(myCards, tp);
 			return [2, p || 13, tp || 13, ...highest(myCards, 1)]; // Two-Pair
 		}
 		return [1, p || 13, ...highest(myCards, 3)]; // Pair
