@@ -82,8 +82,23 @@ best5Hand = (cards: number[]) => {
 			return [8, nums[n] || 13]; // Straight Flush
 		}
 	}
+	let trip = -1, p = -1, tp = -1;
 	for (const num of nums) {
-		if (myCards.has(num) && myCards.has(num + 13) && myCards.has(num + 26) && myCards.has(num + 39)) {
+		const count = +myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39);
+		switch (count) {
+		case 2:
+			if (p === -1) {
+				p = num;
+			} else if (tp === -1) {
+				tp = num;
+			}
+			break;
+		case 3:
+			if (trip === -1) {
+				trip = num;
+			}
+			break;
+		case 4:
 			myCards.delete(num);
 			myCards.delete(num + 13);
 			myCards.delete(num + 26);
@@ -91,14 +106,8 @@ best5Hand = (cards: number[]) => {
 			return [7, num || 13, ...highest(myCards, 1)]; // Four of a Kind
 		}
 	}
-	for (const anum of nums) {
-		if (+myCards.has(anum) + +myCards.has(anum + 13) + +myCards.has(anum + 26) + +myCards.has(anum + 39) === 3) {
-			for (const bnum of nums) {
-				if (+myCards.has(bnum) + +myCards.has(bnum + 13) + +myCards.has(bnum + 26) + +myCards.has(bnum + 39) === 2) {
-					return [6, anum, bnum]; // Full House
-				}
-			}
-		}
+	if (trip >= 0 && p >= 0) {
+		return [6, trip || 13, p || 13]; // Full House
 	}
 	for (let s = 0; s < 4; s++) {
 		const base = 13 * s;
@@ -127,40 +136,30 @@ best5Hand = (cards: number[]) => {
 			return  [4, nums[n] || 13]; // Straight
 		}
 	}
-	for (const num of nums) {
-		if (+myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39) === 3) {
-			myCards.delete(num);
-			myCards.delete(num + 13);
-			myCards.delete(num + 26);
-			myCards.delete(num + 39);
-			return [3, num || 13, ...highest(myCards, 2)]; // Three of a Kind
-		}
+	if (trip >= 0) {
+		myCards.delete(trip);
+		myCards.delete(trip + 13);
+		myCards.delete(trip + 26);
+		myCards.delete(trip + 39);
+		return [3, trip || 13, ...highest(myCards, 2)]; // Three of a Kind
 	}
-	for (const anum of nums) {
-		if (+myCards.has(anum) + +myCards.has(anum + 13) + +myCards.has(anum + 26) + +myCards.has(anum + 39) === 2) {
-			for (const bnum of nums) {
-				if (anum !== bnum && +myCards.has(bnum) + +myCards.has(bnum + 13) + +myCards.has(bnum + 26) + +myCards.has(bnum + 39) === 2) {
-					myCards.delete(anum);
-					myCards.delete(anum + 13);
-					myCards.delete(anum + 26);
-					myCards.delete(anum + 39);
-					myCards.delete(bnum);
-					myCards.delete(bnum + 13);
-					myCards.delete(bnum + 26);
-					myCards.delete(bnum + 39);
-					return [2, anum || 13, bnum || 13, ...highest(myCards, 1)]; // Two-Pair
-				}
-			}
-		}
+	if (tp >= 0) {
+		myCards.delete(tp);
+		myCards.delete(tp + 13);
+		myCards.delete(tp + 26);
+		myCards.delete(tp + 39);
+		myCards.delete(p);
+		myCards.delete(p + 13);
+		myCards.delete(p + 26);
+		myCards.delete(p + 39);
+		return [2, p || 13, tp || 13, ...highest(myCards, 1)]; // Two-Pair
 	}
-	for (const num of nums) {
-		if (+myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39) === 2) {
-			myCards.delete(num);
-			myCards.delete(num + 13);
-			myCards.delete(num + 26);
-			myCards.delete(num + 39);
-			return [1, num || 13, ...highest(myCards, 3)]; // Pair
-		}
+	if (p >= 0) {
+		myCards.delete(p);
+		myCards.delete(p + 13);
+		myCards.delete(p + 26);
+		myCards.delete(p + 39);
+		return [1, p || 13, ...highest(myCards, 3)]; // Pair
 	}
 	return [0, ...highest(myCards, 5)];
 },
