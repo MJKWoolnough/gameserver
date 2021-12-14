@@ -156,16 +156,17 @@ best5Hand = (cards: Cards): Win => {
 	}
 	return [0, ...highest(myCards, 5)] as Win;
 },
-win2String = (hand: Win) => {
+win2String = (hand: Win, kickers = false) => {
+	const kicker = kickers ? `, with ${hand.slice(hand[0] === 2 ? 3 : 2).map(n => numNames[n]).join(", ")} kicker${hand[0] === 2 || hand[0] === 7 ? "" : "s"}` : ""
 	switch (hand[0]) {
 	case 0:
-		return `${numNames[hand[1]]} High Card`;
+		return `${numNames[hand[1]]} High Card${kicker}`;
 	case 1:
-		return `Pair of ${plural(hand[1])}`;
+		return `Pair of ${plural(hand[1])}${kicker}`;
 	case 2:
-		return `Two Pair, ${plural(hand[1])} over ${plural(hand[2])}`;
+		return `Two Pair, ${plural(hand[1])} over ${plural(hand[2])}${kicker}` ;
 	case 3:
-		return `Trip ${plural(hand[1])}`;
+		return `Trip ${plural(hand[1])}${kicker}`;
 	case 4:
 		return `${numNames[hand[1]]}-High Straight`;
 	case 5:
@@ -173,7 +174,7 @@ win2String = (hand: Win) => {
 	case 6:
 		return `Full House, ${plural(hand[1])} over ${plural(hand[2])}`;
 	case 7:
-		return `Quad ${plural(hand[1])}`;
+		return `Quad ${plural(hand[1])}${kicker}`;
 	case 8:
 		return `${hand[1] === 13 ? "Royal" : `${numNames[hand[1]]}-High Straight`} Flush`;
 	}
