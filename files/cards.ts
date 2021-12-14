@@ -174,4 +174,14 @@ win2String = (hand: number[]) => {
 		return `${hand[1] === 13 ? "Royal" : `${numNames[hand[1]]}-High Straight`} Flush`;
 	}
 	return "";
-};
+},
+sortHands = (hands: number[][]) => hands.sort((a: number[], b: number[]) => {
+	for (let i = 0; i < a.length; i++) {
+		const c = b[i] - a[i];
+		if (c === 0) {
+			continue;
+		}
+		return c;
+	}
+	return 0;
+});
