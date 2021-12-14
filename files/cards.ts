@@ -143,22 +143,18 @@ best5Hand = (cards: number[]) => {
 		myCards.delete(trip + 39);
 		return [3, trip || 13, ...highest(myCards, 2)]; // Three of a Kind
 	}
-	if (tp >= 0) {
-		myCards.delete(tp);
-		myCards.delete(tp + 13);
-		myCards.delete(tp + 26);
-		myCards.delete(tp + 39);
-		myCards.delete(p);
-		myCards.delete(p + 13);
-		myCards.delete(p + 26);
-		myCards.delete(p + 39);
-		return [2, p || 13, tp || 13, ...highest(myCards, 1)]; // Two-Pair
-	}
 	if (p >= 0) {
 		myCards.delete(p);
 		myCards.delete(p + 13);
 		myCards.delete(p + 26);
 		myCards.delete(p + 39);
+		if (tp >= 0) {
+			myCards.delete(tp);
+			myCards.delete(tp + 13);
+			myCards.delete(tp + 26);
+			myCards.delete(tp + 39);
+			return [2, p || 13, tp || 13, ...highest(myCards, 1)]; // Two-Pair
+		}
 		return [1, p || 13, ...highest(myCards, 3)]; // Pair
 	}
 	return [0, ...highest(myCards, 5)];
