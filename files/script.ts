@@ -19,7 +19,7 @@ const lobby = () => {
 		return;
 	}
 	const rooms = room.rooms(),
-	      username = input({"type": "text", "placeholder": "Spectate or Enter Username Here", "style": {"font-size": "3em", "width": "100%"}, "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
+	      username = input({"type": "text", "placeholder": "Spectate or Enter Username Here", "style": {"font-size": "3em", "width": "100%", "box-sizing": "border-box"}, "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r)));
