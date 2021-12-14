@@ -98,7 +98,7 @@ best5Hand = (cards: Cards): Win => {
 		case 2:
 			if (p === -1) {
 				p = num;
-			} else if (tp === -1) {
+			} else if (tp === -1 && num) {
 				tp = num;
 			}
 			break;
