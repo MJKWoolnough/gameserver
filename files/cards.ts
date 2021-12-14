@@ -182,10 +182,9 @@ win2String = (hand: Win) => {
 sortHands = (hands: Win[]) => hands.sort((a: Win, b: Win) => {
 	for (let i = 0; i < a.length; i++) {
 		const c = b[i] - a[i];
-		if (c === 0) {
-			continue;
+		if (c !== 0) {
+			return c;
 		}
-		return c;
 	}
 	return 0;
 });
