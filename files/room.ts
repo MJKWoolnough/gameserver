@@ -117,11 +117,6 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			}
 		}
 	});
-	rpc.request("listRooms").then(r => {
-		for (const room of r) {
-			rooms.push({room, [node]: roomFormatter(room)});
-		}
-	});
 	rpc.await(broadcastRoomAdd, true).then(room => rooms.push({room, [node]: roomFormatter(room)}));
 	rpc.await(broadcastRoomRemove, true).then(room => rooms.filterRemove(r => r.room === room));
 	rpc.await(broadcastAdminNone, true).then(() => {
@@ -142,5 +137,9 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}
 	});
 	rpc.await(broadcastMessage, true).then(data => messages.request(data));
-	return rpc.request("time").then(t => timeShift = t - Date.now() / 1000);
+	return rpc.request("time").then(t => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then(r => {
+		for (const room of r) {
+			rooms.push({room, [node]: roomFormatter(room)});
+		}
+	}));
 });
