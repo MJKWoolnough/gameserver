@@ -30,6 +30,8 @@ type GameMessage = {
 	game: string;
 }
 
+export let timeShift = 0;
+
 export const room = {} as {
 	admin: () => string;
 	rooms: () => NodeArray<RoomNode>;
@@ -140,4 +142,5 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}
 	});
 	rpc.await(broadcastMessage, true).then(data => messages.request(data));
+	return rpc.request("time").then(t => timeShift = t - Date.now() / 1000);
 });
