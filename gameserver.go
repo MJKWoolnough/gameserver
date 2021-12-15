@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"golang.org/x/net/websocket"
 	"vimagination.zapto.org/jsonrpc"
@@ -172,6 +173,8 @@ type roomUser struct {
 
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
 	switch method {
+	case "time":
+		return time.Now().Unix(), nil
 	case "listRooms":
 		rooms := json.RawMessage{'['}
 		c.server.mu.RLock()
