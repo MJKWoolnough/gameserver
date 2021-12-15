@@ -160,7 +160,7 @@ best5Hand = (cards: Cards): Win => {
 	return [0, ...highest(myCards, 5)] as Win;
 },
 win2String = (hand: Win, kickers = false) => {
-	const kicker = kickers && (hand[0] < 4 || hand[0] === 7) ? `, with ${hand.slice(hand[0] === 2 ? 3 : 2).map(n => numNames[n]).join(", ")} kicker${hand[0] === 2 || hand[0] === 7 ? "" : "s"}` : ""
+	const kicker = kickers && (hand[0] < 4 || hand[0] === 7) ? `, with ${hand.slice(hand[0] === 2 ? 3 : 2).map(n => numNames[n]).join(", ")} kicker${hand[0] === 2 || hand[0] === 7 ? "" : "s"}` : "";
 	switch (hand[0]) {
 	case 0:
 		return `${numNames[hand[1]]} High Card${kicker}`;
