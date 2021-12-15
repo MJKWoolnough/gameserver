@@ -6,11 +6,11 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
       highest = (myCards: Set<number>, n: number) => {
 	const toRet: number[] = [];
 	for (const num of nums) {
-		for (let total = +myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39); toRet.length < n && total > 0; total--) {
+		if (myCards.has(num) || myCards.has(num + 13) || myCards.has(num + 26) || myCards.has(num + 39)) {
 			toRet.push(num || 13);
-		}
-		if (toRet.length >= n) {
-			break;
+			if (toRet.length >= n) {
+				break;
+			}
 		}
 	}
 	return toRet;
