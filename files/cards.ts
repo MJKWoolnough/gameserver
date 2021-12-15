@@ -78,6 +78,9 @@ shuffledDeck = (n = 1): number[] => {
 	return Array.from({length}, () => deck.splice(Math.floor(Math.random() * deck.length), 1)[0]);
 },
 best5Hand = (cards: Cards): Win => {
+	if (cards.length < 5) {
+		throw new RangeError("hand needs to have at least 5 cards");
+	}
 	const myCards = new Set(cards);
 	SF:
 	for (let n = 0; n < 10; n++) {
