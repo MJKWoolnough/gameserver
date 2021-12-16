@@ -60,7 +60,13 @@ games.set(game, (admin: boolean, _status?: any) => {
 			label({"for": "starting"}, "Starting Amount: "),
 			starting,
 			br(),
-			button({"onclick": () => {}}, "Deal")
+			button({"onclick": () => {
+				const amount = parseInt(starting.value) || 5;
+				for (const player in players) {
+					players[player] = amount;
+				}
+				setStatus();
+			}}, "Deal")
 		]);
 		options();
 	}
