@@ -134,7 +134,11 @@ input::placeholder {
 	font-size: 2em;
 }
 
-#holdem input:checked + label, #holdem input:active + label {
+#holdem input + label:hover {
+	background-color: #009;
+}
+
+#holdem input:checked + label, #holdem input:active:hover + label {
 	border-style: inset;
 	background-color: #006;
 	border-color: #007;
