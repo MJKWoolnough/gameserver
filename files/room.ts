@@ -78,6 +78,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				const {"admin": a, "users": u, status} = resp;
 				admin = a;
 				username = user;
+				users.push({user, [node]: userFormatter(user)});
 				for (const user of u) {
 					users.push({user, [node]: userFormatter(user)});
 				}
