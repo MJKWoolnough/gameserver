@@ -104,14 +104,24 @@ input::placeholder {
 	}
 }
 
-#holdem label {
+#holdemOptions {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow-y: auto;
+	background-color: #000;
+}
+
+#holdemOptions label {
 	display: inline-block;
 	width: 8em;
 	font-size: 2em;
 	text-align: right;
 }
 
-#holdem label + input {
+#holdemOptions label + input {
 	box-sizing: border-box;
 	width: calc(100% - 8em);
 	font-size: 2em;
@@ -121,11 +131,11 @@ input::placeholder {
 	border-style: solid;
 }
 
-#holdem input[type=radio] {
+#holdemOptions input[type=radio] {
 	display: none;
 }
 
-#holdem input + label {
+#holdemOptions input + label {
 	display: block;
 	border: 1vmax outset #00a;
 	background-color: #008;
@@ -134,17 +144,17 @@ input::placeholder {
 	font-size: 2em;
 }
 
-#holdem input + label:hover {
+#holdemOptions input + label:hover {
 	background-color: #009;
 }
 
-#holdem input:checked + label, #holdem input:active:hover + label {
+#holdemOptions input:checked + label, #holdemOptions input:active:hover + label {
 	border-style: inset;
 	background-color: #006;
 	border-color: #007;
 }
 
-#holdem button {
+#holdemOptions button {
 	color: #fff;
 	font-size: 2em;
 	background-color: #800;
