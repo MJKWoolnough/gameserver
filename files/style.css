@@ -129,7 +129,7 @@ input::placeholder {
 	display: block;
 	border: 1vmax outset #00a;
 	background-color: #008;
-	width: 100%;
+	width: calc(100% - 2vmax);
 	text-align: center;
 	font-size: 2em;
 }
