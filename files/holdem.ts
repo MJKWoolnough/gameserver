@@ -1,5 +1,5 @@
 import {clearElement} from './lib/dom.js';
-import {createHTML, br, button, div, input, label} from './lib/html.js';
+import {createHTML, br, button, div, input, label, li} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import games from './games.js';
 import {room} from './room.js';
@@ -46,6 +46,15 @@ const game = "Texas Hold'Em",
 games.set(game, (admin: boolean, _status?: any) => {
 	if (admin) {
 		const starting = input({"id": "starting", "type": "number", "min": 5, "value": 20});
+		room.userFormatter(user => li({"onclick": function(this: HTMLLIElement) {
+			if (user in players) {
+				delete players[user];
+				this.classList.toggle("no", false);
+			} else {
+				players[user] = 0
+				this.classList.toggle("no", true);
+			}
+		}}, user));
 		createHTML(clearElement(document.body), {"id": "holdem"}, [
 			room.users()[node],
 			label({"for": "starting"}, "Starting Amount: "),
