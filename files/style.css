@@ -163,3 +163,48 @@ input::placeholder {
 	height: 3em;
 	border-width: 1vmax;
 }
+
+#holdem ul {
+	list-style: none;
+	padding: 0;
+}
+
+#holdem ul li {
+	width: 100%;
+	background-color: #0a0;
+	color: #fff;
+	text-align: center;
+	font-size: 2em;
+	cursor: pointer;
+}
+
+#holdem ul li.no {
+	background-color: #a00;
+}
+
+#holdem label {
+	display: inline-block;
+	width: 10em;
+	font-size: 2em;
+	text-align: right;
+}
+
+#holdem input {
+	width: calc(100% - 10em);
+	box-sizing: border-box;
+	background-color: #000;
+	color: #fff;
+	border-color: #fff;
+	font-size: 2em;
+	text-align: center;
+}
+
+#holdem button {
+	width: 100%;
+	border-width: 1vmax;
+	height: 3em;
+	border-color: #900;
+	background-color: #800;
+	color: #fff;
+	font-size: 2em;
+}
