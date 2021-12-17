@@ -26,7 +26,7 @@ games.set(name, (admin: boolean, status?: any) => {
 				      data["title"] = shuffledFiles[image][0];
 			      }
 			      createHTML(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
-			      room.setStatus(data);
+			      room.message(data);
 		      },
 		      progress = div({"style": {"text-align": "center", "font-size": "2em"}});
 		sendStatus();

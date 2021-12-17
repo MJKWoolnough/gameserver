@@ -11,7 +11,7 @@ let limitType = 0,
 const game = "Texas Hold'Em",
       community: number[] = [],
       players: Record<string, number> = {},
-      setStatus = () => room.setStatus({game, limitType, minimumBet, ante, community, players}),
+      setStatus = () => room.message({game, limitType, minimumBet, ante, community, players}),
       options = () => {
 	const minimumBetValue = input({"id": "minimum", "type": "number", "min": 1, "value": 2}),
 	      anteValue = input({"id": "ante", "type": "number", "min": 0, "value": 0}),
