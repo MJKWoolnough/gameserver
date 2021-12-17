@@ -46,6 +46,7 @@ export const room = {} as {
 	username: () => string;
 	userFormatter: (fn: (username: string) => HTMLLIElement) => void;
 	roomFormatter: (fn: (room: string) => HTMLLIElement) => void;
+	userExit: (fn: (username: string) => void) => void;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const messages = new Requester(),
@@ -55,7 +56,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	let admin = "",
 	    username = "",
 	    userFormatter: (username: string) => HTMLLIElement = li,
-	    roomFormatter: (room: string) => HTMLLIElement = li;
+	    roomFormatter: (room: string) => HTMLLIElement = li,
+	    userExit: (username: string) => void = () => {};
 	messages.responder(() => {});
 	adminChange.responder("");
 	Object.assign(room, {
@@ -114,6 +116,9 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				rooms[node].replaceChild(n, room[node]);
 				room[node] = n;
 			}
+		},
+		"userExit": (fn: (username: string) => void) => {
+			userExit = fn;
 		}
 	});
 	rpc.await(broadcastRoomAdd, true).then(room => rooms.push({room, [node]: roomFormatter(room)}));
@@ -133,6 +138,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		const pos = rooms.indexOf(user);
 		if (pos >= 0) {
 			users.splice(pos, 1);
+			userExit(user);
 		}
 	});
 	rpc.await(broadcastMessage, true).then(data => messages.request(data));
