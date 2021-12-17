@@ -271,27 +271,8 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 			return nil, err
 		}
 		return nil, nil
-	case "setStatus":
-		if len(data) == 0 || data[0] != '{' {
-			data = noData
-		}
-		c.server.mu.RLock()
-		defer c.server.mu.RUnlock()
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if c.room == nil {
-			return nil, errNotInRoom
-		}
-		c.room.mu.Lock()
-		defer c.room.mu.Unlock()
-		if c.room.admin != c {
-			return nil, errNotAdmin
-		}
-		c.room.status = data
-		broadcast(c.room.users, broadcastMessage, data)
-		return nil, nil
 	case "message":
-		if len(data) == 0 {
+		if len(data) == 0 || data[0] != '{' {
 			data = noData
 		}
 		c.mu.RLock()
@@ -299,9 +280,10 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if c.room == nil {
 			return nil, errNotInRoom
 		}
-		c.room.mu.RLock()
-		defer c.room.mu.RUnlock()
+		c.room.mu.Lock()
+		defer c.room.mu.Unlock()
 		if c.room.admin == c {
+			c.room.status = data
 			broadcast(c.room.users, broadcastMessage, data)
 		} else if _, ok := c.room.names[c.name]; ok {
 			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessage, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
