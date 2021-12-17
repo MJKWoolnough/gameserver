@@ -1,5 +1,6 @@
+import type {UserNode} from './room.js';
 import {clearElement} from './lib/dom.js';
-import {createHTML, br, button, div, input, label, li} from './lib/html.js';
+import {createHTML, br, button, div, input, label, li, span} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import games from './games.js';
 import {room} from './room.js';
@@ -41,7 +42,9 @@ const game = "Texas Hold'Em",
 		}}, "Done")
 	      ]);
 	createHTML(document.body, options);
-      };
+      },
+      playerSort = ({user: a}: UserNode, {user: b}: UserNode) => a in players ? b in players ? players[a][0] - players[b][0] : -1 : 0,
+      playerFormatter = (name: string) => name in players ? li([span(name), span(players[name][1] + "")]) : li({"style": "display: none"});
 
 games.set(game, (admin: boolean, _status?: any) => {
 	if (admin) {
@@ -72,5 +75,8 @@ games.set(game, (admin: boolean, _status?: any) => {
 			}}, "Deal")
 		]);
 		options();
+	} else {
+		room.users().sort(playerSort);
+		room.userFormatter(playerFormatter);
 	}
 });
