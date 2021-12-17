@@ -121,27 +121,31 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			userExit = fn;
 		}
 	});
-	rpc.await(broadcastRoomAdd, true).then(room => rooms.push({room, [node]: roomFormatter(room)}));
-	rpc.await(broadcastRoomRemove, true).then(room => rooms.filterRemove(r => r.room === room));
-	rpc.await(broadcastAdminNone, true).then(() => {
-		admin = "";
-		if (username) {
-			createHTML(document.body, becomeAdmin);
-		}
-	});
-	rpc.await(broadcastAdmin, true).then((a: string) => {
-		becomeAdmin.remove();
-		adminChange.request(admin = a);
-	});
-	rpc.await(broadcastUserJoin, true).then((user: string) => users.push({user, [node]: userFormatter(user)}));
-	rpc.await(broadcastUserLeave, true).then(user => {
-		const pos = rooms.indexOf(user);
-		if (pos >= 0) {
-			users.splice(pos, 1);
-			userExit(user);
-		}
-	});
-	rpc.await(broadcastMessage, true).then(data => messages.request(data));
+	for (const [id, fn] of [
+		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
+		[broadcastRoomRemove, room => rooms.filterRemove(r => r.room === room)],
+		[broadcastAdminNone, () => {
+			admin = "";
+			if (username) {
+				createHTML(document.body, becomeAdmin);
+			}
+		}],
+		[broadcastAdmin, (a: string) => {
+			becomeAdmin.remove();
+			adminChange.request(admin = a);
+		}],
+		[broadcastUserJoin, (user: string) => users.push({user, [node]: userFormatter(user)})],
+		[broadcastUserLeave, user => {
+			const pos = rooms.indexOf(user);
+			if (pos >= 0) {
+				users.splice(pos, 1);
+				userExit(user);
+			}
+		}],
+		[broadcastMessage, data => messages.request(data)]
+	] as [number, (data: any) => any][]) {
+		rpc.await(id, true).then(fn);
+	}
 	return rpc.request("time").then(t => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then(r => {
 		for (const room of r) {
 			rooms.push({room, [node]: roomFormatter(room)});
