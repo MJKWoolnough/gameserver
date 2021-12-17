@@ -10,7 +10,7 @@ let limitType = 0,
 
 const game = "Texas Hold'Em",
       community: number[] = [],
-      players: Record<string, number> = {},
+      players: Record<string, [number, number]> = {},
       setStatus = () => room.message({game, limitType, minimumBet, ante, community, players}),
       options = () => {
 	const minimumBetValue = input({"id": "minimum", "type": "number", "min": 1, "value": 2}),
@@ -51,7 +51,7 @@ games.set(game, (admin: boolean, _status?: any) => {
 				delete players[user];
 				this.classList.toggle("no", false);
 			} else {
-				players[user] = 0
+				players[user] = [0, 0];
 				this.classList.toggle("no", true);
 			}
 		}}, user));
@@ -62,10 +62,13 @@ games.set(game, (admin: boolean, _status?: any) => {
 			br(),
 			button({"onclick": () => {
 				const amount = parseInt(starting.value) || 5;
+				let num = 0;
 				for (const player in players) {
-					players[player] = amount;
+					players[player] = [num++, amount];
 				}
-				setStatus();
+				if (num > 1) {
+					setStatus();
+				}
 			}}, "Deal")
 		]);
 		options();
