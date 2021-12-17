@@ -181,7 +181,6 @@ win2String = (hand: Win, kickers = false) => {
 	case 8:
 		return `${hand[1] === 13 ? "Royal" : `${numNames[hand[1]]}-High Straight`} Flush`;
 	}
-	return "";
 },
 sortHands = (hands: Win[]) => hands.sort((a: Win, b: Win) => {
 	for (let i = 0; i < a.length; i++) {
