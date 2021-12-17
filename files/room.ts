@@ -15,7 +15,7 @@ type RoomNode = {
 	[node]: HTMLLIElement;
 }
 
-type UserNode = {
+export type UserNode = {
 	user: string;
 	[node]: HTMLLIElement;
 }
