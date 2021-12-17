@@ -40,7 +40,6 @@ export const room = {} as {
 	join: (room: string, user: string) => Promise<RoomEntry>;
 	leave: () => Promise<void>;
 	makeAdmin: () => Promise<void>;
-	setStatus: <T extends GameMessage>(data: T) => Promise<void>;
 	message: (msg: any) => Promise<void>;
 	messageTo: (user: string, message: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
@@ -96,7 +95,6 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			becomeAdmin.remove();
 			admin = username;
 		}),
-		"setStatus": (status: GameMessage) => rpc.request("setStatus", status),
 		"message": (message: any) => rpc.request("message", message),
 		"messageTo": (to: string, message: any) => rpc.request("messageTo", {to, message}),
 		"messageHandler": messages.responder.bind(messages),
