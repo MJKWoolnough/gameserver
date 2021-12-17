@@ -4,7 +4,7 @@ import games from './games.js';
 import {room} from './room.js';
 import {files} from './wit_data.js';
 
-const name = "What is That?",
+const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82];
 
 type Message = {
@@ -13,7 +13,7 @@ type Message = {
 	title?: string;
 }
 
-games.set(name, (admin: boolean, status?: any) => {
+games.set(game, (admin: boolean, status?: any) => {
 	if (admin) {
 		let image = 0, step = 0;
 		const shuffledFiles = Array.from({"length": files.length}, () => files.splice(Math.floor(Math.random() * files.length), 1)[0]),
@@ -21,7 +21,7 @@ games.set(name, (admin: boolean, status?: any) => {
 		      sendStatus = () => {
 			      image = ((image % l) + l) % l;
 			      step = Math.max(Math.min(step, boxes.length), 0);
-			      const data: any = {"game": name, "url": shuffledFiles[image][1], "step": step};
+			      const data: any = {game, "url": shuffledFiles[image][1], step};
 			      if (step === boxes.length) {
 				      data["title"] = shuffledFiles[image][0];
 			      }
@@ -31,7 +31,7 @@ games.set(name, (admin: boolean, status?: any) => {
 		      progress = div({"style": {"text-align": "center", "font-size": "2em"}});
 		sendStatus();
 		createHTML(clearElement(document.body), [
-			h1({"style": "text-align: center"}, name),
+			h1({"style": "text-align: center"}, game),
 			progress,
 			button({"class": "witButton", "onclick": () => {
 				image--;
