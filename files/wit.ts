@@ -7,6 +7,7 @@ import {files} from './wit_data.js';
 const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
       runAdmin = () => {
+	room.messageHandler(() => {});
 	let image = 0, step = 0;
 	const shuffledFiles = Array.from({"length": files.length}, () => files.splice(Math.floor(Math.random() * files.length), 1)[0]),
 	      l = shuffledFiles.length,
