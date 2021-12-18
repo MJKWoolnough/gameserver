@@ -1,13 +1,13 @@
 import {createHTML, div, h1, li, ul} from './lib/html.js';
 import {node, NodeArray} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
+import games from './games.js';
 
-const broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessage = -7;
+const broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
 
 declare const pageLoad: Promise<void>;
 
-const {protocol, host} = window.location,
-      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin()}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
+const {protocol, host} = window.location;
 
 type RoomNode = {
 	room: string;
@@ -37,27 +37,27 @@ export const room = {} as {
 	users: () => NodeArray<UserNode>;
 	new: (room: string, user: string) => Promise<void>;
 	join: (room: string, user: string) => Promise<RoomEntry>;
+	adminGame: (game: string) => void;
 	leave: () => Promise<void>;
 	makeAdmin: () => void;
-	message: (msg: any) => Promise<void>;
-	messageTo: (user: string, message: any) => Promise<void>;
-	messageHandler: (fn: (data: any) => void) => void;
+	messageAdmin: (data: any) => Promise<void>;
+	messageUser: (to: string, data: any) => Promise<void>;
+	messageRoom: (data: any) => Promise<void>;
 	username: () => string;
-	userFormatter: (fn: (username: string) => HTMLLIElement) => void;
 	roomFormatter: (fn: (room: string) => HTMLLIElement) => void;
-	userExit: (fn: (username: string) => void) => void;
-	onAdmin: (fn: () => void) => void;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const rooms = new NodeArray<RoomNode>(ul()),
-	      users = new NodeArray<UserNode>(ul());
+	      users = new NodeArray<UserNode>(ul()),
+	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
+		becomeAdmin.remove();
+		admin = username;
+		games.get(game)?.onAdmin();
+	      })}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 	let admin = "",
 	    username = "",
-	    messageHandler: (message: any) => void = () => {},
-	    userFormatter: (username: string) => HTMLLIElement = li,
 	    roomFormatter: (room: string) => HTMLLIElement = li,
-	    userExit: (username: string) => void = () => {},
-	    onAdmin = () => {};
+	    game = "";
 	Object.assign(room, {
 		"admin": () => admin,
 		"rooms": () => rooms,
@@ -70,44 +70,34 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
 			admin = username = "";
+			game = "";
 			return rpc.request("joinRoom", {room, user}).then((resp: any) => {
 				if (!user) {
 					return resp;
 				}
-				const {"admin": a, "users": u, status} = resp;
+				const {"admin": a, "users": u, data: {game: g = "", data = {}} = {}} = resp,
+				      uf = games.get(game)?.userFormatter ?? li;
 				admin = a;
 				username = user;
-				users.push({user, [node]: userFormatter(user)});
+				users.push({user, [node]: uf(user)});
 				for (const user of u) {
-					users.push({user, [node]: userFormatter(user)});
+					users.push({user, [node]: uf(user)});
 				}
 				if (!admin) {
 					setTimeout(() => createHTML(document.body, becomeAdmin), 0);
 				}
-				return status;
+				games.get(game = g)?.onRoomMessage?.(data);
 			});
 		},
+		"adminGame": (g: string) => games.get(game = g)?.onAdmin(),
 		"leave": () => {
 			createHTML(document.body, becomeAdmin);
 			return rpc.request("leaveRoom");
 		},
-		"makeAdmin": () => rpc.request("adminRoom").then(() => {
-			becomeAdmin.remove();
-			admin = username;
-			onAdmin();
-		}),
-		"message": (message: any) => rpc.request("message", message),
-		"messageTo": (to: string, message: any) => rpc.request("messageTo", {to, message}),
-		"messageHandler": (fn: (message: any) => void) => messageHandler = fn,
+		"messageAdmin": (data: any) => rpc.request("message", data),
+		"messageUser": (to: string, data: any) => rpc.request("message", {to, data}),
+		"messageRoom": (data: any) => rpc.request("message", {game, data}),
 		"username": () => username,
-		"userFormatter": (fn: (username: string) => HTMLLIElement) => {
-			userFormatter = fn;
-			for (const user of users) {
-				const n = fn(user.user);
-				users[node].replaceChild(n, user[node]);
-				user[node] = n;
-			}
-		},
 		"roomFormatter": (fn: (room: string) => HTMLLIElement) => {
 			roomFormatter = fn;
 			for (const room of rooms) {
@@ -115,11 +105,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				rooms[node].replaceChild(n, room[node]);
 				room[node] = n;
 			}
-		},
-		"userExit": (fn: (username: string) => void) => {
-			userExit = fn;
-		},
-		"onAdmin": (fn: () => void) => onAdmin = fn
+		}
 	});
 	for (const [id, fn] of [
 		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
@@ -134,15 +120,17 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			becomeAdmin.remove();
 			admin = a;
 		}],
-		[broadcastUserJoin, (user: string) => users.push({user, [node]: userFormatter(user)})],
+		[broadcastUserJoin, (user: string) => users.push({user, [node]: (games.get(game)?.userFormatter ?? li)(user)})],
 		[broadcastUserLeave, user => {
 			const pos = rooms.indexOf(user);
 			if (pos >= 0) {
 				users.splice(pos, 1);
-				userExit(user);
+				games.get(game)?.onUserLeave?.(user);
 			}
 		}],
-		[broadcastMessage, (message: any) => messageHandler(message)]
+		[broadcastMessageAdmin, (data: any) => games.get(game)?.onMessage?.(data)],
+		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
+		[broadcastMessageRoom, (data: any) => games.get(game = data.game)?.onRoomMessage(data.data)]
 	] as [number, (data: any) => any][]) {
 		rpc.await(id, true).then(fn);
 	}
