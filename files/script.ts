@@ -12,16 +12,16 @@ type GameNode = {
 	[node]: HTMLLIElement;
 }
 
-const lobby = () => {
+ready.then(() => {
 	if (Array.from(new URL(window.location + "").searchParams.keys()).some(k => k === "monitor")) {
-		room.join("default", "").then(enterRoom);
+		room.join("default", "");
 		return;
 	}
 	const rooms = room.rooms(),
 	      username = input({"type": "text", "placeholder": "Spectate or Enter Username Here", "style": {"font-size": "3em", "width": "100%", "box-sizing": "border-box"}, "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
-	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).then(enterRoom).catch((e: Error) => createHTML(error, e.message))}, r)));
+	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).catch((e: Error) => createHTML(error, e.message))}, r)));
 	createHTML(clearElement(document.body), {"style": {"margin": 0}}, [
 		h1("Game Server"),
 		username,
@@ -30,37 +30,26 @@ const lobby = () => {
 		button({"onclick": () => {
 			const roomName = prompt("Please enter new Room name");
 			if (roomName) {
-				room.new(roomName, username.value).then(enterRoom).catch((e: Error) => alert(e.message));
+				room.new(roomName, username.value).catch((e: Error) => alert(e.message));
 			}
 		}}, "New Room")
 	]);
-      },
-      enterRoom = (status?: any) => {
-	if (status) {
-		const game = games.get(status.game);
-		if (game) {
-			game(false, status);
-		} else {
-			room.messageHandler(status => {
-				const game = games.get(status.game);
-				if (game) {
-					game(false, status);
-				}
-			});
-			room.onAdmin(enterRoom);
-			createHTML(clearElement(document.body), h1("Waiting for Game"));
-		}
-	} else {
-		room.messageHandler(() => {});
+});
+
+games.set("", {
+	"onAdmin": () => {
 		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a: GameNode, b: GameNode) => stringSort(a.game, b.game));
-		for (const [game, fn] of games) {
-			gameList.push({game, [node]: li(button({"onclick": () => fn(true)}, game))});
+		for (const [game, d] of games) {
+			if (game) {
+				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
+			}
 		}
 		createHTML(clearElement(document.body), [
 			h1("Choose Game"),
 			gameList[node]
 		]);
+	},
+	"onRoomMessage": () => {
+		createHTML(clearElement(document.body), h1("Waiting for Game"));
 	}
-      };
-
-ready.then(lobby);
+});
