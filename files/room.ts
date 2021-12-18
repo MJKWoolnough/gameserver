@@ -142,7 +142,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				userExit(user);
 			}
 		}],
-		[broadcastMessage, messageHandler]
+		[broadcastMessage, (message: any) => messageHandler(message)]
 	] as [number, (data: any) => any][]) {
 		rpc.await(id, true).then(fn);
 	}
