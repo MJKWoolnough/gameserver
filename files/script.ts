@@ -47,8 +47,8 @@ const lobby = () => {
 					game(false, status);
 				}
 			});
+			room.onAdmin(enterRoom);
 			createHTML(clearElement(document.body), h1("Waiting for Game"));
-			room.onAdmin = enterRoom;
 		}
 	} else {
 		room.messageHandler(() => {});
