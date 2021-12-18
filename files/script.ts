@@ -1,5 +1,5 @@
 import {clearElement} from './lib/dom.js';
-import {createHTML, button, div, h1, input, li, span, ul} from './lib/html.js';
+import {createHTML, button, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
 import games from './games.js';
 import {room, ready} from './room.js';
@@ -10,8 +10,6 @@ type GameNode = {
 	game: string;
 	[node]: HTMLLIElement;
 }
-
-export const becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin().then(enterRoom)}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 
 const lobby = () => {
 	if (Array.from(new URL(window.location + "").searchParams.keys()).some(k => k === "monitor")) {
@@ -49,8 +47,10 @@ const lobby = () => {
 				}
 			});
 			createHTML(clearElement(document.body), h1("Waiting for Game"));
+			room.onAdmin = enterRoom;
 		}
 	} else {
+		room.messageHandler(() => {});
 		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a: GameNode, b: GameNode) => stringSort(a.game, b.game));
 		for (const [game, fn] of games) {
 			gameList.push({game, [node]: li(button({"onclick": () => fn(true)}, game))});
