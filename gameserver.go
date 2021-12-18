@@ -120,7 +120,7 @@ func (r *room) join(conn *conn) (json.RawMessage, error) {
 		}
 		data = strconv.AppendQuote(data, name)
 	}
-	data = append(append(append(strconv.AppendQuote(append(data, "],\"admin\":"...), adminName), ",\"status\":"...), r.status...), '}')
+	data = append(append(append(strconv.AppendQuote(append(data, "],\"admin\":"...), adminName), ",\"data\":"...), r.status...), '}')
 	r.names[conn.name] = conn
 	r.users[r.admin] = struct{}{}
 	broadcast(r.users, broadcastUserJoin, strconv.AppendQuote(json.RawMessage{}, conn.name))
