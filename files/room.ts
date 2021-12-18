@@ -1,14 +1,13 @@
-import {Requester} from './lib/inter.js';
-import {createHTML, li, ul} from './lib/html.js';
+import {createHTML, div, h1, li, ul} from './lib/html.js';
 import {node, NodeArray} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
-import {becomeAdmin} from './script.js';
 
 const broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessage = -7;
 
 declare const pageLoad: Promise<void>;
 
-const {protocol, host} = window.location;
+const {protocol, host} = window.location,
+      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => room.makeAdmin()}, h1("Admin not present. Click/Tap here to become Admin for this Room"));
 
 type RoomNode = {
 	room: string;
@@ -39,7 +38,7 @@ export const room = {} as {
 	new: (room: string, user: string) => Promise<void>;
 	join: (room: string, user: string) => Promise<RoomEntry>;
 	leave: () => Promise<void>;
-	makeAdmin: () => Promise<void>;
+	makeAdmin: () => void;
 	message: (msg: any) => Promise<void>;
 	messageTo: (user: string, message: any) => Promise<void>;
 	messageHandler: (fn: (data: any) => void) => void;
@@ -47,19 +46,18 @@ export const room = {} as {
 	userFormatter: (fn: (username: string) => HTMLLIElement) => void;
 	roomFormatter: (fn: (room: string) => HTMLLIElement) => void;
 	userExit: (fn: (username: string) => void) => void;
+	onAdmin: (fn: () => void) => void;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
-	const messages = new Requester(),
-	      adminChange = new Requester<string>(),
-	      rooms = new NodeArray<RoomNode>(ul()),
+	const rooms = new NodeArray<RoomNode>(ul()),
 	      users = new NodeArray<UserNode>(ul());
 	let admin = "",
 	    username = "",
+	    messageHandler: (message: any) => void = () => {},
 	    userFormatter: (username: string) => HTMLLIElement = li,
 	    roomFormatter: (room: string) => HTMLLIElement = li,
-	    userExit: (username: string) => void = () => {};
-	messages.responder(() => {});
-	adminChange.responder("");
+	    userExit: (username: string) => void = () => {},
+	    onAdmin = () => {};
 	Object.assign(room, {
 		"admin": () => admin,
 		"rooms": () => rooms,
@@ -96,10 +94,11 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"makeAdmin": () => rpc.request("adminRoom").then(() => {
 			becomeAdmin.remove();
 			admin = username;
+			onAdmin();
 		}),
 		"message": (message: any) => rpc.request("message", message),
 		"messageTo": (to: string, message: any) => rpc.request("messageTo", {to, message}),
-		"messageHandler": messages.responder.bind(messages),
+		"messageHandler": (fn: (message: any) => void) => messageHandler = fn,
 		"username": () => username,
 		"userFormatter": (fn: (username: string) => HTMLLIElement) => {
 			userFormatter = fn;
@@ -119,7 +118,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		},
 		"userExit": (fn: (username: string) => void) => {
 			userExit = fn;
-		}
+		},
+		"onAdmin": (fn: () => void) => onAdmin = fn
 	});
 	for (const [id, fn] of [
 		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
@@ -132,7 +132,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}],
 		[broadcastAdmin, (a: string) => {
 			becomeAdmin.remove();
-			adminChange.request(admin = a);
+			admin = a;
 		}],
 		[broadcastUserJoin, (user: string) => users.push({user, [node]: userFormatter(user)})],
 		[broadcastUserLeave, user => {
@@ -142,7 +142,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				userExit(user);
 			}
 		}],
-		[broadcastMessage, data => messages.request(data)]
+		[broadcastMessage, messageHandler]
 	] as [number, (data: any) => any][]) {
 		rpc.await(id, true).then(fn);
 	}
