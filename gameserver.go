@@ -283,37 +283,28 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		c.room.mu.Lock()
 		defer c.room.mu.Unlock()
 		if c.room.admin == c {
-			c.room.status = data
-			broadcast(c.room.users, broadcastMessage, data)
+			var message struct {
+				Game string `json:"game"`
+				To   string `json:"to"`
+			}
+			if err := json.Unmarshal(data, &message); err != nil {
+				return nil, err
+			}
+			if len(message.To) > 0 {
+				userConn, ok := c.room.names[message.To]
+				if !ok {
+					return nil, errNoUser
+				}
+				go userConn.rpc.SendData(buildBroadcast(broadcastMessageUser, data))
+			} else if len(message.Game) > 0 {
+				c.room.status = data
+				broadcast(c.room.users, broadcastMessageRoom, data)
+			}
 		} else if _, ok := c.room.names[c.name]; ok {
-			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessage, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
+			go c.room.admin.rpc.SendData(buildBroadcast(broadcastMessageAdmin, append(append(append(strconv.AppendQuote(append(json.RawMessage{}, "{\"from\":"...), c.name), ",\"data\":"...), data...), '}')))
 		} else {
 			return nil, errNotUser
 		}
-		return nil, nil
-	case "messageTo":
-		var messageTo struct {
-			To      string          `json:"to"`
-			Message json.RawMessage `json:"message"`
-		}
-		if err := json.Unmarshal(data, &messageTo); err != nil {
-			return nil, err
-		}
-		c.mu.RLock()
-		defer c.mu.RUnlock()
-		if c.room == nil {
-			return nil, errNotInRoom
-		}
-		c.room.mu.RLock()
-		defer c.room.mu.RUnlock()
-		if c.room.admin != c {
-			return nil, errNotAdmin
-		}
-		userConn, ok := c.room.names[messageTo.To]
-		if !ok {
-			return nil, errNoUser
-		}
-		userConn.rpc.SendData(buildBroadcast(broadcastMessage, messageTo.Message))
 		return nil, nil
 	}
 	return nil, errUnknownEndpoint
@@ -326,7 +317,9 @@ const (
 	broadcastAdmin
 	broadcastUserJoin
 	broadcastUserLeave
-	broadcastMessage
+	broadcastMessageAdmin
+	broadcastMessageUser
+	broadcastMessageRoom
 )
 
 const broadcastStart = "{\"id\": -0,\"result\":"
