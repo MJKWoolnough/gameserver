@@ -25,13 +25,15 @@ const game = "Middleground",
 		}}),
 		label({"for": "confirm"})
 	] : []
-      ]]);
+      ]]),
+      runAdmin = () => {};
 
 games.set(game, (admin: boolean, status?: any) => {
 	if (admin) {
-		
+		runAdmin();
 	} else {
 		room.messageHandler(messageHandler);
+		room.onAdmin(runAdmin);
 	}
 	if (status) {
 		messageHandler(status);
