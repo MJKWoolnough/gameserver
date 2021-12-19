@@ -1,7 +1,8 @@
 import {HTTPRequest} from './lib/conn.js';
 
 const params = {"response": "json"},
-      fields = ["category", "type", "difficulty", "question", "correct_answer"];
+      fields = ["category", "type", "difficulty", "question", "correct_answer"],
+      errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"];
 
 type TokenResponse = {
 	response_code: number;
@@ -55,29 +56,23 @@ class OTDB {
 		}
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
-		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(qr => {
-			switch (qr.response_code) {
+		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
+			switch (response_code) {
 			case 0:
-				for (const question of qr.results) {
+				for (const question of results) {
 					for (const field of fields) {
 						(question as any)[field] = atob((question as any)[field]);
 					}
 					question.incorrect_answers = question.incorrect_answers.map(atob);
 				}
-				return qr.results;
-			case 1:
-				throw new Error("no results");
-			case 2:
-				throw new Error("invalid param");
+				return results;
 			case 3:
 			case 4:
 				if (filter.autoReset) {
 					return this.resetToken().then(() => this.getQuestions(filter));
-				} else {
-					throw new Error("no more results");
 				}
 			}
-			throw new Error("unknown error");
+			return Promise.reject(errors[response_code] || "Unknown Error");
 		});
 	}
 	resetToken() {
