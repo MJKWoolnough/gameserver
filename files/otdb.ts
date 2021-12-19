@@ -1,6 +1,7 @@
 import {HTTPRequest} from './lib/conn.js';
 
-const params = {"response": "json"};
+const params = {"response": "json"},
+      fields = ["category", "type", "difficulty", "question", "correct_answer"];
 
 type TokenResponse = {
 	response_code: number;
@@ -17,11 +18,15 @@ type CategoryResponse = {
 	trivia_categories: Category[];
 }
 
+type Difficulty = "easy" | "medium" | "hard";
+
+type Type = "multiple" | "boolean";
+
 type QuestionFilter = {
 	amount: number;
 	category?: number;
-	difficulty?: "easy" | "medium" | "hard";
-	type?: "multiple" | "boolean";
+	difficulty?: Difficulty;
+	type?: Type;
 	autoReset?: boolean;
 }
 
@@ -32,8 +37,8 @@ type QuestionResponse = {
 
 type Question = {
 	category: string;
-	type: "multiple" | "boolean";
-	difficulty: "easy" | "medium" | "hard";
+	type: Type;
+	difficulty: Difficulty;
 	question: string;
 	correct_answer: string;
 	incorrect_answers: string[];
@@ -53,6 +58,12 @@ class OTDB {
 		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(qr => {
 			switch (qr.response_code) {
 			case 0:
+				for (const question of qr.results) {
+					for (const field of fields) {
+						(question as any)[field] = atob((question as any)[field]);
+					}
+					question.incorrect_answers = question.incorrect_answers.map(atob);
+				}
 				return qr.results;
 			case 1:
 				throw new Error("no results");
