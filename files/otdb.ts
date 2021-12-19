@@ -24,6 +24,14 @@ class OTDB {
 		this.#sessionID = sessionID;
 		this.#categories = cats;
 	}
+	resetToken() {
+		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, responseParam) as Promise<TokenResponse>).then(token => {
+			if (token.response_code !== 0) {
+				throw new Error("could not retrieve token");
+			}
+			this.#sessionID = token.token;
+		});
+	}
 }
 
 export default () => Promise.all([
