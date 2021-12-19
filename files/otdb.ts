@@ -1,6 +1,6 @@
 import {HTTPRequest} from './lib/conn.js';
 
-const params = {"response": "json", "encode": "base64"};
+const params = {"response": "json"};
 
 type TokenResponse = {
 	response_code: number;
@@ -50,7 +50,7 @@ class OTDB {
 		}
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
-		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}`, params) as Promise<QuestionResponse>).then(qr => {
+		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(qr => {
 			switch (qr.response_code) {
 			case 0:
 				return qr.results;
