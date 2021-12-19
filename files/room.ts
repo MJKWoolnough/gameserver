@@ -128,7 +128,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				games.get(game)?.onUserLeave?.(user);
 			}
 		}],
-		[broadcastMessageAdmin, (data: any) => games.get(game)?.onMessage?.(data)],
+		[broadcastMessageAdmin, ({from, data}: {from: string; data: any}) => games.get(game)?.onMessage?.(from, data)],
 		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
 		[broadcastMessageRoom, (data: any) => games.get(game = data.game)?.onRoomMessage(data.data)]
 	] as [number, (data: any) => any][]) {
