@@ -39,7 +39,7 @@ ready.then(() => {
 games.set("", {
 	"onAdmin": () => {
 		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a: GameNode, b: GameNode) => stringSort(a.game, b.game));
-		for (const [game, d] of games) {
+		for (const game of games.keys()) {
 			if (game) {
 				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
 			}
