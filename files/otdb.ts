@@ -1,6 +1,6 @@
 import {HTTPRequest} from './lib/conn.js';
 
-const responseParam = {"response": "json"};
+const params = {"response": "json", "encode": "base64"};
 
 type TokenResponse = {
 	response_code: number;
@@ -28,7 +28,7 @@ class OTDB {
 		}
 	}
 	resetToken() {
-		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, responseParam) as Promise<TokenResponse>).then(token => {
+		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params) as Promise<TokenResponse>).then(token => {
 			if (token.response_code !== 0) {
 				throw new Error("could not retrieve token");
 			}
@@ -38,8 +38,8 @@ class OTDB {
 }
 
 export default () => Promise.all([
-	HTTPRequest("https://opentdb.com/api_token.php?command=request", responseParam) as Promise<TokenResponse>,
-	HTTPRequest("https://opentdb.com/api_category.php", responseParam) as Promise<CategoryResponse>
+	HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>,
+	HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>
 ]).then(([token, cats]) => {
 	if (token.response_code !== 0) {
 		throw new Error("could not retrieve token");
