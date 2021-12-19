@@ -1,21 +1,37 @@
 import {HTTPRequest} from './lib/conn.js';
 
+const responseParam = {"response": "json"};
+
 type TokenResponse = {
 	response_code: number;
 	response_message: string;
 	token: string;
 }
 
+type Category = {
+	id: number;
+	name: string;
+}
+
+type CategoryResponse = {
+	trivia_categories: Category[];
+}
+
 class OTDB {
 	#sessionID: string;
-	constructor (sessionID: string) {
+	#categories: Category[];
+	constructor (sessionID: string, cats: Category[]) {
 		this.#sessionID = sessionID;
+		this.#categories = cats;
 	}
 }
 
-export default () => HTTPRequest("https://opentdb.com/api_token.php?command=request").then((data: TokenResponse) => {
-	if (data.response_code !== 0) {
+export default () => Promise.all([
+	HTTPRequest("https://opentdb.com/api_token.php?command=request", responseParam) as Promise<TokenResponse>,
+	HTTPRequest("https://opentdb.com/api_category.php", responseParam) as Promise<CategoryResponse>
+]).then(([token, cats]) => {
+	if (token.response_code !== 0) {
 		throw new Error("could not retrieve token");
 	}
-	return new OTDB(data.token);
+	return new OTDB(token.token, cats.trivia_categories);
 });
