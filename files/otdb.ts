@@ -19,10 +19,13 @@ type CategoryResponse = {
 
 class OTDB {
 	#sessionID: string;
-	#categories: Category[];
+	categories: Map<string, number>;
 	constructor (sessionID: string, cats: Category[]) {
 		this.#sessionID = sessionID;
-		this.#categories = cats;
+		this.categories = new Map<string, number>();
+		for (const {id, name} of cats) {
+			this.categories.set(name, id);
+		}
 	}
 	resetToken() {
 		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, responseParam) as Promise<TokenResponse>).then(token => {
