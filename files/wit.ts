@@ -17,8 +17,9 @@ type Message = {
 games.set(game, {
 	"onAdmin": () => {
 		let image = 0, step = 0;
-		const shuffledFiles = Array.from({"length": files.length}, () => files.splice(Math.floor(Math.random() * files.length), 1)[0]),
-		      l = shuffledFiles.length,
+		const sFiles = files.concat(),
+		      l = sFiles.length,
+		      shuffledFiles = Array.from({"length": l}, () => sFiles.splice(Math.floor(Math.random() * sFiles.length), 1)[0]),
 		      sendStatus = () => {
 			      image = ((image % l) + l) % l;
 			      step = Math.max(Math.min(step, boxes.length), 0);
