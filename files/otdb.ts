@@ -78,9 +78,10 @@ class OTDB {
 	resetToken() {
 		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params) as Promise<TokenResponse>).then(token => {
 			if (token.response_code !== 0) {
-				throw new Error("could not retrieve token");
+				return Promise.reject("could not retrieve token");
 			}
 			this.#sessionID = token.token;
+			return;
 		});
 	}
 }
@@ -92,7 +93,7 @@ export default () => Promise.all([
 	categories ?? (categories = HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>)
 ]).then(([token, cats]) => {
 	if (token.response_code !== 0) {
-		throw new Error("could not retrieve token");
+		return Promise.reject("could not retrieve token");
 	}
 	return new OTDB(token.token, cats.trivia_categories);
 });
