@@ -1,4 +1,5 @@
 import {HTTPRequest} from './lib/conn.js';
+import {stringSort} from './lib/nodes.js';
 
 const params = {"response": "json"},
       fields = ["category", "type", "difficulty", "question", "correct_answer"],
@@ -88,14 +89,6 @@ class OTDB {
 	}
 }
 
-let categories: CategoryResponse | null = null
+let categories: Category[];
 
-export default () => Promise.all([
-	HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>,
-	categories ?? (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response)
-]).then(([token, cats]) => {
-	if (token.response_code !== 0) {
-		return reject("could not retrieve token");
-	}
-	return new OTDB(token.token, cats.trivia_categories);
-});
+export default () => (categories ? Promise.resolve() : (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response.trivia_categories.sort((a: Category, b: Category) => stringSort(a.name, b.name)))).then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>).then(token => token.response_code ? reject(token.response_message) : new OTDB(token.token, categories));
