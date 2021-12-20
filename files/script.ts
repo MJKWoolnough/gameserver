@@ -13,7 +13,7 @@ type GameNode = {
 }
 
 ready.then(() => {
-	if (Array.from(new URL(window.location + "").searchParams.keys()).some(k => k === "monitor")) {
+	if (new URLSearchParams(window.location.search).has("monitor")) {
 		room.join("default", "");
 		return;
 	}
