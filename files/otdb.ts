@@ -25,7 +25,7 @@ type Difficulty = "easy" | "medium" | "hard";
 
 type Type = "multiple" | "boolean";
 
-type QuestionFilter = {
+export type QuestionFilter = {
 	amount: number;
 	category?: number;
 	difficulty?: Difficulty;
@@ -38,7 +38,7 @@ type QuestionResponse = {
 	results: Question[];
 }
 
-type Question = {
+export type Question = {
 	category: string;
 	type: Type;
 	difficulty: Difficulty;
@@ -47,7 +47,13 @@ type Question = {
 	incorrect_answers: string[];
 }
 
-class OTDB {
+export interface OTDB {
+	categories: ReadonlyMap<string, number>;
+	getQuestions: (filter: QuestionFilter) => Promise<Question[]>;
+	resetToken: () => Promise<void>;
+}
+
+class otdb {
 	#sessionID: string;
 	categories: ReadonlyMap<string, number>;
 	constructor (sessionID: string, cats: Category[]) {
@@ -91,4 +97,4 @@ class OTDB {
 
 let categories: Category[];
 
-export default () => (categories ? Promise.resolve() : (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response.trivia_categories.sort((a: Category, b: Category) => stringSort(a.name, b.name)))).then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>).then(token => token.response_code ? reject(token.response_message) : new OTDB(token.token, categories));
+export default () => (categories ? Promise.resolve() : (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response.trivia_categories.sort((a: Category, b: Category) => stringSort(a.name, b.name)))).then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>).then(token => token.response_code ? reject(token.response_message) : new otdb(token.token, categories) as OTDB);
