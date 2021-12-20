@@ -2,7 +2,8 @@ import {HTTPRequest} from './lib/conn.js';
 
 const params = {"response": "json"},
       fields = ["category", "type", "difficulty", "question", "correct_answer"],
-      errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"];
+      errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
+      reject = (reason: string) => Promise.reject(reason);
 
 type TokenResponse = {
 	response_code: number;
@@ -72,13 +73,13 @@ class OTDB {
 					return this.resetToken().then(() => this.getQuestions(filter));
 				}
 			}
-			return Promise.reject(errors[response_code] || "Unknown Error");
+			return reject(errors[response_code] || "Unknown Error");
 		});
 	}
 	resetToken() {
 		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params) as Promise<TokenResponse>).then(token => {
 			if (token.response_code !== 0) {
-				return Promise.reject("could not retrieve token");
+				return reject("could not retrieve token");
 			}
 			this.#sessionID = token.token;
 			return;
@@ -93,7 +94,7 @@ export default () => Promise.all([
 	categories ?? (categories = HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>)
 ]).then(([token, cats]) => {
 	if (token.response_code !== 0) {
-		return Promise.reject("could not retrieve token");
+		return reject("could not retrieve token");
 	}
 	return new OTDB(token.token, cats.trivia_categories);
 });
