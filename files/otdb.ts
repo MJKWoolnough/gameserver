@@ -48,13 +48,14 @@ type Question = {
 
 class OTDB {
 	#sessionID: string;
-	categories: Map<string, number>;
+	categories: ReadonlyMap<string, number>;
 	constructor (sessionID: string, cats: Category[]) {
 		this.#sessionID = sessionID;
-		this.categories = new Map<string, number>();
+		const categories = new Map<string, number>();
 		for (const {id, name} of cats) {
-			this.categories.set(name, id);
+			categories.set(name, id);
 		}
+		this.categories = categories;
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
