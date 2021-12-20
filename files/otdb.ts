@@ -87,11 +87,11 @@ class OTDB {
 	}
 }
 
-let categories: Promise<CategoryResponse> | null = null
+let categories: CategoryResponse | null = null
 
 export default () => Promise.all([
 	HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>,
-	categories ?? (categories = HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>)
+	categories ?? (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response)
 ]).then(([token, cats]) => {
 	if (token.response_code !== 0) {
 		return reject("could not retrieve token");
