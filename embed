@@ -23,7 +23,7 @@ tmpFile="$(mktemp)";
 	echo -n "</script><style type=\"text/css\">";
 	grep -hv "^@import" *.css | uglifycss | tr -d '\n';
 	echo -n "</style>";
-	tail -n5 index.html | tr -d '\n	';
+	tail -n6 index.html | tr -d '\n	';
 ) > "$tmpFile";
 
 echo -e "package gameserver\n\nconst (\n	uncompressedSize = $(stat --format "%s" "$tmpFile")\n	indexUpdated     = $(date "+%s")\n)" > "index_size.go";
