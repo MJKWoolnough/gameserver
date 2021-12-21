@@ -76,14 +76,25 @@ class otdb {
 		this.#counts = counts;
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
-		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
+		filter.category = filter.category === undefined ? -1 : this.#counts.has(filter.category) ? filter.category : -1;
+		const amount = Math.min(Math.max(filter.amount, 1), 50, this.#counts.get(filter.category) || 0);
+		if (amount === 0 && filter.autoReset) {
+			return this.resetToken().then(() => this.getQuestions(filter));
+		}
+		return (HTTPRequest(`https://opentdb.com/api.php?amount=${amount}${filter.category !== -1 ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
 			switch (response_code) {
 			case 0:
+				this.#counts.set(-1, this.#counts.get(-1)! - results.length);
 				for (const question of results) {
 					for (const field of fields) {
 						(question as any)[field] = atob((question as any)[field]);
 					}
 					question.incorrect_answers = question.incorrect_answers.map(atob);
+					const catID = this.categories.get(question.category) || -2,
+					      num = this.#counts.get(catID);
+					if (num) {
+						this.#counts.set(catID, num - 1);
+					}
 				}
 				return results;
 			case 3:
@@ -114,6 +125,7 @@ export default () => (
 			(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>)
 		]).then(([cats, catCounts]) => {
 			categories = cats.trivia_categories.map(c => [c.name, c.id]);
+			counts.push([-1, catCounts.total_num_of_questions]);
 			for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
 				counts.push([parseInt(id), total_num_of_verified_questions]);
 			}
