@@ -118,22 +118,14 @@ class otdb {
 	}
 }
 
-export default () => (
-	categories ?
-		Promise.resolve() :
-		Promise.all([
-			(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>),
-			(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>)
-		]).then(([cats, catCounts]) => {
-			categories = cats.trivia_categories.map(c => [c.name, c.id]);
-			counts.push([-1, catCounts.total_num_of_questions]);
-			for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
-				counts.push([parseInt(id), total_num_of_verified_questions]);
-			}
-		})
-	)
-	.then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>)
-	.then(token => token.response_code ?
-		reject(token.response_message) :
-		new otdb(token.token, new Map(categories), new Map(counts)) as OTDB
-	);
+export default () => (categories ? Promise.resolve() : Promise.all([
+	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.map(c => [c.name, c.id])),
+	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
+		counts.push([-1, catCounts.total_num_of_verified_questions]);
+		for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
+			counts.push([parseInt(id), total_num_of_verified_questions]);
+		}
+	})
+]))
+.then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>)
+.then(token => token.response_code ? reject(token.response_message) : new otdb(token.token, new Map(categories), new Map(counts)) as OTDB);
