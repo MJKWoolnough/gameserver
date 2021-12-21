@@ -208,3 +208,70 @@ input::placeholder {
 	color: #fff;
 	font-size: 2em;
 }
+
+#quizOptions > label {
+	display: inline-block;
+	width: 9em;
+	text-align: right;
+	font-size: 1.5em;
+}
+
+#quizOptions > input {
+	box-sizing: border-box;
+	width: calc(100% - 10em);
+	text-align: center;
+	font-size: 2em;
+}
+
+#quizOptions > input[type=checkbox] {
+	min-height: 1.5em;
+}
+
+#quizOptions ul input {
+	display: none;
+}
+
+#quizOptions ul {
+	list-style: none;
+	padding: 0;
+}
+
+#quizOptions ul {
+	display: grid;
+	grid-gap: 2px;
+	grid-template-columns: repeat(auto-fit, minmax(20em, 1fr))
+}
+
+#quizOptions li label, #quizOptions li input:checked:active:hover + label {
+	display: block;
+	font-size: 2em;
+	box-sizing: border-box;
+	min-height: 3em;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1vmax outset #00a;
+	background-color: #009;
+}
+
+#quizOptions li input:checked + label, #quizOptions li input:not(checked):active:hover + label {
+	background-color: #090;
+	border-color: #0a0;
+	border-style: inset;
+}
+
+#quizOptions h1, #quizOptions h2 {
+	text-align: center;
+}
+
+#quizOptions button {
+	box-sizing: border-box;
+	width: 100%;
+	height: 4em;
+	background-color: #900;
+	border: 1vmax outset #a00;
+	font-size: 2em;
+	color: #fff;
+}
