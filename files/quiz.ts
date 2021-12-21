@@ -11,10 +11,10 @@ games.set(game, {
 		otdb().then(o => {
 			let round = 0;
 			const roundStart = () => {
-				const timer = input({"type": "number", "min": 0, "value": 0}),
-				      showAnswers = input({"type": "checkbox", "checked": true}),
+				const timer = input({"id": "timer", "type": "number", "min": 0, "value": 0}),
+				      showAnswers = input({"id": "showAnswers", "type": "checkbox", "checked": true}),
 				      cats = new Set<number>(),
-				      numberQs = input({"type": "number", "min": 1, "max": 50, "value": 10});
+				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10});
 				createHTML(clearElement(document.body), div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
 					label({"for": "timer"}, "Timer (s): "),
