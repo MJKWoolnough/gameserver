@@ -112,6 +112,7 @@ class otdb {
 				return reject("could not retrieve token");
 			}
 			this.#sessionID = token.token;
+			this.#counts = new Map(counts);
 			return;
 		});
 	}
