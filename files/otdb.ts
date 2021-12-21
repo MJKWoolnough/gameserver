@@ -1,7 +1,9 @@
 import {HTTPRequest} from './lib/conn.js';
-import {stringSort} from './lib/nodes.js';
 
-const params = {"response": "json"},
+
+let categories: [string, number][] | null = null;
+const counts: [number, number][] = [],
+      params = {"response": "json"},
       fields = ["category", "type", "difficulty", "question", "correct_answer"],
       errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
       reject = (reason: string) => Promise.reject(reason);
@@ -19,6 +21,17 @@ type Category = {
 
 type CategoryResponse = {
 	trivia_categories: Category[];
+}
+
+type CategoryCount = {
+	total_num_of_questions: number;
+	total_num_of_pending_questions: number;
+	total_num_of_verified_questions: number;
+	total_num_of_rejected_questions: number;
+}
+
+type CategoryCountResponse = CategoryCount & {
+	categories: Record<string, CategoryCount>;
 }
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -56,13 +69,11 @@ export interface OTDB {
 class otdb {
 	#sessionID: string;
 	categories: ReadonlyMap<string, number>;
-	constructor (sessionID: string, cats: Category[]) {
+	#counts: Map<number, number>;
+	constructor (sessionID: string, cats: Map<string, number>, counts: Map<number, number>) {
 		this.#sessionID = sessionID;
-		const categories = new Map<string, number>();
-		for (const {id, name} of cats) {
-			categories.set(name, id);
-		}
-		this.categories = categories;
+		this.categories = cats;
+		this.#counts = counts;
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		return (HTTPRequest(`https://opentdb.com/api.php?amount=${Math.min(Math.max(filter.amount, 1), 50)}${filter.category ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
@@ -95,6 +106,21 @@ class otdb {
 	}
 }
 
-let categories: Category[];
-
-export default () => (categories ? Promise.resolve() : (HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(response => categories = response.trivia_categories.sort((a: Category, b: Category) => stringSort(a.name, b.name)))).then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>).then(token => token.response_code ? reject(token.response_message) : new otdb(token.token, categories) as OTDB);
+export default () => (
+	categories ?
+		Promise.resolve() :
+		Promise.all([
+			(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>),
+			(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>)
+		]).then(([cats, catCounts]) => {
+			categories = cats.trivia_categories.map(c => [c.name, c.id]);
+			for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
+				counts.push([parseInt(id), total_num_of_verified_questions]);
+			}
+		})
+	)
+	.then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>)
+	.then(token => token.response_code ?
+		reject(token.response_message) :
+		new otdb(token.token, new Map(categories), new Map(counts)) as OTDB
+	);
