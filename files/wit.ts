@@ -2,7 +2,7 @@ import {clearElement} from './lib/dom.js';
 import {createHTML, button, canvas, div, h1, img} from './lib/html.js';
 import games from './games.js';
 import {room} from './room.js';
-import {files} from './wit_data.js';
+import {files} from './data/wit_data.js';
 
 const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
