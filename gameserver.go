@@ -12,7 +12,7 @@ import (
 	"vimagination.zapto.org/jsonrpc"
 )
 
-// New create a new gameserver mux
+// New create a new gameserver mux, with the given dataDir used for data required by the games
 func New(dataDir http.FileSystem) *http.ServeMux {
 	m := http.NewServeMux()
 	m.Handle("/data", http.FileServer(dataDir))
