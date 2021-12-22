@@ -1,0 +1,38 @@
+.witButton {
+	width: 100%;
+	height: 10vh;
+	border-width: 1vmax;
+	font-size: 2vmax
+}
+
+.witButton:nth-of-type(1) {
+	background-color: #f80;
+	border-color: #f90;
+}
+
+.witButton:nth-of-type(2) {
+	background-color: #aa0;
+	border-color: #bb0;
+}
+
+.witButton:nth-of-type(3) {
+	background-color: #08f;
+	border-color: #09f;
+}
+
+.witButton:nth-of-type(4) {
+	background-color: #080;
+	border-color: #090;
+}
+
+.witButton.big {
+	height: 40vh;
+	width: 50%;
+}
+
+@media (orientation: portrait) {
+	.witButton.big {
+		width: 100%;
+		height: 30vh;
+	}
+}
