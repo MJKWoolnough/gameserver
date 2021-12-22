@@ -1,3 +1,4 @@
+// Package gameserver implements a simple messaging server to be used with several built in games.
 package gameserver
 
 import (
