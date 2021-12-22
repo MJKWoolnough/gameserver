@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -18,12 +19,15 @@ func main() {
 }
 
 func run() error {
+	var dataDir string
+	flag.StringVar(&dataDir, "d", "./data/", "Game Data Directory")
+	flag.Parse()
 	l, err := listen()
 	if err != nil {
 		return err
 	}
 	server := http.Server{
-		Handler: gameserver.New(),
+		Handler: gameserver.New(http.Dir(dataDir)),
 	}
 	go server.Serve(l)
 	sc := make(chan os.Signal, 1)
