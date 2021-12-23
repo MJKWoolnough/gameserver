@@ -1,6 +1,7 @@
 import type {Question} from './otdb.js';
 import {clearElement} from './lib/dom.js';
 import {createHTML, br, button, div, h1, h2, input, label, li, ul} from './lib/html.js';
+import {stringSort} from './lib/nodes.js';
 import games from './games.js';
 import otdb from './otdb.js';
 import {room} from './room.js';
@@ -85,6 +86,7 @@ games.set(game, {
 							for (let i = 0; i < n; i++) {
 								sqs.push(qs.splice(Math.floor(Math.random() * qs.length))[0]);
 							}
+							room.messageRoom({round, "num": 1, "question": qs[0].question, "answers": s ? [qs[0].correct_answer].concat(qs[0].incorrect_answers).sort(stringSort) : undefined, "endTime": t ? room.getTime() + t : 0, "scores": {}});
 						      };
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
