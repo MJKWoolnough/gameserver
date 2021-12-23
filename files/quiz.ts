@@ -4,6 +4,15 @@ import {createHTML, br, button, div, h1, h2, input, label, li, ul} from './lib/h
 import games from './games.js';
 import otdb from './otdb.js';
 
+type QuestionMessage = {
+	round: number;
+	num: number;
+	question: string;
+	answers?: string[];
+	endTime?: number;
+	scores: Record<string, number>;
+}
+
 const game = "Quiz";
 
 games.set(game, {
@@ -69,5 +78,12 @@ games.set(game, {
 			roundStart();
 		}).catch(alert);
 	},
-	"onRoomMessage": () => {}
+	"onRoomMessage": (data: QuestionMessage) => {
+		createHTML(clearElement(document.body), div([
+			h1(`Round ${data.round} - Question ${data.num}`),
+			h2(data.question),
+			data.answers ? ul() : [],
+			data.endTime ? div() : []
+		]));
+	}
 });
