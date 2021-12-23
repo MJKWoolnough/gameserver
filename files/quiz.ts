@@ -3,6 +3,7 @@ import {clearElement} from './lib/dom.js';
 import {createHTML, br, button, div, h1, h2, input, label, li, ul} from './lib/html.js';
 import games from './games.js';
 import otdb from './otdb.js';
+import {room} from './room.js';
 
 type QuestionMessage = {
 	round: number;
@@ -13,7 +14,22 @@ type QuestionMessage = {
 	scores: Record<string, number>;
 }
 
-const game = "Quiz";
+const game = "Quiz",
+      countDown = (endTime: number) => {
+	const time = div(),
+	      setTime = () => {
+		const remaining = endTime - room.getTime();
+		if (remaining <= 0) {
+			clearInterval(si);
+			createHTML(time, "0");
+		} else {
+			createHTML(time, remaining + "");
+		}
+	      },
+	      si = setInterval(setTime, 1000);
+	setTime();
+	return time;
+      };
 
 games.set(game, {
 	"onAdmin": () => {
@@ -83,7 +99,7 @@ games.set(game, {
 			h1(`Round ${data.round} - Question ${data.num}`),
 			h2(data.question),
 			data.answers ? ul() : [],
-			data.endTime ? div() : []
+			data.endTime ? countDown(data.endTime) : []
 		]));
 	}
 });
