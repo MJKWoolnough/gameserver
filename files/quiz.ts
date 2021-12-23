@@ -95,10 +95,11 @@ games.set(game, {
 		}).catch(alert);
 	},
 	"onRoomMessage": (data: QuestionMessage) => {
-		createHTML(clearElement(document.body), div([
+		const isSpectator = room.username() === "";
+		createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 			h1(`Round ${data.round} - Question ${data.num}`),
 			h2(data.question),
-			data.answers ? ul() : [],
+			data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => {}}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": () => {}}),
 			data.endTime ? countDown(data.endTime) : []
 		]));
 	}
