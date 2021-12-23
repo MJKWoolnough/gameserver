@@ -44,27 +44,18 @@ games.set(game, {
 						      qs = [],
 						      cs = Array.from(cats),
 						      getQs = () => {
-							const i = Math.floor(Math.random() * cs.length),
-							      category = cs.length === 0 ? undefined : cs[i];
-							o.getQuestions({"amount": 1, category}).then(questions => {
+							const i = Math.floor(Math.random() * cs.length);
+							o.getQuestions({"amount": 1, "category": cs.length === 0 ? undefined : cs[i]}).then(questions => {
 								if (questions.length === 0) {
-									if (cs.length === 0) {
-										return o.resetToken().then(getQs);
-									} else {
-										cs.splice(i, 1);
-										return getQs();
-									}
+									cs.splice(i, 1);
+									return cs.length === 0 ? o.resetToken().then(getQs) : getQs();
 								}
 								qs.push(...questions);
-								if (qs.length === n) {
-									return start();
-								}
-								return getQs();
+								return qs.length === n ? start() : getQs();
 							});
 						      },
 						      start = () => {};
 						getQs();
-
 					}}, "Start")
 				]));
 			      };
