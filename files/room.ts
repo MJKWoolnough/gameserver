@@ -29,7 +29,7 @@ type GameMessage = {
 	game: string;
 }
 
-export let timeShift = 0;
+let timeShift = 0;
 
 export const room = {} as {
 	admin: () => string;
@@ -45,6 +45,7 @@ export const room = {} as {
 	messageRoom: (data: any) => Promise<void>;
 	username: () => string;
 	roomFormatter: (fn: (room: string) => HTMLLIElement) => void;
+	getTime: () => number;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const rooms = new NodeArray<RoomNode>(ul()),
@@ -105,7 +106,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				rooms[node].replaceChild(n, room[node]);
 				room[node] = n;
 			}
-		}
+		},
+		"getTime": () => timeShift + Date.now() / 1000
 	});
 	for (const [id, fn] of [
 		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
