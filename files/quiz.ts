@@ -37,7 +37,35 @@ games.set(game, {
 						}}),
 						label({"for": `cat_${id}`}, cat)
 					]))),
-					button({"onclick": () => {}}, "Start")
+					button({"onclick": () => {
+						const t = parseInt(timer.value) || 0,
+						      s = showAnswers.checked,
+						      n = parseInt(numberQs.value) || 10,
+						      qs = [],
+						      cs = Array.from(cats),
+						      getQs = () => {
+							const i = Math.floor(Math.random() * cs.length),
+							      category = cs.length === 0 ? undefined : cs[i];
+							o.getQuestions({"amount": 1, category}).then(questions => {
+								if (questions.length === 0) {
+									if (cs.length === 0) {
+										return o.resetToken().then(getQs);
+									} else {
+										cs.splice(i, 1);
+										return getQs();
+									}
+								}
+								qs.push(...questions);
+								if (qs.length === n) {
+									return start();
+								}
+								return getQs();
+							});
+						      },
+						      start = () => {};
+						getQs();
+
+					}}, "Start")
 				]));
 			      };
 			roundStart();
