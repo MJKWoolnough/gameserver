@@ -55,6 +55,7 @@ games.set(game, {
 							});
 						      },
 						      start = () => {};
+						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
 				]));
