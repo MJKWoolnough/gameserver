@@ -1,3 +1,4 @@
+import type {Question} from './otdb.js';
 import {clearElement} from './lib/dom.js';
 import {createHTML, br, button, div, h1, h2, input, label, li, ul} from './lib/html.js';
 import games from './games.js';
@@ -41,7 +42,7 @@ games.set(game, {
 						const t = parseInt(timer.value) || 0,
 						      s = showAnswers.checked,
 						      n = parseInt(numberQs.value) || 10,
-						      qs = [],
+						      qs: Question[] = [],
 						      cs = Array.from(cats),
 						      getQs = () => {
 							const i = Math.floor(Math.random() * cs.length);
@@ -54,7 +55,12 @@ games.set(game, {
 								return qs.length === n ? start() : getQs();
 							});
 						      },
-						      start = () => {};
+						      start = () => {
+							const sqs: Question[] = [];
+							for (let i = 0; i < n; i++) {
+								sqs.push(qs.splice(Math.floor(Math.random() * qs.length))[0]);
+							}
+						      };
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
