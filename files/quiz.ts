@@ -1,7 +1,7 @@
 import type {Question} from './otdb.js';
 import {clearElement} from './lib/dom.js';
-import {createHTML, br, button, div, h1, h2, input, label, li, ul} from './lib/html.js';
-import {stringSort} from './lib/nodes.js';
+import {createHTML, br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
+import {NodeArray, node, stringSort} from './lib/nodes.js';
 import games from './games.js';
 import otdb from './otdb.js';
 import {room} from './room.js';
@@ -12,6 +12,10 @@ type QuestionMessage = {
 	question: string;
 	answers?: string[];
 	endTime?: number;
+}
+
+type EndOfRoundMessage = {
+	round: number;
 	scores: Record<string, number>;
 }
 
@@ -32,7 +36,8 @@ const game = "Quiz",
 	setTime();
 	return time;
       },
-      answers = new Map<string, string>();
+      answers = new Map<string, string>(),
+      isEndOfRoundMessage = (data: QuestionMessage | EndOfRoundMessage): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined;
 
 games.set(game, {
 	"onAdmin": () => {
@@ -115,14 +120,26 @@ games.set(game, {
 		}).catch(alert);
 	},
 	"onMessage": (from: string, data: string) => answers.set(from, data),
-	"onRoomMessage": (data: QuestionMessage) => {
-		const isSpectator = room.username() === "",
-		      answer = div(data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
-		createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
-			h1(`Round ${data.round} - Question ${data.num}`),
-			h2(data.question),
-			answer,
-			data.endTime ? countDown(data.endTime, answer) : []
-		]));
+	"onRoomMessage": (data: QuestionMessage | EndOfRoundMessage) => {
+		if (isEndOfRoundMessage(data)) {
+			const scores = new NodeArray<{"name": string, "score": number, [node]: HTMLLIElement}>(ul(), (a, b) => (a.score - b.score) || stringSort(a.name, b.name));
+			for (const name in data.scores) {
+				const score = data.scores[name];
+				scores.push({name, score, [node]: li([span(name), span(score + "")])});
+			}
+			createHTML(clearElement(document.body), div({"id": "quizScores"}, [
+				h1(`Round ${data.round}`),
+				scores[node]
+			]));
+		} else {
+			const isSpectator = room.username() === "",
+			      answer = div(data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
+			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+				h1(`Round ${data.round} - Question ${data.num}`),
+				h2(data.question),
+				answer,
+				data.endTime ? countDown(data.endTime, answer) : []
+			]));
+		}
 	}
 });
