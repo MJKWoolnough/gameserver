@@ -20,14 +20,14 @@ type EndOfRoundMessage = {
 }
 
 const game = "Quiz",
-      countDown = (endTime: number, answerContainer: HTMLDivElement) => {
+      countDown = (endTime: number, fn: () => void) => {
 	const time = div(),
 	      setTime = () => {
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
 			clearInterval(si);
 			createHTML(time, "0");
-			answerContainer.remove();
+			fn?.();
 		} else {
 			createHTML(time, remaining + "");
 		}
@@ -107,8 +107,10 @@ games.set(game, {
 								h1(`Round ${round} - Question ${num}`),
 								h2(qs[num]),
 								answer,
-								endTime ? countDown(endTime, answer) : []
+								endTime ? countDown(endTime, runA) : button({"onclick": runA}, "End Question")
 							]));
+						      },
+						      runA = () => {
 						      };
 						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
@@ -138,7 +140,7 @@ games.set(game, {
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				answer,
-				data.endTime ? countDown(data.endTime, answer) : []
+				data.endTime ? countDown(data.endTime, () => answer.remove()) : []
 			]));
 		}
 	}
