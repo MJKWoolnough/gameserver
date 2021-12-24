@@ -74,20 +74,22 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			game = "";
 			return rpc.request("joinRoom", {room, user}).then((resp: any) => {
 				if (!user) {
-					return resp;
-				}
-				const {"admin": a, "users": u, data: {game: g = "", data = {}} = {}} = resp,
-				      uf = games.get(game)?.userFormatter ?? li;
-				admin = a;
-				username = user;
-				users.push({user, [node]: uf(user)});
-				for (const user of u) {
+					const {game: g, data} = resp;
+					games.get(game = g)?.onRoomMessage?.(data);
+				} else {
+					const {"admin": a, "users": u, data: {game: g = "", data = {}} = {}} = resp,
+					      uf = games.get(game)?.userFormatter ?? li;
+					admin = a;
+					username = user;
 					users.push({user, [node]: uf(user)});
+					for (const user of u) {
+						users.push({user, [node]: uf(user)});
+					}
+					if (!admin) {
+						setTimeout(() => createHTML(document.body, becomeAdmin), 0);
+					}
+					games.get(game = g)?.onRoomMessage?.(data);
 				}
-				if (!admin) {
-					setTimeout(() => createHTML(document.body, becomeAdmin), 0);
-				}
-				games.get(game = g)?.onRoomMessage?.(data);
 			});
 		},
 		"adminGame": (g: string) => games.get(game = g)?.onAdmin(),
