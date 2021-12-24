@@ -101,7 +101,7 @@ games.set(game, {
 		createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 			h1(`Round ${data.round} - Question ${data.num}`),
 			h2(data.question),
-			data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => {}}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": () => {}}),
+			data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}),
 			data.endTime ? countDown(data.endTime) : []
 		]));
 	}
