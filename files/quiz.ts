@@ -87,9 +87,23 @@ games.set(game, {
 							for (let i = 0; i < n; i++) {
 								sqs.push(qs.splice(Math.floor(Math.random() * qs.length))[0]);
 							}
+							runQ();
+						      },
+						      runQ = () => {
 							answers.clear();
-							room.messageRoom({round, "num": 1, "question": qs[0].question, "answers": s ? [qs[0].correct_answer].concat(qs[0].incorrect_answers).sort(stringSort) : undefined, "endTime": t ? room.getTime() + t : 0, "scores": {}});
+							num++;
+							const answerList = s ? [qs[num].correct_answer].concat(qs[num].incorrect_answers).sort(stringSort) : undefined,
+							      username = room.username(),
+							      endTime = t ? room.getTime() + t : 0;
+							room.messageRoom({round, num, "question": qs[num].question, "answers": answerList, endTime, "scores": {}});
+							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+								h1(`Round ${round} - Question ${num}`),
+								h2(qs[num]),
+								answerList ? ul(answerList.map(answer => li({"onclick": () => answers.set(room.username(), answer)}, answer))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}}),
+								endTime ? countDown(endTime) : []
+							]));
 						      };
+						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
