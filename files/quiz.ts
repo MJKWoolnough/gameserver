@@ -100,13 +100,15 @@ games.set(game, {
 							num++;
 							const answerList = s ? [qs[num].correct_answer].concat(qs[num].incorrect_answers).sort(stringSort) : undefined,
 							      username = room.username(),
-							      endTime = t ? room.getTime() + t : 0,
-							      answer = div(answerList ? ul(answerList.map(answer => li({"onclick": () => answers.set(room.username(), answer)}, answer))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}}));
+							      endTime = t ? room.getTime() + t : 0;
 							room.messageRoom({round, num, "question": qs[num].question, "answers": answerList, endTime, "scores": {}});
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(qs[num]),
-								answer,
+								div(answerList ? ul(answerList.map((answer, n) => li([
+								      input({"type": "checkbox", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
+								      label({"for": `answer_${n}`}, answer)
+								]))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}})),
 								endTime ? countDown(endTime, runA) : button({"onclick": runA}, "End Question")
 							]));
 						      },
@@ -135,7 +137,10 @@ games.set(game, {
 			]));
 		} else {
 			const isSpectator = room.username() === "",
-			      answer = div(data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
+			      answer = div(data.answers ? ul(data.answers.map((answer, n) => li([
+				      input({"type": "checkbox", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
+				      label({"for": `answer_${n}`}, answer)
+			      ]))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
 			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
