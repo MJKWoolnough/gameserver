@@ -16,13 +16,14 @@ type QuestionMessage = {
 }
 
 const game = "Quiz",
-      countDown = (endTime: number) => {
+      countDown = (endTime: number, answerContainer: HTMLDivElement) => {
 	const time = div(),
 	      setTime = () => {
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
 			clearInterval(si);
 			createHTML(time, "0");
+			answerContainer.remove();
 		} else {
 			createHTML(time, remaining + "");
 		}
@@ -94,13 +95,14 @@ games.set(game, {
 							num++;
 							const answerList = s ? [qs[num].correct_answer].concat(qs[num].incorrect_answers).sort(stringSort) : undefined,
 							      username = room.username(),
-							      endTime = t ? room.getTime() + t : 0;
+							      endTime = t ? room.getTime() + t : 0,
+							      answer = div(answerList ? ul(answerList.map(answer => li({"onclick": () => answers.set(room.username(), answer)}, answer))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}}));
 							room.messageRoom({round, num, "question": qs[num].question, "answers": answerList, endTime, "scores": {}});
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(qs[num]),
-								answerList ? ul(answerList.map(answer => li({"onclick": () => answers.set(room.username(), answer)}, answer))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}}),
-								endTime ? countDown(endTime) : []
+								answer,
+								endTime ? countDown(endTime, answer) : []
 							]));
 						      };
 						let num = 0;
@@ -114,12 +116,13 @@ games.set(game, {
 	},
 	"onMessage": (from: string, data: string) => answers.set(from, data),
 	"onRoomMessage": (data: QuestionMessage) => {
-		const isSpectator = room.username() === "";
+		const isSpectator = room.username() === "",
+		      answer = div(data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
 		createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 			h1(`Round ${data.round} - Question ${data.num}`),
 			h2(data.question),
-			data.answers ? ul(data.answers.map(answer => li({"onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}, answer))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}),
-			data.endTime ? countDown(data.endTime) : []
+			answer,
+			data.endTime ? countDown(data.endTime, answer) : []
 		]));
 	}
 });
