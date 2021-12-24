@@ -16,8 +16,8 @@ import (
 // New create a new gameserver mux, with the given dataDir used for data required by the games
 func New(dataDir http.FileSystem) *http.ServeMux {
 	m := http.NewServeMux()
-	m.Handle("/data", http.FileServer(dataDir))
 	m.Handle("/", index)
+	m.Handle("/data/", http.StripPrefix("/data/", http.FileServer(dataDir)))
 	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
 	return m
 }
