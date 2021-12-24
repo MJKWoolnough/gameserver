@@ -30,7 +30,8 @@ const game = "Quiz",
 	      si = setInterval(setTime, 1000);
 	setTime();
 	return time;
-      };
+      },
+      answers = new Map<string, string>();
 
 games.set(game, {
 	"onAdmin": () => {
@@ -86,6 +87,7 @@ games.set(game, {
 							for (let i = 0; i < n; i++) {
 								sqs.push(qs.splice(Math.floor(Math.random() * qs.length))[0]);
 							}
+							answers.clear();
 							room.messageRoom({round, "num": 1, "question": qs[0].question, "answers": s ? [qs[0].correct_answer].concat(qs[0].incorrect_answers).sort(stringSort) : undefined, "endTime": t ? room.getTime() + t : 0, "scores": {}});
 						      };
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
@@ -96,6 +98,7 @@ games.set(game, {
 			roundStart();
 		}).catch(alert);
 	},
+	"onMessage": (from: string, data: string) => answers.set(from, data),
 	"onRoomMessage": (data: QuestionMessage) => {
 		const isSpectator = room.username() === "";
 		createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
