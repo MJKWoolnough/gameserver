@@ -97,14 +97,15 @@ games.set(game, {
 						      },
 						      runQ = () => {
 							answers.clear();
-							num++;
-							const answerList = s ? [qs[num].correct_answer].concat(qs[num].incorrect_answers).sort(stringSort) : undefined,
+							const {question, correct_answer, incorrect_answers} = qs[num],
+							      answerList = s ? [correct_answer].concat(incorrect_answers).sort(stringSort) : undefined,
 							      username = room.username(),
 							      endTime = t ? room.getTime() + t : 0;
-							room.messageRoom({round, num, "question": qs[num].question, "answers": answerList, endTime, "scores": {}});
+							num++;
+							room.messageRoom({round, num, question, "answers": answerList, endTime, "scores": {}});
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
-								h2(qs[num]),
+								h2(question),
 								div(answerList ? ul(answerList.map((answer, n) => li([
 								      input({"type": "checkbox", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
 								      label({"for": `answer_${n}`}, answer)
