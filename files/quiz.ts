@@ -108,7 +108,7 @@ games.set(game, {
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
 								div(answerList ? ul(answerList.map((answer, n) => li([
-								      input({"type": "checkbox", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
+								      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
 								      label({"for": `answer_${n}`}, answer)
 								]))) : input({"type": "text", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}})),
 								endTime ? countDown(endTime, runA) : button({"onclick": runA}, "End Question")
@@ -140,7 +140,7 @@ games.set(game, {
 		} else {
 			const isSpectator = room.username() === "",
 			      answer = div(data.answers ? ul(data.answers.map((answer, n) => li([
-				      input({"type": "checkbox", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
+				      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
 				      label({"for": `answer_${n}`}, answer)
 			      ]))) : isSpectator ? [] : input({"type": "text", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
 			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
