@@ -103,7 +103,11 @@ games.set(game, {
 							const {question, correct_answer, incorrect_answers} = qs[num],
 							      answerList = s ? [correct_answer].concat(incorrect_answers).sort(stringSort) : undefined,
 							      username = room.username(),
-							      endTime = t ? room.getTime() + t : 0;
+							      endTime = t ? room.getTime() + t : 0,
+							      sendAnswer = () => {
+								      room.messageRoom({round, num, question, correct_answer});
+								      runA(correct_answer);
+							      };
 							num++;
 							room.messageRoom({round, num, question, "answers": answerList, endTime});
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
@@ -113,10 +117,10 @@ games.set(game, {
 								      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
 								      label({"for": `answer_${n}`}, answer)
 								]))) : input({"type": "text", "placeholder": "Answer Here", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}})),
-								endTime ? countDown(endTime, runA) : button({"onclick": runA}, "End Question")
+								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
-						      runA = () => {
+						      runA = (_answer: string) => {
 						      };
 						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
