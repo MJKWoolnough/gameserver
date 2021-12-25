@@ -109,7 +109,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				room[node] = n;
 			}
 		},
-		"getTime": () => timeShift + Date.now() / 1000
+		"getTime": () => timeShift + Math.round(Date.now() / 1000)
 	});
 	for (const [id, fn] of [
 		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
