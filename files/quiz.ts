@@ -26,7 +26,8 @@ type EndOfRoundMessage = {
 }
 
 const game = "Quiz",
-      countDown = (endTime: number, fn: () => void) => {
+      showAnswerCountdown = 10,
+      countDown = (endTime: number, fn?: () => void) => {
 	const time = div({"id": "countdown"}),
 	      setTime = () => {
 		const remaining = endTime - room.getTime();
@@ -113,8 +114,20 @@ games.set(game, {
 							      username = room.username(),
 							      endTime = t ? room.getTime() + t : 0,
 							      sendAnswer = () => {
-								      room.messageRoom({round, num, question, correct_answer});
-								      runA(correct_answer);
+								room.messageRoom({round, num, question, correct_answer});
+								if (showAnswers.checked) {
+									for (const [u, a] of answers) {
+										scores.set(u, (scores.get(u) || 0) + (a === correct_answer ? 1 : 0));
+									}
+								} else {
+									// TODO: implement
+								}
+								createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+									h1(`Round ${round} - Question ${num}`),
+									h2(question),
+									h2(correct_answer),
+									countDown(room.getTime() + showAnswerCountdown, num === n ? endRound : runQ)
+								]));
 							      };
 							num++;
 							room.messageRoom({round, num, question, "answers": answerList, endTime});
@@ -128,15 +141,7 @@ games.set(game, {
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
-						      runA = (answer: string) => {
-							if (showAnswers.checked) {
-								for (const [u, a] of answers) {
-									scores.set(u, (scores.get(u) || 0) + (a === answer ? 1 : 0));
-								}
-							} else {
-								// TODO: implement
-							}
-						      };
+						      endRound = () => {};
 						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
@@ -162,7 +167,8 @@ games.set(game, {
 			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
-				h2(data.correct_answer)
+				h2(data.correct_answer),
+				countDown(room.getTime() + showAnswerCountdown)
 			]));
 		} else {
 			const isSpectator = room.username() === "",
