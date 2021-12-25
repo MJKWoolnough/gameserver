@@ -25,6 +25,12 @@ type EndOfRoundMessage = {
 	scores: Record<string, number>;
 }
 
+type Score = {
+	name: string;
+	score: number;
+	[node]: HTMLLIElement;
+}
+
 const game = "Quiz",
       showAnswerCountdown = 10,
       countDown = (endTime: number, fn?: () => void) => {
@@ -45,7 +51,8 @@ const game = "Quiz",
       },
       answers = new Map<string, string>(),
       isEndOfRoundMessage = (data: QuestionMessage | EndOfRoundMessage): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined,
-      isAnswerMessage = (data: QuestionMessage | EndOfRoundMessage | AnswerMessage): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined;
+      isAnswerMessage = (data: QuestionMessage | EndOfRoundMessage | AnswerMessage): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined,
+      scoreSort = (a: Score, b: Score) => (a.score - b.score) || stringSort(a.name, b.name);
 
 games.set(game, {
 	"onAdmin": () => {
@@ -143,7 +150,7 @@ games.set(game, {
 						      },
 						      endRound = () => {
 							const scores: Record<string, number> = {},
-							      scoreArr = new NodeArray<{"name": string, "score": number, [node]: HTMLLIElement}>(ul(), (a, b) => (a.score - b.score) || stringSort(a.name, b.name));
+							      scoreArr = new NodeArray<Score>(ul(), scoreSort);
 							for (const [name, score] of playerScores) {
 								scores[name] = score;
 								scoreArr.push({name, score, [node]: li([span(name), span(score + "")])});
@@ -167,7 +174,7 @@ games.set(game, {
 	"onMessage": (from: string, data: string) => answers.set(from, data),
 	"onRoomMessage": (data: QuestionMessage | EndOfRoundMessage) => {
 		if (isEndOfRoundMessage(data)) {
-			const scores = new NodeArray<{"name": string, "score": number, [node]: HTMLLIElement}>(ul(), (a, b) => (a.score - b.score) || stringSort(a.name, b.name));
+			const scores = new NodeArray<Score>(ul(), scoreSort);
 			for (const name in data.scores) {
 				const score = data.scores[name];
 				scores.push({name, score, [node]: li([span(name), span(score + "")])});
