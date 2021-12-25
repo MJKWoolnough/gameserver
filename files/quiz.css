@@ -121,3 +121,8 @@
 	border-width: 1vmax;
 	color: #fff;
 }
+
+#quizQuestion #countdown {
+	text-align: center;
+	font-size: 3em;
+}
