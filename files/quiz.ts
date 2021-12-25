@@ -57,7 +57,7 @@ games.set(game, {
 				      showAnswers = input({"id": "showAnswers", "type": "checkbox", "checked": true}),
 				      cats = new Set<number>(),
 				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
-				      scores = new Map<string, number>();
+				      playerScores = new Map<string, number>();
 				createHTML(clearElement(document.body), div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
 					label({"for": "timer"}, "Timer (s): "),
@@ -117,7 +117,7 @@ games.set(game, {
 								room.messageRoom({round, num, question, correct_answer});
 								if (showAnswers.checked) {
 									for (const [u, a] of answers) {
-										scores.set(u, (scores.get(u) || 0) + (a === correct_answer ? 1 : 0));
+										playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
 									}
 								} else {
 									// TODO: implement
@@ -141,7 +141,20 @@ games.set(game, {
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
-						      endRound = () => {};
+						      endRound = () => {
+							const scores: Record<string, number> = {},
+							      scoreArr = new NodeArray<{"name": string, "score": number, [node]: HTMLLIElement}>(ul(), (a, b) => (a.score - b.score) || stringSort(a.name, b.name));
+							for (const [name, score] of playerScores) {
+								scores[name] = score;
+								scoreArr.push({name, score, [node]: li([span(name), span(score + "")])});
+							}
+							room.messageRoom({round, "scores": scores});
+							createHTML(clearElement(document.body), div({"id": "quizScores"}, [
+								h1(`Round ${round}`),
+								scoreArr[node],
+								button({"onclick": roundStart}, "Next Round")
+							]));
+						      };
 						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
