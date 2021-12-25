@@ -14,6 +14,12 @@ type QuestionMessage = {
 	endTime?: number;
 }
 
+type AnswerMessage = {
+	round: number;
+	num: number;
+	correct_answer: string;
+}
+
 type EndOfRoundMessage = {
 	round: number;
 	scores: Record<string, number>;
@@ -37,7 +43,8 @@ const game = "Quiz",
 	return time;
       },
       answers = new Map<string, string>(),
-      isEndOfRoundMessage = (data: QuestionMessage | EndOfRoundMessage): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined;
+      isEndOfRoundMessage = (data: QuestionMessage | EndOfRoundMessage): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined,
+      isAnswerMessage = (data: QuestionMessage | EndOfRoundMessage | AnswerMessage): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined;
 
 games.set(game, {
 	"onAdmin": () => {
@@ -142,6 +149,12 @@ games.set(game, {
 			createHTML(clearElement(document.body), div({"id": "quizScores"}, [
 				h1(`Round ${data.round}`),
 				scores[node]
+			]));
+		} else if (isAnswerMessage(data)) {
+			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+				h1(`Round ${data.round} - Question ${data.num}`),
+				h2(data.question),
+				h2(data.correct_answer)
 			]));
 		} else {
 			const isSpectator = room.username() === "",
