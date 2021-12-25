@@ -31,7 +31,8 @@ type CategoryCount = {
 	total_num_of_rejected_questions: number;
 }
 
-type CategoryCountResponse = CategoryCount & {
+type CategoryCountResponse = {
+	overall: CategoryCount;
 	categories: Record<string, CategoryCount>;
 }
 
@@ -119,7 +120,7 @@ class otdb {
 export default () => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.sort((a, b) => stringSort(a.name, b.name)).map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
-		counts.push([-1, catCounts.total_num_of_verified_questions]);
+		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
 		for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
 			counts.push([parseInt(id), total_num_of_verified_questions]);
 		}
