@@ -103,7 +103,7 @@ games.set(game, {
 							      username = room.username(),
 							      endTime = t ? room.getTime() + t : 0;
 							num++;
-							room.messageRoom({round, num, question, "answers": answerList, endTime, "scores": {}});
+							room.messageRoom({round, num, question, "answers": answerList, endTime});
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
