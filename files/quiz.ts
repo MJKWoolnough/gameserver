@@ -55,7 +55,8 @@ games.set(game, {
 				const timer = input({"id": "timer", "type": "number", "min": 0, "value": 0}),
 				      showAnswers = input({"id": "showAnswers", "type": "checkbox", "checked": true}),
 				      cats = new Set<number>(),
-				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10});
+				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
+				      scores = new Map<string, number>();
 				createHTML(clearElement(document.body), div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
 					label({"for": "timer"}, "Timer (s): "),
@@ -127,7 +128,14 @@ games.set(game, {
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
-						      runA = (_answer: string) => {
+						      runA = (answer: string) => {
+							if (showAnswers.checked) {
+								for (const [u, a] of answers) {
+									scores.set(u, (scores.get(u) || 0) + (a === answer ? 1 : 0));
+								}
+							} else {
+								// TODO: implement
+							}
 						      };
 						let num = 0;
 						createHTML(clearElement(document.body), h1("Loading Questions..."));
