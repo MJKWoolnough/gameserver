@@ -93,6 +93,7 @@ games.set(game, {
 							for (let i = 0; i < n; i++) {
 								sqs.push(qs.splice(Math.floor(Math.random() * qs.length))[0]);
 							}
+							qs.push(...sqs);
 							runQ();
 						      },
 						      runQ = () => {
