@@ -27,7 +27,7 @@ type EndOfRoundMessage = {
 
 const game = "Quiz",
       countDown = (endTime: number, fn: () => void) => {
-	const time = div(),
+	const time = div({"id": "countdown"}),
 	      setTime = () => {
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
