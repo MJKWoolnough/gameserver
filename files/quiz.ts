@@ -57,9 +57,11 @@ games.set(game, {
 					label({"for": "numberQs"}, "Number of Questions: "),
 					numberQs,
 					br(),
+					/*
 					label({"for": "showAnswers"}, "Show Answers: "),
 					showAnswers,
 					br(),
+					*/
 					h2("Categories"),
 					ul(Array.from(o.categories.entries()).map(([cat, id]) => li([
 						input({"id": `cat_${id}`, "type": "checkbox", "onclick": function(this: HTMLInputElement) {
