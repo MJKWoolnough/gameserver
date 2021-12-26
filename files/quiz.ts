@@ -17,6 +17,7 @@ type QuestionMessage = {
 type AnswerMessage = {
 	round: number;
 	num: number;
+	question: string;
 	correct_answer: string;
 }
 
@@ -30,6 +31,8 @@ type Score = {
 	score: number;
 	[node]: HTMLLIElement;
 }
+
+type Message = QuestionMessage | AnswerMessage | EndOfRoundMessage;
 
 const game = "Quiz",
       showAnswerCountdown = 10,
@@ -50,8 +53,8 @@ const game = "Quiz",
 	return time;
       },
       answers = new Map<string, string>(),
-      isEndOfRoundMessage = (data: QuestionMessage | EndOfRoundMessage): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined,
-      isAnswerMessage = (data: QuestionMessage | EndOfRoundMessage | AnswerMessage): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined,
+      isEndOfRoundMessage = (data: Message): data is EndOfRoundMessage => (data as EndOfRoundMessage).scores !== undefined,
+      isAnswerMessage = (data: Message): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined,
       scoreSort = (a: Score, b: Score) => (a.score - b.score) || stringSort(a.name, b.name);
 
 games.set(game, {
@@ -162,7 +165,7 @@ games.set(game, {
 		}).catch(alert);
 	},
 	"onMessage": (from: string, data: string) => answers.set(from, data),
-	"onRoomMessage": (data: QuestionMessage | EndOfRoundMessage) => {
+	"onRoomMessage": (data: Message) => {
 		if (isEndOfRoundMessage(data)) {
 			const scores = new NodeArray<Score>(ul(), scoreSort);
 			for (const name in data.scores) {
