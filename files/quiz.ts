@@ -134,10 +134,10 @@ games.set(game, {
 							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
-								div(answerList ? ul(answerList.map((answer, n) => li([
+								div(ul(answerList.map((answer, n) => li([
 								      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
 								      label({"for": `answer_${n}`}, answer)
-								]))) : input({"type": "text", "placeholder": "Answer Here", "oninput": function(this: HTMLInputElement) {answers.set(username, this.value)}})),
+								])))),
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
