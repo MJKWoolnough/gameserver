@@ -9,7 +9,7 @@ type Data = {
 }
 
 const game = "Middleground",
-      word = input({"type": "text", "value": ""});
+      word = input({"type": "text", "value": "", "placeholder": "Word Here"});
 
 games.set(game, {
 	"onAdmin": () => {},
