@@ -21,11 +21,7 @@ games.set(game, {
 			data.players.includes(room.username()) ? [
 				createHTML(word, {"value": ""}),
 				input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
-					if (room.admin() === room.username()) {
-
-					} else {
-						room.messageAdmin({"word": this.checked ? word.value : ""});
-					}
+					room.messageAdmin({"word": this.checked ? word.value : ""});
 				}}),
 				label({"for": "confirm"})
 			] : []
