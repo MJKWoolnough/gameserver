@@ -71,14 +71,6 @@
 	font-size: 3em;
 }
 
-#quizQuestion > div > input {
-	width: 100%;
-	box-sizing: border-box;
-	font-size: 5em;
-	padding: 10px;
-	margin-bottom: 5vh;
-}
-
 #quizQuestion label {
 	background-color: #008;
 	border: 1vmax outset #00a;
