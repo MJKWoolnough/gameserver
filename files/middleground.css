@@ -1,0 +1,12 @@
+#mg div {
+	width: 50%;
+	display: inline-block;
+	text-align: center;
+	font-size: 3em;
+}
+
+#mg input {
+	width: 100%;
+	box-sizing: border-box;
+	font-size: 3em;
+}
