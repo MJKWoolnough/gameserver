@@ -10,7 +10,7 @@ type QuestionMessage = {
 	round: number;
 	num: number;
 	question: string;
-	answers?: string[];
+	answers: string[];
 	endTime?: number;
 }
 
@@ -61,7 +61,6 @@ games.set(game, {
 			let round = 0;
 			const roundStart = () => {
 				const timer = input({"id": "timer", "type": "number", "min": 0, "value": 0}),
-				      showAnswers = input({"id": "showAnswers", "type": "checkbox", "checked": true}),
 				      cats = new Set<number>(),
 				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
 				      playerScores = new Map<string, number>();
@@ -73,11 +72,6 @@ games.set(game, {
 					label({"for": "numberQs"}, "Number of Questions: "),
 					numberQs,
 					br(),
-					/*
-					label({"for": "showAnswers"}, "Show Answers: "),
-					showAnswers,
-					br(),
-					*/
 					h2("Categories"),
 					ul(Array.from(o.categories.entries()).map(([cat, id]) => li([
 						input({"id": `cat_${id}`, "type": "checkbox", "onclick": function(this: HTMLInputElement) {
@@ -91,7 +85,6 @@ games.set(game, {
 					]))),
 					button({"onclick": () => {
 						const t = parseInt(timer.value) || 0,
-						      s = showAnswers.checked,
 						      n = parseInt(numberQs.value) || 10,
 						      qs: Question[] = [],
 						      cs = Array.from(cats),
@@ -116,18 +109,15 @@ games.set(game, {
 						      },
 						      runQ = () => {
 							answers.clear();
-							const {question, correct_answer, incorrect_answers} = qs[num],
-							      answerList = s ? [correct_answer].concat(incorrect_answers).sort(stringSort) : undefined,
+							      console.log(qs, num);
+							const {question, correct_answer, incorrect_answers} = qs.pop()!,
+							      answerList = [correct_answer].concat(incorrect_answers).sort(stringSort),
 							      username = room.username(),
 							      endTime = t ? room.getTime() + t : 0,
 							      sendAnswer = () => {
 								room.messageRoom({round, num, question, correct_answer});
-								if (showAnswers.checked) {
-									for (const [u, a] of answers) {
-										playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
-									}
-								} else {
-									// TODO: implement
+								for (const [u, a] of answers) {
+									playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
 								}
 								createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 									h1(`Round ${round} - Question ${num}`),
@@ -192,10 +182,10 @@ games.set(game, {
 			]));
 		} else {
 			const isSpectator = room.username() === "",
-			      answer = div(data.answers ? ul(data.answers.map((answer, n) => li([
+			      answer = div(ul(data.answers.map((answer, n) => li([
 				      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
 				      label({"for": `answer_${n}`}, answer)
-			      ]))) : isSpectator ? [] : input({"type": "text", "placeholder": "Answer Here", "oninput": function(this: HTMLInputElement) {room.messageAdmin(this.value)}}));
+			      ]))));
 			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
