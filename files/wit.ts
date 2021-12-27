@@ -1,5 +1,5 @@
-import {clearElement} from './lib/dom.js';
-import {createHTML, button, canvas, div, h1, img} from './lib/html.js';
+import {clearElement, makeElement} from './lib/dom.js';
+import {button, canvas, div, h1, img} from './lib/html.js';
 import {Requester} from './lib/inter.js';
 import games from './games.js';
 import {room} from './room.js';
@@ -22,7 +22,7 @@ const game = "What is That?",
 	if (witTitle) {
 		on = boxNum;
 		ctx.drawImage(i, 0, 0, c.width = width, c.height = height);
-		createHTML(document.body, createHTML(title, witTitle));
+		makeElement(document.body, makeElement(title, witTitle));
 	} else {
 		if (on < boxNum) {
 			on++;
@@ -64,7 +64,7 @@ wit.responder(message => {
 		drawImage();
 	}
 	if (!c.parentNode) {
-		createHTML(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
+		makeElement(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
 	}
 });
 
@@ -75,18 +75,18 @@ games.set(game, {
 		      l = sFiles.length,
 		      shuffledFiles = Array.from({"length": l}, () => sFiles.splice(Math.floor(Math.random() * sFiles.length), 1)[0]),
 		      sendStatus = () => {
-			      image = ((image % l) + l) % l;
-			      step = Math.max(Math.min(step, boxes.length), 0);
-			      const data: any = {"url": shuffledFiles[image][1], step};
-			      if (step === boxes.length) {
-				      data["title"] = shuffledFiles[image][0];
-			      }
-			      createHTML(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
-			      room.messageRoom(data);
+			image = ((image % l) + l) % l;
+			step = Math.max(Math.min(step, boxes.length), 0);
+			const data: any = {"url": shuffledFiles[image][1], step};
+			if (step === boxes.length) {
+			      data["title"] = shuffledFiles[image][0];
+			}
+			makeElement(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
+			room.messageRoom(data);
 		      },
 		      progress = div({"style": {"text-align": "center", "font-size": "2em"}});
 		sendStatus();
-		createHTML(clearElement(document.body), [
+		makeElement(clearElement(document.body), [
 			h1({"style": "text-align: center"}, game),
 			progress,
 			button({"class": "witButton", "onclick": () => {

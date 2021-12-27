@@ -1,4 +1,5 @@
-import {createHTML, div, h1, li, ul} from './lib/html.js';
+import {makeElement} from './lib/dom.js';
+import {div, h1, li, ul} from './lib/html.js';
 import {node, NodeArray} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
 import games from './games.js';
@@ -86,7 +87,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 						users.push({user, [node]: uf(user)});
 					}
 					if (!admin) {
-						setTimeout(() => createHTML(document.body, becomeAdmin), 0);
+						setTimeout(() => makeElement(document.body, becomeAdmin), 0);
 					}
 					games.get(game = g)?.onRoomMessage?.(data);
 				}
@@ -94,7 +95,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		},
 		"adminGame": (g: string) => games.get(game = g)?.onAdmin(),
 		"leave": () => {
-			createHTML(document.body, becomeAdmin);
+			makeElement(document.body, becomeAdmin);
 			return rpc.request("leaveRoom");
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
@@ -117,7 +118,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		[broadcastAdminNone, () => {
 			admin = "";
 			if (username) {
-				createHTML(document.body, becomeAdmin);
+				makeElement(document.body, becomeAdmin);
 			}
 		}],
 		[broadcastAdmin, (a: string) => {

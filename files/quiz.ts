@@ -1,6 +1,6 @@
 import type {Question} from './otdb.js';
-import {clearElement} from './lib/dom.js';
-import {createHTML, br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
+import {clearElement, makeElement} from './lib/dom.js';
+import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
 import games from './games.js';
 import otdb from './otdb.js';
@@ -42,10 +42,10 @@ const game = "Quiz",
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
 			clearInterval(si);
-			createHTML(time, "0");
+			makeElement(time, "0");
 			fn?.();
 		} else {
-			createHTML(time, remaining + "");
+			makeElement(time, remaining + "");
 		}
 	      },
 	      si = setInterval(setTime, 1000);
@@ -59,7 +59,7 @@ const game = "Quiz",
 
 games.set(game, {
 	"onAdmin": () => {
-		createHTML(clearElement(document.body), h1("Creating OpenTrivia Database Connection"));
+		makeElement(clearElement(document.body), h1("Creating OpenTrivia Database Connection"));
 		otdb().then(o => {
 			let round = 0;
 			const roundStart = () => {
@@ -67,7 +67,7 @@ games.set(game, {
 				      cats = new Set<number>(),
 				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
 				      playerScores = new Map<string, number>();
-				createHTML(clearElement(document.body), div({"id": "quizOptions"}, [
+				makeElement(clearElement(document.body), div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
 					label({"for": "timer"}, "Timer (s): "),
 					timer,
@@ -122,7 +122,7 @@ games.set(game, {
 								for (const [u, a] of answers) {
 									playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
 								}
-								createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+								makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
 									h1(`Round ${round} - Question ${num}`),
 									h2(question),
 									h2(correct_answer),
@@ -131,7 +131,7 @@ games.set(game, {
 							      };
 							num++;
 							room.messageRoom({round, num, question, "answers": answerList, endTime});
-							createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+							makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
 								div(ul(answerList.map((answer, n) => li([
@@ -149,14 +149,14 @@ games.set(game, {
 								scoreArr.push({name, score, [node]: li([span(name), span(score + "")])});
 							}
 							room.messageRoom({round, "scores": scores});
-							createHTML(clearElement(document.body), div({"id": "quizScores"}, [
+							makeElement(clearElement(document.body), div({"id": "quizScores"}, [
 								h1(`Round ${round}`),
 								scoreArr[node],
 								button({"onclick": roundStart}, "Next Round")
 							]));
 						      };
 						let num = 0;
-						createHTML(clearElement(document.body), h1("Loading Questions..."));
+						makeElement(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
 				]));
@@ -172,12 +172,12 @@ games.set(game, {
 				const score = data.scores[name];
 				scores.push({name, score, [node]: li([span(name), span(score + "")])});
 			}
-			createHTML(clearElement(document.body), div({"id": "quizScores"}, [
+			makeElement(clearElement(document.body), div({"id": "quizScores"}, [
 				h1(`Round ${data.round}`),
 				scores[node]
 			]));
 		} else if (isAnswerMessage(data)) {
-			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+			makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				h2(data.correct_answer),
@@ -189,7 +189,7 @@ games.set(game, {
 				      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
 				      label({"for": `answer_${n}`}, answer)
 			      ]))));
-			createHTML(clearElement(document.body), div({"id": "quizQuestion"}, [
+			makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				answer,
