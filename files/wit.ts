@@ -14,14 +14,27 @@ const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
       wit = new Requester<void, [Message]>(),
       drawImage = () => {
+	if (st) {
+		clearTimeout(st);
+		st = 0;
+	}
 	const {naturalWidth: width, naturalHeight: height} = i;
 	if (witTitle) {
+		on = boxNum;
 		ctx.drawImage(i, 0, 0, c.width = width, c.height = height);
 		createHTML(document.body, createHTML(title, witTitle));
 	} else {
+		if (on < boxNum) {
+			on++;
+		} else if (on > boxNum) {
+			on--;
+		}
 		title.remove();
-		const factor = Math.max(width, height) / boxNum;
+		const factor = Math.max(width, height) / on;
 		ctx.drawImage(i, 0, 0, c.width = width / factor, c.height = height / factor);
+		if (on !== boxNum) {
+			st = setTimeout(drawImage, 200);
+		}
 	}
       };
 
@@ -31,7 +44,9 @@ let title: HTMLDivElement,
     url = "",
     i: HTMLImageElement,
     boxNum = 1,
-    witTitle = "";
+    on = 1,
+    witTitle = "",
+    st = 0;
 
 wit.responder(message => {
 	if (!title) {
@@ -40,11 +55,12 @@ wit.responder(message => {
 		ctx = c.getContext("2d")!;
 	}
 	witTitle = message.title || "";
-	boxNum = boxes[message.step];
+	boxNum = boxes[message.step] || boxes[boxes.length - 1];
 	if (message.url !== url) {
 		url = message.url;
+		on = 1;
 		i = img({"src": message.url, "onload": drawImage});
-	} else {
+	} else if (!st || witTitle) {
 		drawImage();
 	}
 	if (!c.parentNode) {
