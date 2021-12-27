@@ -2,7 +2,6 @@ import {clearElement} from './lib/dom.js';
 import {createHTML, button, canvas, div, h1, img} from './lib/html.js';
 import games from './games.js';
 import {room} from './room.js';
-import {files} from './data/wit_data.js';
 
 const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
@@ -15,7 +14,7 @@ type Message = {
 }
 
 games.set(game, {
-	"onAdmin": () => {
+	"onAdmin": () => (import('./data/wit_data.js') as Promise<{files: [string, string][]}>).then(({files}) => {
 		let image = 0, step = 0;
 		const sFiles = files.concat(),
 		      l = sFiles.length,
@@ -54,7 +53,7 @@ games.set(game, {
 				sendStatus();
 			}}, "Next Image")
 		]);
-	},
+	}),
 	"onRoomMessage": (message: Message) => {
 		const c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}}),
 		      ctx = c.getContext("2d")!;
