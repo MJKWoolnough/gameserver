@@ -53,7 +53,7 @@ games.set(game, {
 				sendStatus();
 			}}, "Next Image")
 		]);
-	}),
+	}).catch(alert),
 	"onRoomMessage": (message: Message) => {
 		const c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}}),
 		      ctx = c.getContext("2d")!;
