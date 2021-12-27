@@ -1,17 +1,56 @@
 import {clearElement} from './lib/dom.js';
 import {createHTML, button, canvas, div, h1, img} from './lib/html.js';
+import {Requester} from './lib/inter.js';
 import games from './games.js';
 import {room} from './room.js';
-
-const game = "What is That?",
-      boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
-      title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}});
 
 type Message = {
 	url: string;
 	step: number;
 	title?: string;
 }
+
+const game = "What is That?",
+      boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
+      wit = new Requester<void, [Message]>(),
+      drawImage = () => {
+	const {naturalWidth: width, naturalHeight: height} = i;
+	if (witTitle) {
+		ctx.drawImage(i, 0, 0, c.width = width, c.height = height);
+		createHTML(document.body, createHTML(title, witTitle));
+	} else {
+		title.remove();
+		const factor = Math.max(width, height) / boxNum;
+		ctx.drawImage(i, 0, 0, c.width = width / factor, c.height = height / factor);
+	}
+      };
+
+let title: HTMLDivElement,
+    c: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    url = "",
+    i: HTMLImageElement,
+    boxNum = 1,
+    witTitle = "";
+
+wit.responder(message => {
+	if (!title) {
+		title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}});
+		c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}});
+		ctx = c.getContext("2d")!;
+	}
+	witTitle = message.title || "";
+	boxNum = boxes[message.step];
+	if (message.url !== url) {
+		url = message.url;
+		i = img({"src": message.url, "onload": drawImage});
+	} else {
+		drawImage();
+	}
+	if (!c.parentNode) {
+		createHTML(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
+	}
+});
 
 games.set(game, {
 	"onAdmin": () => (import('./data/wit_data.js') as Promise<{files: [string, string][]}>).then(({files}) => {
@@ -54,20 +93,5 @@ games.set(game, {
 			}}, "Next Image")
 		]);
 	}).catch(alert),
-	"onRoomMessage": (message: Message) => {
-		const c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}}),
-		      ctx = c.getContext("2d")!;
-		img({"src": message.url, "onload": function(this: HTMLImageElement) {
-			const {naturalWidth: width, naturalHeight: height} = this;
-			if (message.title) {
-				ctx.drawImage(this, 0, 0, c.width = width, c.height = height);
-				createHTML(document.body, createHTML(title, message.title));
-			} else {
-				title.remove();
-				const factor = Math.max(width, height) / boxes[message.step];
-				ctx.drawImage(this, 0, 0, c.width = width / factor, c.height = height / factor);
-			}
-		}});
-		createHTML(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
-	}
+	"onRoomMessage": wit.request.bind(wit)
 });
