@@ -133,11 +133,15 @@ class otdbLocal {
 			}
 		}
 	}
+	#construct(data: Question[]) {
+		this.#questions.clear();
+		this.#questions = new Set<Question>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
+	}
 	getQuestions(_filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		return Promise.resolve([]);
 	}
 	resetToken() {
-		return Promise.resolve();
+		return imported!.then(this.#construct);
 	}
 }
 
