@@ -68,7 +68,7 @@ export interface OTDB {
 	resetToken: () => Promise<void>;
 }
 
-class otdb {
+class otdbNet {
 	#sessionID: string;
 	categories: ReadonlyMap<string, number>;
 	#counts: Map<number, number>;
@@ -117,7 +117,17 @@ class otdb {
 	}
 }
 
-export default () => (categories ? Promise.resolve() : Promise.all([
+class otdbLocal {
+	constructor(_data: Question[]) {}
+	getQuestions(_filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
+		return Promise.resolve([]);
+	}
+	resetToken() {
+		return Promise.resolve();
+	}
+}
+
+export default () => import("data/otdb.js").then(data => new otdbLocal(data.default) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.sort((a, b) => stringSort(a.name, b.name)).map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
@@ -127,4 +137,4 @@ export default () => (categories ? Promise.resolve() : Promise.all([
 	})
 ]))
 .then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>)
-.then(token => token.response_code ? reject(token.response_message) : new otdb(token.token, new Map(categories), new Map(counts)) as OTDB);
+.then(token => token.response_code ? reject(token.response_message) : new otdbNet(token.token, new Map(categories), new Map(counts)) as OTDB));
