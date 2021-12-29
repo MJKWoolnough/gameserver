@@ -137,8 +137,22 @@ class otdbLocal {
 		this.#questions.clear();
 		this.#questions = new Set<Question>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
 	}
-	getQuestions(_filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
-		return Promise.resolve([]);
+	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
+		const qs: Question[] = [];
+		for (const q of this.#questions) {
+			if ((filter.category && (this.#cats[filter.category] || "") !== q.category) && (filter.difficulty && (filter.difficulty !== q.difficulty)) && (filter.type && (filter.type !== q.type))) {
+				continue;
+			}
+			this.#questions.delete(q);
+			if (qs.push(q) === filter.amount) {
+				break;
+			}
+		}
+		if (qs.length !== filter.amount && filter.autoReset) {
+			this.resetToken();
+			return this.getQuestions();
+		}
+		return Promise.resolve(qs);
 	}
 	resetToken() {
 		return imported!.then(this.#construct);
