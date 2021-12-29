@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"golang.org/x/net/websocket"
+	"vimagination.zapto.org/httpgzip"
 	"vimagination.zapto.org/jsonrpc"
 )
 
@@ -17,7 +18,7 @@ import (
 func New(dataDir http.FileSystem) *http.ServeMux {
 	m := http.NewServeMux()
 	m.Handle("/", index)
-	m.Handle("/data/", http.StripPrefix("/data/", http.FileServer(dataDir)))
+	m.Handle("/data/", http.StripPrefix("/data/", httpgzip.FileServer(dataDir)))
 	m.Handle("/socket", websocket.Handler(newServer().ServeConn))
 	return m
 }
