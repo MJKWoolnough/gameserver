@@ -66,7 +66,7 @@ export type Question = {
 export interface OTDB {
 	categories: ReadonlyMap<string, number>;
 	getQuestions: (filter: QuestionFilter) => Promise<Question[]>;
-	resetToken: () => Promise<void>;
+	reset: () => Promise<void>;
 }
 
 class otdbNet {
@@ -81,7 +81,7 @@ class otdbNet {
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		filter.category = filter.category === undefined ? -1 : this.#counts.has(filter.category) ? filter.category : -1;
 		const amount = Math.min(Math.max(filter.amount, 1), 50, this.#counts.get(filter.category) || 0);
-		return amount === 0 ? filter.autoReset ? this.resetToken().then(() => this.getQuestions(filter)) : Promise.resolve([]) : (HTTPRequest(`https://opentdb.com/api.php?amount=${amount}${filter.category !== -1 ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
+		return amount === 0 ? filter.autoReset ? this.reset().then(() => this.getQuestions(filter)) : Promise.resolve([]) : (HTTPRequest(`https://opentdb.com/api.php?amount=${amount}${filter.category !== -1 ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
 			switch (response_code) {
 			case 0:
 				this.#counts.set(-1, this.#counts.get(-1)! - results.length);
@@ -100,13 +100,13 @@ class otdbNet {
 			case 3:
 			case 4:
 				if (filter.autoReset) {
-					return this.resetToken().then(() => this.getQuestions(filter));
+					return this.reset().then(() => this.getQuestions(filter));
 				}
 			}
 			return reject(errors[response_code] || "Unknown Error");
 		});
 	}
-	resetToken() {
+	reset() {
 		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params) as Promise<TokenResponse>).then(token => {
 			if (token.response_code !== 0) {
 				return reject("could not retrieve token");
@@ -149,12 +149,12 @@ class otdbLocal {
 			}
 		}
 		if (qs.length !== filter.amount && filter.autoReset) {
-			this.resetToken();
+			this.reset();
 			return this.getQuestions();
 		}
 		return Promise.resolve(qs);
 	}
-	resetToken() {
+	reset() {
 		return imported!.then(this.#construct);
 	}
 }

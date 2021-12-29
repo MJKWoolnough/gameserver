@@ -96,7 +96,7 @@ games.set(game, {
 							o.getQuestions({"amount": 1, "category": cs.length === 0 ? undefined : cs[i]}).then(questions => {
 								if (questions.length === 0) {
 									cs.splice(i, 1);
-									return cs.length === 0 ? o.resetToken().then(getQs) : getQs();
+									return cs.length === 0 ? o.reset().then(getQs) : getQs();
 								}
 								qs.push(...questions);
 								return qs.length === n ? start() : getQs();
