@@ -165,8 +165,7 @@ class otdbLocal {
 			}
 		}
 		if (qs.length !== filter.amount && filter.autoReset) {
-			this.reset();
-			return this.getQuestions();
+			return this.reset().then(() => this.getQuestions());
 		}
 		return Promise.resolve(qs);
 	}
