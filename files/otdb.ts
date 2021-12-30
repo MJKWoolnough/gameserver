@@ -169,7 +169,6 @@ class otdbLocal {
 	}
 	reset() {
 		return imported!.then(([data]) => {
-			this.#questions.clear();
 			this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
 		});
 	}
