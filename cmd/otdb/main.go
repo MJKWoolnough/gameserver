@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -27,18 +26,14 @@ type Question struct {
 	IncorrectAnswers []string `json:"incorrect_answers"`
 }
 
-type noNL struct {
-	*os.File
-}
-
-var (
-	nl   = []byte{'\n'}
-	none = []byte{}
+const (
+	easy        = "ZWFzeQ=="
+	medium      = "bWVkaXVt"
+	hard        = "aGFyZA=="
+	boolean     = "Ym9vbGVhbg=="
+	multiple    = "bXVsdGlwbGU="
+	booleanTrue = "VHJ1ZQ=="
 )
-
-func (n noNL) Write(p []byte) (int, error) {
-	return n.File.Write(bytes.ReplaceAll(p, nl, none))
-}
 
 func run() error {
 	var output string
@@ -83,10 +78,11 @@ func run() error {
 		ResponseCode uint8      `json:"response_code"`
 		Results      []Question `json:"results"`
 	}
-	if _, err := f.WriteString("export default ["); err != nil {
+	if _, err := f.WriteString("export const qs = ["); err != nil {
 		return err
 	}
-	j := json.NewEncoder(noNL{f})
+	categories := make(map[string]int)
+	catID := 0
 	for amount.Overall.Num > 0 {
 		if amount.Overall.Num < 50 {
 			num = fmt.Sprintf("%d", amount.Overall.Num)
@@ -103,13 +99,61 @@ func run() error {
 		case 0:
 			fmt.Printf("retrieved %d more results ", len(questions.Results))
 			for _, q := range questions.Results {
+				typ := 0
+				switch q.Type {
+				case boolean:
+					typ = 0
+				case multiple:
+					typ = 1
+				default:
+					continue
+				}
+				difficulty := 0
+				switch q.Difficulty {
+				case easy:
+					difficulty = 0
+				case medium:
+					difficulty = 1
+				case hard:
+					difficulty = 2
+				default:
+					continue
+				}
+				cID, ok := categories[q.Category]
+				if !ok {
+					cID = catID
+					catID++
+					categories[q.Category] = cID
+				}
 				if got > 0 {
 					if _, err := f.WriteString(","); err != nil {
 						return err
 					}
 				}
 				got++
-				if err := j.Encode(q); err != nil {
+				if _, err := fmt.Fprintf(f, "[%d,%d,%d,%q,", typ, difficulty, cID, q.Question); err != nil {
+					return err
+				}
+				if typ == 1 {
+					fmt.Fprintf(f, "%q", q.CorrectAnswer)
+					for _, a := range q.IncorrectAnswers {
+						if _, err := f.WriteString(","); err != nil {
+							return err
+						}
+						if _, err := fmt.Fprintf(f, "%q", a); err != nil {
+							return err
+						}
+					}
+				} else if q.CorrectAnswer == booleanTrue {
+					if _, err := f.WriteString("1"); err != nil {
+						return err
+					}
+				} else {
+					if _, err := f.WriteString("0"); err != nil {
+						return err
+					}
+				}
+				if _, err := f.WriteString("]"); err != nil {
 					return err
 				}
 			}
@@ -127,7 +171,23 @@ func run() error {
 			return errors.New("unknown error")
 		}
 	}
-	if _, err := f.WriteString("];\n"); err != nil {
+	if _, err := f.WriteString("], cats = ["); err != nil {
+		return err
+	}
+	first := true
+	for cat := range categories {
+		if first {
+			first = false
+		} else {
+			if _, err := f.WriteString(","); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintf(f, "%q", cat); err != nil {
+			return err
+		}
+	}
+	if _, err := f.WriteString("];"); err != nil {
 		return err
 	}
 	return f.Close()
