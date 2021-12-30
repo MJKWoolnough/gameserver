@@ -1,19 +1,6 @@
 import {HTTPRequest} from './lib/conn.js';
 import {stringSort} from './lib/nodes.js';
 
-
-let categories: [string, number][] | null = null,
-    imported: Promise<Question[]> | null = null;
-
-const counts: [number, number][] = [],
-      params = {"response": "json"},
-      fields = ["category", "type", "difficulty", "question", "correct_answer"],
-      errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
-      reject = (reason: string) => Promise.reject(reason),
-      types = ["boolean", "multiple"] as Type[],
-      difficulties = ["easy", "medium", "hard"] as Difficulty[],
-      booleans = ["False", "True"];
-
 type TokenResponse = {
 	response_code: number;
 	response_message: string;
@@ -73,6 +60,20 @@ export interface OTDB {
 	reset: () => Promise<void>;
 }
 
+type QuestionData = [0, 0 | 1 | 2, number, string, 0 | 1] | [1, 0 | 1 | 2, number, string, string, ...string[]];
+
+let categories: [string, number][] | null = null,
+    imported: Promise<[QuestionData[], string[]]> | null = null;
+
+const counts: [number, number][] = [],
+      params = {"response": "json"},
+      fields = ["category", "type", "difficulty", "question", "correct_answer"],
+      errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
+      reject = (reason: string) => Promise.reject(reason),
+      types = ["boolean", "multiple"] as Type[],
+      difficulties = ["easy", "medium", "hard"] as Difficulty[],
+      booleans = ["False", "True"];
+
 class otdbNet {
 	#sessionID: string;
 	categories: ReadonlyMap<string, number>;
@@ -123,35 +124,43 @@ class otdbNet {
 }
 
 class otdbLocal {
-	#questions: Set<Question>;
+	#questions: Set<QuestionData>;
 	categories: Map<string, number>;
 	#cats: string[];
-	constructor(data: Question[]) {
+	constructor(data: QuestionData[], cats: string[]) {
 		const shuffledQs = Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]);
-		this.#questions = new Set<Question>(shuffledQs);
+		this.#questions = new Set<QuestionData>(shuffledQs);
 		this.categories = new Map<string, number>();
-		this.#cats = [];
-		for (const q of shuffledQs) {
-			if (!this.#cats.includes(q.category)) {
-				this.categories.set(q.category, this.#cats.push(q.category) - 1);
-			}
+		this.#cats = cats;
+		for (const cat of cats) {
+			this.categories.set(cat, this.categories.size);
 		}
 	}
-	#construct(data: Question[]) {
+	#construct(data: QuestionData[]) {
 		this.#questions.clear();
-		this.#questions = new Set<Question>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
+		this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		if (filter.amount > 50) {
 			filter.amount = 50;
 		}
-		const qs: Question[] = [];
+		const qs: Question[] = [],
+		      fdifficulty = filter.difficulty === undefined ? -1 : difficulties.indexOf(filter.difficulty),
+		      ftyp = filter.type === undefined ? -1 : types.indexOf(filter.type);
 		for (const q of this.#questions) {
-			if ((filter.category && (this.#cats[filter.category] || "") !== q.category) && (filter.difficulty && (filter.difficulty !== q.difficulty)) && (filter.type && (filter.type !== q.type))) {
+			const [typ, difficulty, category, question, answer, ...a] = q;
+			if ((filter.category !== undefined && filter.category !== category) && (fdifficulty >= 0 && (fdifficulty !== difficulty)) && (ftyp >= 0 && (ftyp !== typ))) {
 				continue;
 			}
 			this.#questions.delete(q);
-			if (qs.push(q) === filter.amount) {
+			if (qs.push({
+				"type": types[typ],
+				"difficulty": difficulties[difficulty],
+				"category": this.#cats[category],
+				"question": atob(question),
+				"correct_answer": typ === 0 ? booleans[1 - (answer as 0 | 1)] : answer as string,
+				"incorrect_answers": typ === 0 ? [booleans[answer as 0 | 1]] : a.map(atob)
+			}) === filter.amount) {
 				break;
 			}
 		}
@@ -162,21 +171,11 @@ class otdbLocal {
 		return Promise.resolve(qs);
 	}
 	reset() {
-		return imported!.then(this.#construct);
+		return imported!.then(([qs]) => this.#construct(qs));
 	}
 }
 
-export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => {
-	cats.map(atob);
-	return qs.map(([typ, difficulty, cat, question, correct, ...a]) => ({
-		"type": types[typ],
-		"difficulty": difficulties[difficulty],
-		"category": cats[cat],
-		"question": atob(question),
-		"correct_answer": typ === 1 ? atob(correct as string) : booleans[1 + -correct],
-		"incorrect_answers": typ === 0 ? [booleans[correct as 0 | 1]] : a.map(atob)
-	}));
-}))).then(data => new otdbLocal(data) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
+export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => [qs, cats.map(atob)]))).then(([qs, cats]) => new otdbLocal(qs, cats) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.sort((a, b) => stringSort(a.name, b.name)).map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
