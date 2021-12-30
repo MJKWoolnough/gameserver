@@ -4,11 +4,15 @@ import {stringSort} from './lib/nodes.js';
 
 let categories: [string, number][] | null = null,
     imported: Promise<Question[]> | null = null;
+
 const counts: [number, number][] = [],
       params = {"response": "json"},
       fields = ["category", "type", "difficulty", "question", "correct_answer"],
       errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
-      reject = (reason: string) => Promise.reject(reason);
+      reject = (reason: string) => Promise.reject(reason),
+      types = ["boolean", "multiple"] as Type[],
+      difficulties = ["easy", "medium", "hard"] as Difficulty[],
+      booleans = ["False", "True"];
 
 type TokenResponse = {
 	response_code: number;
@@ -138,6 +142,9 @@ class otdbLocal {
 		this.#questions = new Set<Question>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
+		if (filter.amount > 50) {
+			filter.amount = 50;
+		}
 		const qs: Question[] = [];
 		for (const q of this.#questions) {
 			if ((filter.category && (this.#cats[filter.category] || "") !== q.category) && (filter.difficulty && (filter.difficulty !== q.difficulty)) && (filter.type && (filter.type !== q.type))) {
@@ -159,15 +166,17 @@ class otdbLocal {
 	}
 }
 
-export default () => (imported ?? (imported = import("data/otdb.js").then(({default: data}) => {
-	for (const q of data) {
-		for (const field of fields) {
-			(q as any)[field] = atob((q as any)[field]);
-		}
-		q.incorrect_answers = q.incorrect_answers.map(atob);
-	}
-	return data;
-}))).then(data => new otdbLocal(data.concat()) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
+export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => {
+	cats.map(atob);
+	return qs.map(([typ, difficulty, cat, question, correct, ...a]) => ({
+		"type": types[typ],
+		"difficulty": difficulties[difficulty],
+		"category": cats[cat],
+		"question": atob(question),
+		"correct_answer": typ === 1 ? atob(correct as string) : booleans[1 + -correct],
+		"incorrect_answers": typ === 0 ? [booleans[correct as 0 | 1]] : a.map(atob)
+	}));
+}))).then(data => new otdbLocal(data) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.sort((a, b) => stringSort(a.name, b.name)).map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
