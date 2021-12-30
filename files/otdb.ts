@@ -63,7 +63,7 @@ export interface OTDB {
 type QuestionData = [0, 0 | 1 | 2, number, string, 0 | 1] | [1, 0 | 1 | 2, number, string, string, ...string[]];
 
 let categories: [string, number][] | null = null,
-    imported: Promise<[QuestionData[], string[]]> | null = null;
+    imported: Promise<QuestionData[]> | null = null;
 
 const counts: [number, number][] = [],
       params = {"response": "json"},
@@ -72,7 +72,8 @@ const counts: [number, number][] = [],
       reject = (reason: string) => Promise.reject(reason),
       types = ["boolean", "multiple"] as Type[],
       difficulties = ["easy", "medium", "hard"] as Difficulty[],
-      booleans = ["False", "True"];
+      booleans = ["False", "True"],
+      iCats: string[] = [];
 
 class otdbNet {
 	#sessionID: string;
@@ -127,13 +128,11 @@ class otdbNet {
 class otdbLocal {
 	#questions: Set<QuestionData>;
 	categories: Map<string, number>;
-	#cats: string[];
-	constructor(data: QuestionData[], cats: string[]) {
+	constructor(data: QuestionData[]) {
 		const shuffledQs = Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]);
 		this.#questions = new Set<QuestionData>(shuffledQs);
 		this.categories = new Map<string, number>();
-		this.#cats = cats;
-		for (const cat of cats) {
+		for (const cat of iCats) {
 			this.categories.set(cat, this.categories.size);
 		}
 	}
@@ -153,7 +152,7 @@ class otdbLocal {
 			if (qs.push({
 				"type": types[typ],
 				"difficulty": difficulties[difficulty],
-				"category": this.#cats[category],
+				"category": iCats[category],
 				"question": atob(question),
 				"correct_answer": typ === 0 ? booleans[1 - (answer as 0 | 1)] : answer as string,
 				"incorrect_answers": typ === 0 ? [booleans[answer as 0 | 1]] : a.map(atob)
@@ -168,13 +167,18 @@ class otdbLocal {
 		return Promise.resolve(qs);
 	}
 	reset() {
-		return imported!.then(([data]) => {
+		return imported!.then(data => {
 			this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
 		});
 	}
 }
 
-export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => [qs, cats.map(atob)]))).then(([qs, cats]) => new otdbLocal(qs, cats) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
+export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => {
+	for (const cat of cats) {
+		iCats.push(atob(cat));
+	}
+	return qs;
+}))).then(qs => new otdbLocal(qs) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.sort((a, b) => stringSort(a.name, b.name)).map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
