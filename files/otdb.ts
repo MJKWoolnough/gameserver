@@ -105,6 +105,7 @@ class otdbNet {
 			case 3:
 			case 4:
 				if (filter.autoReset) {
+					delete filter["autoReset"];
 					return this.reset().then(() => this.getQuestions(filter));
 				}
 			}
