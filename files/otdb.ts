@@ -136,10 +136,6 @@ class otdbLocal {
 			this.categories.set(cat, this.categories.size);
 		}
 	}
-	#construct(data: QuestionData[]) {
-		this.#questions.clear();
-		this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
-	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		if (filter.amount > 50) {
 			filter.amount = 50;
@@ -170,7 +166,10 @@ class otdbLocal {
 		return Promise.resolve(qs);
 	}
 	reset() {
-		return imported!.then(([qs]) => this.#construct(qs));
+		return imported!.then(([data]) => {
+			this.#questions.clear();
+			this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
+		});
 	}
 }
 
