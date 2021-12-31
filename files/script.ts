@@ -8,11 +8,6 @@ import './middleground.js';
 import './quiz.js';
 import './wit.js';
 
-type GameNode = {
-	game: string;
-	[node]: HTMLLIElement;
-}
-
 ready.then(() => {
 	if (new URLSearchParams(window.location.search).has("monitor")) {
 		room.join("default", "");
@@ -39,7 +34,7 @@ ready.then(() => {
 
 games.set("", {
 	"onAdmin": () => {
-		const gameList = new NodeArray<GameNode>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
+		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
 		for (const game of games.keys()) {
 			if (game) {
 				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
