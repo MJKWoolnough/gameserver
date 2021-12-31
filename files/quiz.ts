@@ -76,7 +76,7 @@ games.set(game, {
 					numberQs,
 					br(),
 					h2("Categories"),
-					ul(Array.from(o.categories.entries()).map(([cat, id]) => li([
+					ul(Array.from(o.categories.entries()).sort((a, b) => stringSort(a[0], b[0])).map(([cat, id]) => li([
 						input({"id": `cat_${id}`, "type": "checkbox", "onclick": function(this: HTMLInputElement) {
 							if (this.checked) {
 								cats.add(id);
