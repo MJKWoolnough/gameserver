@@ -324,7 +324,7 @@ const (
 	broadcastMessageRoom
 )
 
-const broadcastStart = "{\"id\": -0,\"result\":"
+const broadcastStart = "{\"id\":-0,\"result\":"
 
 func buildBroadcast(id int8, data json.RawMessage) json.RawMessage {
 	l := len(broadcastStart) + len(data) + 1
@@ -332,11 +332,7 @@ func buildBroadcast(id int8, data json.RawMessage) json.RawMessage {
 	copy(dat, broadcastStart)
 	copy(dat[len(broadcastStart):], data)
 	id = -id
-	if id > 9 {
-		dat[6] = '-'
-		dat[7] = byte('0' + id/10)
-	}
-	dat[8] = byte('0' + id%10)
+	dat[7] = byte('0' + id%10)
 	dat[l-1] = '}'
 	return dat
 }
