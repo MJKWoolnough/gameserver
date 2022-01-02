@@ -1,6 +1,5 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, canvas, div, h1, img} from './lib/html.js';
-import {Requester} from './lib/inter.js';
 import games from './games.js';
 import {room} from './room.js';
 
@@ -12,7 +11,6 @@ type Message = {
 
 const game = "What is That?",
       boxes = [10, 12, 16, 22, 30, 40, 52, 66, 82],
-      wit = new Requester<void, [Message]>(),
       drawImage = () => {
 	if (st) {
 		clearTimeout(st);
@@ -47,26 +45,6 @@ let title: HTMLDivElement,
     on = 1,
     witTitle = "",
     st = 0;
-
-wit.responder(message => {
-	if (!title) {
-		title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}});
-		c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}});
-		ctx = c.getContext("2d")!;
-	}
-	witTitle = message.title || "";
-	boxNum = boxes[message.step] || boxes[boxes.length - 1];
-	if (message.url !== url) {
-		url = message.url;
-		on = 1;
-		i = img({"src": message.url, "onload": drawImage});
-	} else if (!st || witTitle) {
-		drawImage();
-	}
-	if (!c.parentNode) {
-		makeElement(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
-	}
-});
 
 games.set(game, {
 	"onAdmin": () => (import('./data/wit_data.js') as Promise<{files: [string, string][]}>).then(({files}) => {
@@ -109,5 +87,23 @@ games.set(game, {
 			}}, "Next Image")
 		]);
 	}).catch(alert),
-	"onRoomMessage": wit.request.bind(wit)
+	"onRoomMessage": (message: Message) => {
+		if (!title) {
+			title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}});
+			c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}});
+			ctx = c.getContext("2d")!;
+		}
+		witTitle = message.title || "";
+		boxNum = boxes[message.step] || boxes[boxes.length - 1];
+		if (message.url !== url) {
+			url = message.url;
+			on = 1;
+			i = img({"src": message.url, "onload": drawImage});
+		} else if (!st || witTitle) {
+			drawImage();
+		}
+		if (!c.parentNode) {
+			makeElement(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
+		}
+	}
 });
