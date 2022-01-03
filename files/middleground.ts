@@ -26,6 +26,7 @@ games.set(game, {
 			data.players.includes(room.username()) ? [
 				makeElement(word, {"value": ""}),
 				input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
+					word.toggleAttribute("disabled", this.checked);
 					room.messageAdmin({"word": this.checked ? word.value : ""});
 				}}),
 				label({"for": "confirm"})
