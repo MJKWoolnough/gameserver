@@ -11,12 +11,24 @@ type Data = {
 
 const game = "Middleground",
       word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
-      words = new Requester<void, [[string, string]]>();
+      words = new Requester<void, [[string, string]]>(),
+      users = new Set<string>();
 
 words.responder(() => {});
 
 games.set(game, {
-	"onAdmin": () => {},
+	"onAdmin": () => {
+		users.clear();
+	},
+	"userFormatter": (username: string) => li({"onclick": function(this: HTMLInputElement) {
+		const toSet = !users.has(username);
+		this.classList.toggle("selected", toSet)
+		if (toSet) {
+			users.add(username);
+		} else {
+			users.delete(username);
+		}
+	}}, username),
 	"onMessage": (from: string, message: string) => words.request([from, message]),
 	"onRoomMessage": (data: Data) => {
 		makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
