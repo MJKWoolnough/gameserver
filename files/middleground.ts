@@ -17,7 +17,6 @@ const game = "Middleground",
       showUI = (data: Data, fn: (word: string) => void) => makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
 		div(data.players[0]),
 		div(data.players[1]),
-		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
 		data.players.includes(room.username()) ? [
 			makeElement(word, {"value": ""}),
 			input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
@@ -25,7 +24,8 @@ const game = "Middleground",
 				fn(this.checked ? word.value : "");
 			}}),
 			label({"for": "confirm"})
-		] : []
+		] : [],
+		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
 	]]);
 
 wordsR.responder(() => {});
