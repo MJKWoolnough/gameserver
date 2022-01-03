@@ -47,7 +47,9 @@ games.set(game, {
 			]);
 		      },
 		      startGame = () => {
-			room.messageRoom({players, words});
+			const data = {players, words};
+			room.messageRoom(data);
+			showUI(data, (word: string) => wordsR.request([room.username(), word]));
 		      };
 		selectUsers();
 	},
