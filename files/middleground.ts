@@ -12,19 +12,29 @@ type Data = {
 
 const game = "Middleground",
       word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
-      words = new Requester<void, [[string, string]]>(),
+      wordsR = new Requester<void, [[string, string]]>(),
       users = new Set<string>();
 
-words.responder(() => {});
+wordsR.responder(() => {});
 
 games.set(game, {
 	"onAdmin": () => {
 		users.clear();
-		const selectUsers = () => {
+		const players: [string, string] = ["", ""],
+		      words: [string, string][] = [],
+		      selectUsers = () => {
 			makeElement(clearElement(document.body), {"id": "mgSelect"}, [
 				room.users()[node],
-				button("Start")
+				button({"onclick": () => {
+					if (users.size === 2) {
+						players.splice(0, 2, ...Array.from(users));
+						startGame();
+					}
+				}}, "Start")
 			]);
+		      },
+		      startGame = () => {
+			room.messageRoom({players, words});
 		      };
 		selectUsers();
 	},
@@ -38,7 +48,7 @@ games.set(game, {
 		}
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
-	"onMessage": (from: string, message: string) => words.request([from, message]),
+	"onMessage": (from: string, message: string) => wordsR.request([from, message]),
 	"onRoomMessage": (data: Data) => {
 		makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
 			div(data.players[0]),
