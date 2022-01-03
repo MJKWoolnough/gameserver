@@ -1,6 +1,7 @@
 import {Requester} from './lib/inter.js';
 import {clearElement, makeElement} from './lib/dom.js';
-import {div, h1, h2, input, label, li, ul} from './lib/html.js';
+import {button, div, h1, h2, input, label, li, ul} from './lib/html.js';
+import {node} from './lib/nodes.js';
 import games from './games.js';
 import {room} from './room.js';
 
@@ -19,6 +20,13 @@ words.responder(() => {});
 games.set(game, {
 	"onAdmin": () => {
 		users.clear();
+		const selectUsers = () => {
+			makeElement(clearElement(document.body), {"id": "mgSelect"}, [
+				room.users()[node],
+				button("Start")
+			]);
+		      };
+		selectUsers();
 	},
 	"userFormatter": (username: string) => li({"onclick": function(this: HTMLInputElement) {
 		const toSet = !users.has(username);
