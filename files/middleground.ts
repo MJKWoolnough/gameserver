@@ -26,7 +26,7 @@ const game = "Middleground",
 			label({"for": "confirm"})
 		] : [],
 		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
-	]]);
+      ]]);
 
 wordsR.responder(() => {});
 
@@ -50,6 +50,7 @@ games.set(game, {
 			const data = {players, words};
 			room.messageRoom(data);
 			showUI(data, (word: string) => wordsR.request([room.username(), word]));
+
 		      };
 		selectUsers();
 	},
