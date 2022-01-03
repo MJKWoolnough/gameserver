@@ -29,6 +29,7 @@ games.set(game, {
 			users.delete(username);
 		}
 	}}, username),
+	"onUserLeave": (username: string) => users.delete(username),
 	"onMessage": (from: string, message: string) => words.request([from, message]),
 	"onRoomMessage": (data: Data) => {
 		makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
