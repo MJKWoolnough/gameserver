@@ -1,3 +1,4 @@
+import {Requester} from './lib/inter.js';
 import {clearElement, makeElement} from './lib/dom.js';
 import {div, h1, h2, input, label, li, ul} from './lib/html.js';
 import games from './games.js';
@@ -9,10 +10,14 @@ type Data = {
 }
 
 const game = "Middleground",
-      word = input({"type": "text", "value": "", "placeholder": "Word Here"});
+      word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
+      words = new Requester<void, [[string, string]]>();
+
+words.responder(() => {});
 
 games.set(game, {
 	"onAdmin": () => {},
+	"onMessage": (from: string, message: string) => words.request([from, message]),
 	"onRoomMessage": (data: Data) => {
 		makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
 			div(data.players[0]),
