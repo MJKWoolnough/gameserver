@@ -50,7 +50,24 @@ games.set(game, {
 			const data = {players, words};
 			room.messageRoom(data);
 			showUI(data, (word: string) => wordsR.request([room.username(), word]));
-
+			words.unshift(["", ""]);
+			wordsR.responder(([player, word]) => {
+				switch (player) {
+				case player[0]:
+					words[0][0] = word;
+					break;
+				case player[1]:
+					words[0][1] = word;
+					break;
+				default:
+					return;
+				}
+				if (words[0][0] && words[0][1]) {
+					checkWords();
+				}
+			});
+		      },
+		      checkWords = () => {
 		      };
 		selectUsers();
 	},
