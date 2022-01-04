@@ -74,6 +74,14 @@ games.set(game, {
 		      checkWords = () => {
 			wordsR.responder(noop);
 			room.messageRoom({players, words, "checking": true});
+			makeElement(clearElement(document.body), [
+				h1("Is there a match?"),
+				button("Yes"),
+				button("No"),
+				div(players[0]),
+				div(players[1]),
+				ul(words.map(([a, b]) => li([div(a), div(b)]))),
+			]);
 		      };
 		selectUsers();
 	},
