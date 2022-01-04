@@ -26,9 +26,10 @@ const game = "Middleground",
 			label({"for": "confirm"})
 		] : [],
 		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
-      ]]);
+      ]]),
+      noop = () => {};
 
-wordsR.responder(() => {});
+wordsR.responder(noop);
 
 games.set(game, {
 	"onAdmin": () => {
@@ -68,6 +69,7 @@ games.set(game, {
 			});
 		      },
 		      checkWords = () => {
+			      wordsR.responder(noop);
 		      };
 		selectUsers();
 	},
