@@ -8,6 +8,7 @@ import {room} from './room.js';
 type Data = {
 	players: [string, string];
 	words: [string, string][];
+	checking?: true;
 }
 
 const game = "Middleground",
@@ -18,7 +19,7 @@ const game = "Middleground",
 	h1(game),
 	div(data.players[0]),
 	div(data.players[1]),
-	data.players.includes(room.username()) ? [
+	!data.checking && data.players.includes(room.username()) ? [
 		makeElement(word, {"value": ""}),
 		input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
 			word.toggleAttribute("disabled", this.checked);
@@ -72,6 +73,7 @@ games.set(game, {
 		      },
 		      checkWords = () => {
 			wordsR.responder(noop);
+			room.messageRoom({players, words, "checking": true});
 		      };
 		selectUsers();
 	},
