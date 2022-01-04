@@ -70,7 +70,7 @@ games.set(game, {
 			});
 		      },
 		      checkWords = () => {
-			      wordsR.responder(noop);
+			wordsR.responder(noop);
 		      };
 		selectUsers();
 	},
