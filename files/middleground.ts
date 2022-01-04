@@ -48,22 +48,23 @@ games.set(game, {
 			]);
 		      },
 		      startGame = () => {
-			const data = {players, words};
+			const data = {players, words},
+			      newWords: [string, string] = ["", ""];
 			room.messageRoom(data);
 			showUI(data, (word: string) => wordsR.request([room.username(), word]));
-			words.unshift(["", ""]);
+			words.unshift(newWords);
 			wordsR.responder(([player, word]) => {
 				switch (player) {
 				case player[0]:
-					words[0][0] = word;
+					newWords[0] = word;
 					break;
 				case player[1]:
-					words[0][1] = word;
+					newWords[1] = word;
 					break;
 				default:
 					return;
 				}
-				if (words[0][0] && words[0][1]) {
+				if (newWords[0] && newWords[1]) {
 					checkWords();
 				}
 			});
