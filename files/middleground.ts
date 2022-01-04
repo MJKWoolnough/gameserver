@@ -1,12 +1,12 @@
 import {Requester} from './lib/inter.js';
 import {clearElement, makeElement} from './lib/dom.js';
-import {button, div, h1, h2, input, label, li, ul} from './lib/html.js';
+import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import games from './games.js';
 import {room} from './room.js';
 
 type Data = {
-	players?: [string, string];
+	players: [string, string];
 	words: [string, string][];
 }
 
@@ -14,19 +14,20 @@ const game = "Middleground",
       word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
       wordsR = new Requester<void, [[string, string]]>(),
       users = new Set<string>(),
-      showUI = (data: Data, fn: (word: string) => void) => makeElement(clearElement(document.body), {"id": "mg"}, [h1(game), !data.players ? h2("Waiting for game to begin...") : [
-		div(data.players[0]),
-		div(data.players[1]),
-		data.players.includes(room.username()) ? [
-			makeElement(word, {"value": ""}),
-			input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
-				word.toggleAttribute("disabled", this.checked);
-				fn(this.checked ? word.value : "");
-			}}),
-			label({"for": "confirm"})
-		] : [],
-		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
-      ]]),
+      showUI = (data: Data, fn: (word: string) => void) => makeElement(clearElement(document.body), {"id": "mg"}, [
+	h1(game),
+	div(data.players[0]),
+	div(data.players[1]),
+	data.players.includes(room.username()) ? [
+		makeElement(word, {"value": ""}),
+		input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
+			word.toggleAttribute("disabled", this.checked);
+			fn(this.checked ? word.value : "");
+		}}),
+		label({"for": "confirm"})
+	] : [],
+	ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
+      ]),
       noop = () => {};
 
 wordsR.responder(noop);
