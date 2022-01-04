@@ -56,6 +56,7 @@ games.set(game, {
 			showUI(data, (word: string) => wordsR.request([room.username(), word]));
 			words.unshift(newWords);
 			wordsR.responder(([player, word]) => {
+				word = word.trim();
 				switch (player) {
 				case player[0]:
 					newWords[0] = word;
