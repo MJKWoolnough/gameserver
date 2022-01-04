@@ -67,21 +67,18 @@ games.set(game, {
 					return;
 				}
 				if (newWords[0] && newWords[1]) {
-					checkWords();
+					wordsR.responder(noop);
+					room.messageRoom({players, words, "checking": true});
+					makeElement(clearElement(document.body), [
+						h1("Is there a match?"),
+						button({"onclick": selectUsers}, "Yes"),
+						button({"onclick": startGame}, "No"),
+						div(players[0]),
+						div(players[1]),
+						ul(words.map(([a, b]) => li([div(a), div(b)]))),
+					]);
 				}
 			});
-		      },
-		      checkWords = () => {
-			wordsR.responder(noop);
-			room.messageRoom({players, words, "checking": true});
-			makeElement(clearElement(document.body), [
-				h1("Is there a match?"),
-				button({"onclick": selectUsers}, "Yes"),
-				button({"onclick": startGame}, "No"),
-				div(players[0]),
-				div(players[1]),
-				ul(words.map(([a, b]) => li([div(a), div(b)]))),
-			]);
 		      };
 		selectUsers();
 	},
