@@ -44,7 +44,7 @@ games.set(game, {
 				room.users()[node],
 				button({"onclick": () => {
 					if (users.size === 2) {
-						players.splice(0, 2, ...Array.from(users));
+						players.splice(0, 2, ...users);
 						startGame();
 					}
 				}}, "Start")
