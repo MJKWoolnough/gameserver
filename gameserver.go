@@ -199,6 +199,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		if err := json.Unmarshal(data, &names); err != nil {
 			return nil, err
 		}
+		if len(names.Room) > 100 || len(names.User) > 100 {
+			return nil, errNameTooLong
+		}
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		c.server.mu.Lock()
@@ -222,6 +225,9 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		var names roomUser
 		if err := json.Unmarshal(data, &names); err != nil {
 			return nil, err
+		}
+		if len(names.User) > 100 {
+			return nil, errNameTooLong
 		}
 		c.server.mu.Lock()
 		defer c.server.mu.Unlock()
@@ -363,4 +369,5 @@ var (
 	errNotAdmin        = errors.New("not admin")
 	errNoUser          = errors.New("no user")
 	errMessageTooBig   = errors.New("message too big")
+	errNameTooLong     = errors.New("name too long")
 )
