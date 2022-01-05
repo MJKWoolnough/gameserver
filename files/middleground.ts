@@ -50,10 +50,10 @@ const game = "Middleground",
 			      wordFn = gameObj.onMessage = (player: string, word: string) => {
 				word = word.trim();
 				switch (player) {
-				case player[0]:
+				case players[0]:
 					newWords[0] = word;
 					break;
-				case player[1]:
+				case players[1]:
 					newWords[1] = word;
 					break;
 				default:
