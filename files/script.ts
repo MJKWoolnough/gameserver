@@ -25,7 +25,7 @@ ready.then(() => {
 		makeElement(rooms[node], {"id": "roomList"}),
 		button({"onclick": () => {
 			const roomName = prompt("Please enter new Room name");
-			if (roomName) {
+			if (roomName && roomName.length <= 100) {
 				room.new(roomName, username.value).catch((e: Error) => alert(e.message));
 			}
 		}}, "New Room")
