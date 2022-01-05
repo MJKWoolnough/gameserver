@@ -47,7 +47,7 @@ const game = "Middleground",
 		      },
 		      startGame = () => {
 			const newWords: [string, string] = ["", ""],
-			      wordFn = (player: string, word: string) => {
+			      wordFn = gameObj.onMessage = (player: string, word: string) => {
 				word = word.trim();
 				switch (player) {
 				case player[0]:
@@ -75,7 +75,6 @@ const game = "Middleground",
 			room.messageRoom(data);
 			showUI(data, (word: string) => wordFn(room.username(), word));
 			words.unshift(newWords);
-			gameObj.onMessage = wordFn;
 		      };
 		selectUsers();
 	},
