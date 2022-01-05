@@ -1,4 +1,3 @@
-import {Requester} from './lib/inter.js';
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
@@ -13,7 +12,6 @@ type Data = {
 
 const game = "Middleground",
       word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
-      wordsR = new Requester<void, [[string, string]]>(),
       users = new Set<string>(),
       showUI = (data: Data, fn: (word: string) => void) => makeElement(clearElement(document.body), {"id": "mg"}, [
 	h1(game),
@@ -31,7 +29,7 @@ const game = "Middleground",
       ]),
       noop = () => {};
 
-wordsR.responder(noop);
+let wordFn: (from: string, word: string) => void = noop;
 
 games.set(game, {
 	"onAdmin": () => {
@@ -53,9 +51,9 @@ games.set(game, {
 		      startGame = () => {
 			const newWords: [string, string] = ["", ""];
 			room.messageRoom(data);
-			showUI(data, (word: string) => wordsR.request([room.username(), word]));
+			showUI(data, (word: string) => wordFn(room.username(), word));
 			words.unshift(newWords);
-			wordsR.responder(([player, word]) => {
+			wordFn = (player, word) => {
 				word = word.trim();
 				switch (player) {
 				case player[0]:
@@ -68,7 +66,7 @@ games.set(game, {
 					return;
 				}
 				if (newWords[0] && newWords[1]) {
-					wordsR.responder(noop);
+					wordFn = noop;
 					room.messageRoom({players, words, "checking": true});
 					makeElement(clearElement(document.body), [
 						h1("Is there a match?"),
@@ -79,7 +77,7 @@ games.set(game, {
 						ul(words.map(([a, b]) => li([div(a), div(b)]))),
 					]);
 				}
-			});
+			};
 		      };
 		selectUsers();
 	},
@@ -93,6 +91,6 @@ games.set(game, {
 		}
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
-	"onMessage": (from: string, message: string) => wordsR.request([from, message]),
+	"onMessage": (from: string, message: string) => wordFn(from, message),
 	"onRoomMessage": (data: Data) => showUI(data, (word: string) => room.messageAdmin({word}))
 });
