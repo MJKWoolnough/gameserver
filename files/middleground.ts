@@ -27,11 +27,8 @@ const game = "Middleground",
 	] : [],
 	ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
       ]),
-      noop = () => {};
-
-let wordFn: (from: string, word: string) => void = noop;
-
-games.set(game, {
+      noop: (player: string, word: string) => void = () => {},
+      gameObj = {
 	"onAdmin": () => {
 		users.clear();
 		const players: [string, string] = ["", ""],
@@ -49,11 +46,8 @@ games.set(game, {
 			]);
 		      },
 		      startGame = () => {
-			const newWords: [string, string] = ["", ""];
-			room.messageRoom(data);
-			showUI(data, (word: string) => wordFn(room.username(), word));
-			words.unshift(newWords);
-			wordFn = (player, word) => {
+			const newWords: [string, string] = ["", ""],
+			      wordFn = (player: string, word: string) => {
 				word = word.trim();
 				switch (player) {
 				case player[0]:
@@ -66,7 +60,7 @@ games.set(game, {
 					return;
 				}
 				if (newWords[0] && newWords[1]) {
-					wordFn = noop;
+					gameObj.onMessage = noop;
 					room.messageRoom({players, words, "checking": true});
 					makeElement(clearElement(document.body), [
 						h1("Is there a match?"),
@@ -77,7 +71,11 @@ games.set(game, {
 						ul(words.map(([a, b]) => li([div(a), div(b)]))),
 					]);
 				}
-			};
+			      };
+			room.messageRoom(data);
+			showUI(data, (word: string) => wordFn(room.username(), word));
+			words.unshift(newWords);
+			gameObj.onMessage = wordFn;
 		      };
 		selectUsers();
 	},
@@ -91,6 +89,7 @@ games.set(game, {
 		}
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
-	"onMessage": (from: string, message: string) => wordFn(from, message),
+	"onMessage": noop,
 	"onRoomMessage": (data: Data) => showUI(data, (word: string) => room.messageAdmin({word}))
-});
+      };
+games.set(game, gameObj);
