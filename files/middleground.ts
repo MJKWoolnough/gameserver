@@ -38,6 +38,7 @@ games.set(game, {
 		users.clear();
 		const players: [string, string] = ["", ""],
 		      words: [string, string][] = [],
+		      data = {players, words},
 		      selectUsers = () => {
 			makeElement(clearElement(document.body), {"id": "mgSelect"}, [
 				room.users()[node],
@@ -50,8 +51,7 @@ games.set(game, {
 			]);
 		      },
 		      startGame = () => {
-			const data = {players, words},
-			      newWords: [string, string] = ["", ""];
+			const newWords: [string, string] = ["", ""];
 			room.messageRoom(data);
 			showUI(data, (word: string) => wordsR.request([room.username(), word]));
 			words.unshift(newWords);
