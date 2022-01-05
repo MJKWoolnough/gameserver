@@ -174,6 +174,9 @@ type roomUser struct {
 }
 
 func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, error) {
+	if len(data) > 0x100000 {
+		return nil, errMessageTooBig
+	}
 	switch method {
 	case "time":
 		return time.Now().Unix(), nil
@@ -359,4 +362,5 @@ var (
 	errNotInRoom       = errors.New("not in room")
 	errNotAdmin        = errors.New("not admin")
 	errNoUser          = errors.New("no user")
+	errMessageTooBig   = errors.New("message too big")
 )
