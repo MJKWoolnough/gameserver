@@ -39,6 +39,11 @@
 	color: #fff;
 }
 
+#mg h1 {
+	font-size: 3em;
+	text-align: center;
+}
+
 #mg div {
 	width: 50%;
 	display: inline-block;
@@ -47,7 +52,32 @@
 }
 
 #mg input {
-	width: 100%;
+	width: calc(100% - 5em);
 	box-sizing: border-box;
 	font-size: 3em;
+}
+
+#mg input[type=checkbox] {
+	display: none;
+}
+
+#mg label:after {
+	box-sizing: border-box;
+	content: "Ready?";
+	display: inline-block;
+	width: 5em;
+	font-size: 3em;
+	background-color: #800;
+	border: 1vmax outset #a00;
+	text-align: center;
+}
+
+#mg label:active:hover:after {
+	border-style: inset;
+}
+
+#mg input:checked + label:after {
+	content: "Ready!";
+	background-color: #080;
+	border-color: #0a0;
 }
