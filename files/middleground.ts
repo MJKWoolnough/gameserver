@@ -18,7 +18,7 @@ const game = "Middleground",
 	div(data.players[0]),
 	div(data.players[1]),
 	!data.checking && data.players.includes(room.username()) ? [
-		makeElement(word, {"value": ""}),
+		makeElement(word, {"value": "", "disabled": undefined}),
 		input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
 			word.toggleAttribute("disabled", this.checked);
 			fn(this.checked ? word.value : "");
