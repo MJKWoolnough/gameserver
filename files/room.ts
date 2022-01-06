@@ -136,10 +136,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}],
 		[broadcastUserJoin, (user: string) => users.push({user, [node]: (games.get(game)?.userFormatter ?? li)(user)})],
 		[broadcastUserLeave, user => {
-			const pos = rooms.indexOf(user);
-			if (pos >= 0) {
-				users.splice(pos, 1);
-				games.get(game)?.onUserLeave?.(user);
+			for (const u of users.filterRemove(u => u.user === user)) {
+				games.get(game)?.onUserLeave?.(u.user);
 			}
 		}],
 		[broadcastMessageAdmin, ({from, data}: {from: string; data: any}) => games.get(game)?.onMessage?.(from, data)],
