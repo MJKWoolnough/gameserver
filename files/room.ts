@@ -93,7 +93,16 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 				}
 			});
 		},
-		"adminGame": (g: string) => games.get(game = g)?.onAdmin(),
+		"adminGame": (g: string) => {
+			const go = games.get(game = g),
+			      fmt = go?.userFormatter ?? li;
+			for (const u of users) {
+				const n = fmt(u.user);
+				users[node].replaceChild(n, u[node]);
+				u[node] = n;
+			}
+			go?.onAdmin()
+		},
 		"leave": () => {
 			makeElement(document.body, becomeAdmin);
 			return rpc.request("leaveRoom");
