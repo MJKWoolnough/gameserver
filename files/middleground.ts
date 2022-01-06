@@ -89,6 +89,6 @@ const game = "Middleground",
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
 	"onMessage": noop,
-	"onRoomMessage": (data: Data) => showUI(data, (word: string) => room.messageAdmin({word}))
+	"onRoomMessage": (data: Data) => showUI(data, room.messageAdmin)
       };
 games.set(game, gameObj);
