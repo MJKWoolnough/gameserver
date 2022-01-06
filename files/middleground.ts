@@ -35,6 +35,7 @@ const game = "Middleground",
 		      words: [string, string][] = [],
 		      data = {players, words},
 		      selectUsers = () => {
+			words.splice(0, words.length);
 			makeElement(clearElement(document.body), {"id": "mgSelect"}, [
 				room.users()[node],
 				button({"onclick": () => {
