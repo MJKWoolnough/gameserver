@@ -285,7 +285,7 @@ func (c *conn) HandleRPC(method string, data json.RawMessage) (interface{}, erro
 		}
 		return nil, nil
 	case "message":
-		if len(data) == 0 || data[0] != '{' {
+		if len(data) == 0 {
 			data = noData
 		}
 		c.mu.RLock()
