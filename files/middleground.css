@@ -1,3 +1,44 @@
+#mgSelect ul {
+	display: grid;
+	grid-gap: 2px;
+	grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+}
+
+#mgSelect li {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	height: 25vh;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+	font-size: 3em;
+	background-color: #080;
+	border: 1vmax outset #0a0;
+}
+
+#mgSelect li:active:hover {
+	border-style: inset;
+}
+
+#mgSelect li.selected {
+	background-color: #008;
+	border-color: #00a;
+}
+
+#mgSelect button {
+	width: 100%;
+	box-sizing: border-box;
+	font-size: 3em;
+	text-align: center;
+	background-color: #800;
+	border-color: #a00;
+	border-width: 1vmax;
+	color: #fff;
+}
+
 #mg div {
 	width: 50%;
 	display: inline-block;
