@@ -148,7 +148,9 @@ func (r *room) leave(conn *conn) bool {
 		r.status = noData
 		broadcast(r.users, broadcastAdminNone, noData)
 	} else if conn.name != "" {
+		r.users[r.admin] = struct{}{}
 		broadcast(r.users, broadcastUserLeave, strconv.AppendQuote(json.RawMessage{}, conn.name))
+		delete(r.users, r.admin)
 	}
 	return len(r.names) == 0 && r.Name != "default"
 }
