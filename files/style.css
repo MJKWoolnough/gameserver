@@ -13,6 +13,12 @@ input::placeholder {
 	text-align: center;
 }
 
+#username {
+	font-size: 3em;
+	width: 100%;
+	box-sizing: border-box;
+}
+
 ul {
 	padding: 0;
 	list-style: none;
