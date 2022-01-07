@@ -60,7 +60,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	    username = "",
 	    roomFormatter: (room: string) => HTMLLIElement = li,
 	    game = "";
-	Object.assign(room, {
+	Object.freeze(Object.assign(room, {
 		"admin": () => admin,
 		"rooms": () => rooms,
 		"users": () => users,
@@ -117,7 +117,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			}
 		},
 		"getTime": () => Math.round(timeShift + Date.now() / 1000)
-	});
+	}));
 	for (const [id, fn] of [
 		[broadcastRoomAdd, room => rooms.push({room, [node]: roomFormatter(room)})],
 		[broadcastRoomRemove, room => rooms.filterRemove(r => r.room === room)],
