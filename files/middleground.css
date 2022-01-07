@@ -98,4 +98,10 @@
 	#mg button {
 		width: 100%;
 	}
+	#mg input {
+		width: 100%;
+	}
+	#mg label:after {
+		width: 100%;
+	}
 }
