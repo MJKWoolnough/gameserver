@@ -11,23 +11,24 @@ type Data = {
 }
 
 const game = "Middleground",
-      word = input({"type": "text", "value": "", "placeholder": "Word Here"}),
       users = new Set<string>(),
-      showUI = (data: Data, fn: (word: string) => void) => makeElement(clearElement(document.body), {"id": "mg"}, [
-	h1(game),
-	div(data.players[0]),
-	div(data.players[1]),
-	!data.checking && data.players.includes(room.username()) ? [
-		makeElement(word, {"disabled": undefined}),
-		input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
-			word.toggleAttribute("disabled", this.checked);
-			fn(this.checked ? word.value : "");
-			word.value = "";
-		}}),
-		label({"for": "confirm"})
-	] : [],
-	ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
-      ]),
+      showUI = (data: Data, fn: (word: string) => void) => {
+	const word = input({"type": "text", "value": "", "placeholder": "Word Here"});
+	return makeElement(clearElement(document.body), {"id": "mg"}, [
+		h1(game),
+		div(data.players[0]),
+		div(data.players[1]),
+		!data.checking && data.players.includes(room.username()) ? [
+			word,
+			input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
+				word.toggleAttribute("disabled", this.checked);
+				fn(this.checked ? word.value : "");
+			}}),
+			label({"for": "confirm"})
+		] : [],
+		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
+	]);
+      },
       noop: (player: string, word: string) => void = () => {},
       gameObj = {
 	"onAdmin": () => {
