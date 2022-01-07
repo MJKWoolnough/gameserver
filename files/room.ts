@@ -103,10 +103,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			}
 			go?.onAdmin()
 		},
-		"leave": () => {
-			makeElement(document.body, becomeAdmin);
-			return rpc.request("leaveRoom");
-		},
+		"leave": () => rpc.request("leaveRoom"),
 		"messageAdmin": (data: any) => rpc.request("message", data),
 		"messageUser": (to: string, data: any) => rpc.request("message", {to, data}),
 		"messageRoom": (data: any) => rpc.request("message", {game, data}),
