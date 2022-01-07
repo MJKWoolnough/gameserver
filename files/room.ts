@@ -1,4 +1,4 @@
-import {makeElement} from './lib/dom.js';
+import {clearElement, makeElement} from './lib/dom.js';
 import {div, h1, li, ul} from './lib/html.js';
 import {node, NodeArray} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
@@ -124,7 +124,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		[broadcastAdminNone, () => {
 			admin = "";
 			if (username) {
-				makeElement(document.body, becomeAdmin);
+				makeElement(clearElement(document.body), becomeAdmin);
 			}
 		}],
 		[broadcastAdmin, (a: string) => {
