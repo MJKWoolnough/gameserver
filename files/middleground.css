@@ -55,6 +55,7 @@
 	width: calc(100% - 5em);
 	box-sizing: border-box;
 	font-size: 3em;
+	text-align: center;
 }
 
 #mg input[type=checkbox] {
