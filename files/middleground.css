@@ -81,3 +81,20 @@
 	background-color: #080;
 	border-color: #0a0;
 }
+
+#mg button {
+	background-color: #008;
+	border-color: #00a;
+	border-width: 1vmax;
+	font-size: 3em;
+	text-align: center;
+	color: #fff;
+	width: 50%;
+	box-sizing: border-box;
+}
+
+@media (orientation: portrait) {
+	#mg button {
+		width: 100%;
+	}
+}
