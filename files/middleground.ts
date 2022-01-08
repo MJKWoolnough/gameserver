@@ -13,7 +13,7 @@ type Data = {
 const game = "Middleground",
       users = new Set<string>(),
       showUI = (data: Data, fn: (word: string) => void) => {
-	const word = input({"type": "text", "value": "", "placeholder": "Word Here"});
+	const word = input({"type": "text", "placeholder": "Word Here"});
 	return makeElement(clearElement(document.body), {"id": "mg"}, [
 		h1(game),
 		div(data.players[0]),
