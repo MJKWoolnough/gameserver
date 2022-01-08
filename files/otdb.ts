@@ -178,7 +178,7 @@ export default () => (imported ?? (imported = import("data/otdb.js").then(({qs, 
 		iCats.push(atob(cat));
 	}
 	return qs;
-}))).then(qs => new otdbLocal(qs) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
+}))).then(qs => new otdbLocal(qs.concat()) as OTDB).catch(() => (categories ? Promise.resolve() : Promise.all([
 	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.map(c => [c.name, c.id])),
 	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
