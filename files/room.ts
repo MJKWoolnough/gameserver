@@ -2,13 +2,15 @@ import {clearElement, makeElement} from './lib/dom.js';
 import {div, h1, li, ul} from './lib/html.js';
 import {node, NodeArray} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
-import games from './games.js';
 
 const broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
 
 declare const pageLoad: Promise<void>;
 
-const {protocol, host} = window.location;
+const {protocol, host} = window.location,
+      games = new Map<string, Game>();
+
+let timeShift = 0;
 
 type RoomNode = {
 	room: string;
@@ -26,7 +28,16 @@ type RoomEntry = {
 	status: {game: string};
 }
 
-let timeShift = 0;
+type Game = {
+	onAdmin: () => void;
+	onRoomMessage: (data: any) => void;
+	onMessage?: (from: string, data: any) => void;
+	onMessageTo?: (data: any) => void;
+	onUserLeave?: (username: string) => void;
+	userFormatter?: (username: string) => HTMLLIElement;
+};
+
+export default games;
 
 export const room = {} as {
 	admin: () => string;

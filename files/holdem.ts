@@ -2,8 +2,7 @@ import type {UserNode} from './room.js';
 import {clearElement, makeElement} from './lib/dom.js';
 import {br, button, div, input, label, li} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import games from './games.js';
-import {room} from './room.js';
+import games, {room} from './room.js';
 
 let limitType = 0,
     minimumBet = 2,

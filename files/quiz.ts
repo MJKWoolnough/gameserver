@@ -2,9 +2,8 @@ import type {Question} from './otdb.js';
 import {clearElement, makeElement} from './lib/dom.js';
 import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
-import games from './games.js';
 import otdb from './otdb.js';
-import {room} from './room.js';
+import games, {room} from './room.js';
 
 type QuestionMessage = {
 	round: number;
