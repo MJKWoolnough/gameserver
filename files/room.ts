@@ -7,8 +7,7 @@ const broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, 
 
 declare const pageLoad: Promise<void>;
 
-const {protocol, host} = window.location,
-      games = new Map<string, Game>();
+const {protocol, host} = window.location;
 
 let timeShift = 0;
 
@@ -37,9 +36,8 @@ type Game = {
 	userFormatter?: (username: string) => HTMLLIElement;
 };
 
-export default games;
-
-export const room = {} as {
+export const games = new Map<string, Game>(),
+room = {} as {
 	admin: () => string;
 	rooms: () => NodeArray<RoomNode>;
 	users: () => NodeArray<UserNode>;

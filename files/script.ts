@@ -1,7 +1,7 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, stringSort} from './lib/nodes.js';
-import games, {room, ready} from './room.js';
+import {games, ready, room} from './room.js';
 import './holdem.js';
 import './middleground.js';
 import './quiz.js';

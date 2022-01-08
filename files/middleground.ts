@@ -1,7 +1,7 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import games, {room} from './room.js';
+import {games, room} from './room.js';
 
 type Data = {
 	players: [string, string];

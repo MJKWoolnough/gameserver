@@ -1,6 +1,6 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, canvas, div, h1, img} from './lib/html.js';
-import games, {room} from './room.js';
+import {games, room} from './room.js';
 
 type Message = {
 	url: string;
