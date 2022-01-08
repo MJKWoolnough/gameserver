@@ -23,11 +23,7 @@ export type UserNode = {
 type RoomEntry = {
 	admin: string;
 	users: string[];
-	status: GameMessage;
-}
-
-type GameMessage = {
-	game: string;
+	status: {game: string};
 }
 
 let timeShift = 0;
