@@ -10,7 +10,7 @@ body {
 	margin: 0;
 }
 
-input::placeholder {
+h1, input::placeholder {
 	text-align: center;
 }
 
