@@ -18,7 +18,7 @@ ready.then(() => {
 	      error = span({"id": "error"});
 	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).catch((e: Error) => makeElement(error, e.message))}, r)));
-	makeElement(clearElement(document.body), {"style": {"margin": 0}}, [
+	makeElement(clearElement(document.body), [
 		h1("Game Server"),
 		username,
 		error,
