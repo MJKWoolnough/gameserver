@@ -126,14 +126,15 @@ class otdbNet {
 
 class otdbLocal {
 	#questions: Set<QuestionData>;
-	categories: Map<string, number>;
+	categories: ReadonlyMap<string, number>;
 	constructor(data: QuestionData[]) {
 		const shuffledQs = Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]);
 		this.#questions = new Set<QuestionData>(shuffledQs);
-		this.categories = new Map<string, number>();
+		const c = new Map<string, number>();
 		for (const cat of iCats) {
-			this.categories.set(cat, this.categories.size);
+			c.set(cat, c.size);
 		}
+		this.categories = c;
 	}
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		if (filter.amount > 50) {
