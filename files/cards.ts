@@ -82,9 +82,8 @@ best5Hand = (cards: Cards): Win => {
 		throw new RangeError("hand needs to have at least 5 cards");
 	}
 	const myCards = new Set(cards);
-	SF:
 	for (let n = 0; n < 10; n++) {
-		for (let s = 0; s < 4; s++) {
+		SF: for (let s = 0; s < 4; s++) {
 			const base = 13 * s;
 			for (let i = 0; i < 5; i++) {
 				if (!myCards.has(base + nums[n + i])) {
