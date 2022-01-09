@@ -29,7 +29,7 @@ const game = "Middleground",
 		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
 	]);
       },
-      noop: (player: string, word: string) => void = () => {},
+      noop = () => {},
       gameObj = {
 	"onAdmin": () => {
 		users.clear();
@@ -91,7 +91,7 @@ const game = "Middleground",
 		}
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
-	"onMessage": noop,
+	"onMessage": noop as (player: string, word: string) => void ,
 	"onRoomMessage": (data: Data) => showUI(data, room.messageAdmin)
       };
 games.set(game, gameObj);
