@@ -95,8 +95,7 @@ best5Hand = (cards: Cards): Win => {
 	}
 	let trip = -1, p = -1, tp = -1;
 	for (const num of nums) {
-		const count = +myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39);
-		switch (count) {
+		switch (+myCards.has(num) + +myCards.has(num + 13) + +myCards.has(num + 26) + +myCards.has(num + 39)) {
 		case 2:
 			if (p === -1) {
 				p = num;
