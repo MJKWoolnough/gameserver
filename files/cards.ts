@@ -65,7 +65,7 @@ cards = svg({"style": {"width": 0, "height": 0}}, [
 				use({"href": `#num_${num}`, "transform": "rotate(180, 125, 175) translate(2, 10) scale(0.5)", "stroke": suit % 2 === 0 ? "#f00" : "#000"}),
 				use({"href": `#suit_${suit}`, "transform": "translate(6, 55) scale(0.4)"}),
 				use({"href": `#suit_${suit}`, "transform": "rotate(180, 125, 175) translate(6, 55) scale(0.4)"}),
-				num === 0 ? use({"href": `#suit_${suit}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#suit_${suit}`, "transform": `scale(0.7) translate(${(placement[0] + (placement[1] > 175 ? 1 : 0)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#num_${num}`, "transform": "translate(53, 91) scale(2)", "stroke": suit % 2 === 0 ? "#f00" : "#000"})
+				num === 0 ? use({"href": `#suit_${suit}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#suit_${suit}`, "transform": `scale(0.7) translate(${(placement[0] + +(placement[1] > 175)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#num_${num}`, "transform": "translate(53, 91) scale(2)", "stroke": suit % 2 === 0 ? "#f00" : "#000"})
 			]);
 		})
 	])
