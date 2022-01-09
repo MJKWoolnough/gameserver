@@ -46,7 +46,7 @@ let title: HTMLDivElement,
     st = 0;
 
 games.set(game, {
-	"onAdmin": () => (import('./data/wit_data.js') as Promise<{files: [string, string][]}>).then(({files}) => {
+	"onAdmin": () => import('./data/wit_data.js').then(({files}) => {
 		let image = 0, step = 0;
 		const sFiles = files.concat(),
 		      l = sFiles.length,
