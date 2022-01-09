@@ -40,6 +40,7 @@ ul {
 	border-color: #0a0;
 	font-size: 3em;
 	border-width: 1vmax;
+	box-sizing: border-box;
 }
 
 :is(#roomList, #gameList) > li > button:hover {
@@ -57,6 +58,7 @@ ul {
 	border-color: #a00;
 	font-size: 3em;
 	border-width: 1vmax;
+	box-sizing: border-box;
 }
 
 #roomList + button:hover {
