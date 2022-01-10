@@ -86,6 +86,7 @@ games.set(game, {
 						label({"for": `cat_${id}`}, cat)
 					]))),
 					button({"onclick": () => {
+						let num = 0;
 						const t = parseInt(timer.value) || 0,
 						      n = parseInt(numberQs.value) || 10,
 						      qs: Question[] = [],
@@ -153,7 +154,6 @@ games.set(game, {
 								button({"onclick": roundStart}, "Next Round")
 							]));
 						      };
-						let num = 0;
 						makeElement(clearElement(document.body), h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
