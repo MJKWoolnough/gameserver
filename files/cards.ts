@@ -180,7 +180,7 @@ win2String = (hand: Win, kickers = false) => {
 		return `${hand[1] === 13 ? "Royal" : `${numNames[hand[1]]}-High Straight`} Flush`;
 	}
 },
-sortHands = (hands: Win[]) => hands.sort((a: Win, b: Win) => {
+compareHands = (a: Win, b: Win) => {
 	for (let i = 0; i < a.length; i++) {
 		const c = b[i] - a[i];
 		if (c !== 0) {
@@ -188,4 +188,4 @@ sortHands = (hands: Win[]) => hands.sort((a: Win, b: Win) => {
 		}
 	}
 	return 0;
-});
+};
