@@ -1,38 +1,43 @@
-.witButton {
+#wit button {
 	width: 100%;
 	height: 10vh;
 	border-width: 1vmax;
 	font-size: 2vmax
 }
 
-.witButton:nth-of-type(1) {
+#wit button:nth-of-type(1) {
 	background-color: #f80;
 	border-color: #f90;
 }
 
-.witButton:nth-of-type(2) {
+#wit button:nth-of-type(2) {
 	background-color: #aa0;
 	border-color: #bb0;
 }
 
-.witButton:nth-of-type(3) {
+#wit button:nth-of-type(3) {
 	background-color: #08f;
 	border-color: #09f;
 }
 
-.witButton:nth-of-type(4) {
+#wit button:nth-of-type(4) {
 	background-color: #080;
 	border-color: #090;
 }
 
-.witButton.big {
+#wit .big {
 	height: 40vh;
 	width: 50%;
 }
 
 @media (orientation: portrait) {
-	.witButton.big {
+	#wit .big {
 		width: 100%;
 		height: 30vh;
 	}
+}
+
+#wit div {
+	text-align: center;
+	font-size: 2em;
 }

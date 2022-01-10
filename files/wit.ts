@@ -61,30 +61,30 @@ games.set(game, {
 			makeElement(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
 			room.messageRoom(data);
 		      },
-		      progress = div({"style": {"text-align": "center", "font-size": "2em"}});
+		      progress = div();
 		sendStatus();
-		makeElement(clearElement(document.body), [
-			h1({"style": "text-align: center"}, game),
+		makeElement(clearElement(document.body), div({"id": "wit"}, [
+			h1(game),
 			progress,
-			button({"class": "witButton", "onclick": () => {
+			button({"onclick": () => {
 				image--;
 				step = 0;
 				sendStatus();
 			}}, "Previous Image"),
-			button({"class": "witButton big", "onclick": () => {
+			button({"class": "big", "onclick": () => {
 				step--;
 				sendStatus();
 			}}, "Previous Step"),
-			button({"class": "witButton big", "onclick": () => {
+			button({"class": "big", "onclick": () => {
 				step++;
 				sendStatus();
 			}}, "Next Step"),
-			button({"class": "witButton", "onclick": () => {
+			button({"onclick": () => {
 				image++;
 				step = 0;
 				sendStatus();
 			}}, "Next Image")
-		]);
+		]));
 	}).catch(alert),
 	"onRoomMessage": (message: Message) => {
 		if (!title) {
