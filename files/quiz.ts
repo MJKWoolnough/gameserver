@@ -111,7 +111,6 @@ games.set(game, {
 						      },
 						      runQ = () => {
 							answers.clear();
-							      console.log(qs, num);
 							const {question, correct_answer, incorrect_answers} = qs.pop()!,
 							      answerList = [correct_answer].concat(incorrect_answers).sort(stringSort),
 							      username = room.username(),
