@@ -88,8 +88,8 @@ games.set(game, {
 	}).catch(alert),
 	"onRoomMessage": (message: Message) => {
 		if (!title) {
-			title = div({"style": {"position": "absolute", "bottom": 0, "left": 0, "right": 0, "text-align": "center", "color": "#fff", "text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", "font-size": "5em"}});
-			c = canvas({"style": {"image-rendering": "pixelated", "max-width": "100%", "max-height": "100%", "width": "100%", "object-fit": "contain"}});
+			title = div({"id": "witTitle"});
+			c = canvas();
 			ctx = c.getContext("2d")!;
 		}
 		witTitle = message.title || "";
@@ -102,7 +102,7 @@ games.set(game, {
 			drawImage();
 		}
 		if (!c.parentNode) {
-			makeElement(clearElement(document.body), {"style": {"cursor": "none", "margin": 0}}, div({"style": {"width": "100vw", "height": "100vh", "display": "flex", "align-items": "center", "justify-content": "center"}}, c));
+			makeElement(clearElement(document.body), div({"id": "witImg"}, c));
 		}
 	}
 });
