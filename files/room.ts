@@ -101,9 +101,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 			const go = games.get(game = g),
 			      fmt = go?.userFormatter ?? li;
 			for (const u of users) {
-				const n = fmt(u.user);
-				users[node].replaceChild(n, u[node]);
-				u[node] = n;
+				u[node].replaceWith(u[node] = fmt(u.user));
 			}
 			go?.onAdmin()
 		},
@@ -115,9 +113,7 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		"roomFormatter": (fn: (room: string) => HTMLLIElement) => {
 			roomFormatter = fn;
 			for (const room of rooms) {
-				const n = fn(room.room);
-				rooms[node].replaceChild(n, room[node]);
-				room[node] = n;
+				room[node].replaceWith(room[node] = fn(room.room));
 			}
 		},
 		"getTime": () => Math.round(timeShift + Date.now() / 1000)
