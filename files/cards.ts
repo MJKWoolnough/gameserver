@@ -165,7 +165,7 @@ win2String = (hand: Win, kickers = false) => {
 	case 1:
 		return `Pair of ${plural(hand[1])}${kicker}`;
 	case 2:
-		return `Two Pair, ${plural(hand[1])} over ${plural(hand[2])}${kicker}` ;
+		return `Two Pair, ${plural(hand[1])} over ${plural(hand[2])}${kicker}`;
 	case 3:
 		return `Trip ${plural(hand[1])}${kicker}`;
 	case 4:
