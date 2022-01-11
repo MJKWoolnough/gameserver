@@ -33,6 +33,7 @@ let timeShift = 0;
 declare const pageLoad: Promise<void>;
 
 const {protocol, host} = window.location,
+      rooms = new NodeArray<RoomNode>(ul(), (a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room)),
       username = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
       error = span({"id": "error"}),
       roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, username.value).catch((e: Error) => makeElement(error, e.message))}, r)),
@@ -41,8 +42,6 @@ const {protocol, host} = window.location,
 		room.join("default", "");
 		return;
 	}
-	const rooms = room.rooms();
-	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 	makeElement(clearElement(document.body), [
 		h1("Game Server"),
 		username,
@@ -61,7 +60,6 @@ const {protocol, host} = window.location,
 export const games = new Map<string, Game>(),
 room = {} as {
 	admin: () => string;
-	rooms: () => NodeArray<RoomNode>;
 	users: () => NodeArray<UserNode>;
 	new: (room: string, user: string) => Promise<void>;
 	join: (room: string, user: string) => Promise<RoomEntry>;
@@ -75,8 +73,7 @@ room = {} as {
 	getTime: () => number;
 },
 ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
-	const rooms = new NodeArray<RoomNode>(ul()),
-	      users = new NodeArray<UserNode>(ul()),
+	const users = new NodeArray<UserNode>(ul()),
 	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
 		admin = username;
@@ -87,7 +84,6 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 	    game = "";
 	Object.freeze(Object.assign(room, {
 		"admin": () => admin,
-		"rooms": () => rooms,
 		"users": () => users,
 		"new": (room: string, user: string) => {
 			admin = username = "";
