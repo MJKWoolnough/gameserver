@@ -128,7 +128,10 @@ class otdbLocal {
 	#questions: Set<QuestionData>;
 	categories: ReadonlyMap<string, number>;
 	constructor(data: QuestionData[]) {
-		this.#questions = new Set<QuestionData>(Array.from({"length": data.length}, () => data.splice(Math.floor(Math.random() * data.length), 1)[0]));
+		this.#questions = new Set<QuestionData>();
+		while (data.length) {
+			this.#questions.add(data.splice(Math.floor(Math.random() * data.length), 1)[0]);
+		}
 		const c = new Map<string, number>();
 		for (const cat of iCats) {
 			c.set(cat, c.size);
