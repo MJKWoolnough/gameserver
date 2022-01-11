@@ -33,6 +33,29 @@ let timeShift = 0;
 declare const pageLoad: Promise<void>;
 
 const {protocol, host} = window.location,
+      start = () => {
+	if (new URLSearchParams(window.location.search).has("monitor")) {
+		room.join("default", "");
+		return;
+	}
+	const rooms = room.rooms(),
+	      username = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
+	      error = span({"id": "error"});
+	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
+	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).catch((e: Error) => makeElement(error, e.message))}, r)));
+	makeElement(clearElement(document.body), [
+		h1("Game Server"),
+		username,
+		error,
+		makeElement(rooms[node], {"id": "roomList"}),
+		button({"onclick": () => {
+			const roomName = prompt("Please enter new Room name");
+			if (roomName && roomName.length <= 100) {
+				room.new(roomName, username.value).catch((e: Error) => alert(e.message));
+			}
+		}}, "New Room")
+	]);
+      },
       broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
 
 export const games = new Map<string, Game>(),
@@ -152,31 +175,8 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		for (const room of r) {
 			rooms.push({room, [node]: roomFormatter(room)});
 		}
+		start();
 	}));
-});
-
-ready.then(() => {
-	if (new URLSearchParams(window.location.search).has("monitor")) {
-		room.join("default", "");
-		return;
-	}
-	const rooms = room.rooms(),
-	      username = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", username.value)}),
-	      error = span({"id": "error"});
-	rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
-	room.roomFormatter((r: string) => li(button({"onclick": () => room.join(r, username.value).catch((e: Error) => makeElement(error, e.message))}, r)));
-	makeElement(clearElement(document.body), [
-		h1("Game Server"),
-		username,
-		error,
-		makeElement(rooms[node], {"id": "roomList"}),
-		button({"onclick": () => {
-			const roomName = prompt("Please enter new Room name");
-			if (roomName && roomName.length <= 100) {
-				room.new(roomName, username.value).catch((e: Error) => alert(e.message));
-			}
-		}}, "New Room")
-	]);
 });
 
 games.set("", {
