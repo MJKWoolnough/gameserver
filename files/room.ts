@@ -57,7 +57,23 @@ const {protocol, host} = window.location,
       },
       broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
 
-export const games = new Map<string, Game>(),
+export const games = new Map<string, Game>([["", {
+	"onAdmin": () => {
+		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
+		for (const game of games.keys()) {
+			if (game) {
+				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
+			}
+		}
+		makeElement(clearElement(document.body), [
+			h1("Choose Game"),
+			gameList[node]
+		]);
+	},
+	"onRoomMessage": () => {
+		makeElement(clearElement(document.body), h1("Waiting for Game"));
+	}
+}]]),
 room = {} as {
 	admin: () => string;
 	users: () => NodeArray<UserNode>;
@@ -165,22 +181,4 @@ ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).
 		}
 		start();
 	}));
-});
-
-games.set("", {
-	"onAdmin": () => {
-		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
-		for (const game of games.keys()) {
-			if (game) {
-				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
-			}
-		}
-		makeElement(clearElement(document.body), [
-			h1("Choose Game"),
-			gameList[node]
-		]);
-	},
-	"onRoomMessage": () => {
-		makeElement(clearElement(document.body), h1("Waiting for Game"));
-	}
 });
