@@ -141,11 +141,10 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			go?.onAdmin()
 		},
 		"leave": () => {
-			rpc.request("leaveRoom")
 			username = "";
 			admin = "";
 			game = "";
-			start();
+			rpc.request("leaveRoom").then(start);
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
 		"messageUser": (to: string, data: any) => rpc.request("message", {to, data}),
