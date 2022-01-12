@@ -1,6 +1,6 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, div, h1, input, li, span, ul} from './lib/html.js';
-import {node, NodeArray, stringSort} from './lib/nodes.js';
+import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
 
 type RoomNode = {
@@ -75,7 +75,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		admin = username;
 		games.get(game)?.onAdmin();
 	      })}, h1("Admin not present. Click/Tap here to become Admin for this Room")),
-	      rooms = new NodeArray<RoomNode>(ul(), (a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room)),
+	      rooms = new NodeArray<RoomNode>(ul()),
 	      usernameInput = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", usernameInput.value)}),
 	      error = span({"id": "error"}),
 	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => makeElement(error, e.message))}, r)),
@@ -84,6 +84,8 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			room.join("default", "");
 			return;
 		}
+		rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
+		rooms.sort(noSort);
 		makeElement(clearElement(document.body), [
 			h1("Game Server"),
 			username,
