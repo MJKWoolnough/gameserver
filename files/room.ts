@@ -30,8 +30,6 @@ type Game = {
 
 let timeShift = 0;
 
-declare const pageLoad: Promise<void>;
-
 const {protocol, host} = window.location,
       games = new Map<string, Game>([["", {
 	"onAdmin": () => {
@@ -67,6 +65,8 @@ room = {} as {
 	username: () => string;
 	getTime: () => number;
 };
+
+declare const pageLoad: Promise<void>;
 
 pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const users = new NodeArray<UserNode>(ul()),
