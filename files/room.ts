@@ -144,6 +144,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			username = "";
 			admin = "";
 			game = "";
+			makeElement(clearElement(document.body), h1("Leaving..."))
 			rpc.request("leaveRoom").then(start);
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
