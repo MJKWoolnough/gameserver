@@ -1,6 +1,6 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, canvas, div, h1, img} from './lib/html.js';
-import {games, room} from './room.js';
+import {addGame, room} from './room.js';
 
 type Message = {
 	url: string;
@@ -45,7 +45,7 @@ let title: HTMLDivElement,
     witTitle = "",
     st = 0;
 
-games.set(game, {
+addGame(game, {
 	"onAdmin": () => import('./data/wit_data.js').then(({files}) => {
 		let image = 0, step = 0;
 		const sFiles = files.concat(),

@@ -2,7 +2,7 @@ import type {UserNode} from './room.js';
 import {clearElement, makeElement} from './lib/dom.js';
 import {br, button, div, input, label, li} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import {games, room} from './room.js';
+import {addGame, room} from './room.js';
 
 let limitType = 0,
     minimumBet = 2,
@@ -46,7 +46,7 @@ const game = "Texas Hold'Em",
 
 ((_a: any) => {})(playerSort);
 
-games.set(game, {
+addGame(game, {
 	"onAdmin": () => {
 		const starting = input({"id": "starting", "type": "number", "min": 5, "value": 20});
 		makeElement(clearElement(document.body), {"id": "holdem"}, [

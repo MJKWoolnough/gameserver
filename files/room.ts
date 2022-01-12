@@ -55,9 +55,7 @@ const {protocol, host} = window.location,
 		}}, "New Room")
 	]);
       },
-      broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
-
-export const games = new Map<string, Game>([["", {
+      games = new Map<string, Game>([["", {
 	"onAdmin": () => {
 		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
 		for (const game of games.keys()) {
@@ -73,7 +71,10 @@ export const games = new Map<string, Game>([["", {
 	"onRoomMessage": () => {
 		makeElement(clearElement(document.body), h1("Waiting for Game"));
 	}
-}]]),
+      }]]),
+      broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
+
+export const addGame = (name: string, game: Game) => games.has(name) || games.set(name, game),
 room = {} as {
 	admin: () => string;
 	users: () => NodeArray<UserNode>;

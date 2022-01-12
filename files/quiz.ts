@@ -3,7 +3,7 @@ import {clearElement, makeElement} from './lib/dom.js';
 import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
 import otdb from './otdb.js';
-import {games, room} from './room.js';
+import {addGame, room} from './room.js';
 
 type QuestionMessage = {
 	round: number;
@@ -56,7 +56,7 @@ const game = "Quiz",
       isAnswerMessage = (data: Message): data is AnswerMessage => (data as AnswerMessage).correct_answer !== undefined,
       scoreSort = (a: Score, b: Score) => (a.score - b.score) || stringSort(a.name, b.name);
 
-games.set(game, {
+addGame(game, {
 	"onAdmin": () => {
 		makeElement(clearElement(document.body), h1("Creating OpenTrivia Database Connection"));
 		otdb().then(o => {

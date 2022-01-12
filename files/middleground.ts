@@ -1,7 +1,7 @@
 import {clearElement, makeElement} from './lib/dom.js';
 import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import {games, room} from './room.js';
+import {addGame, room} from './room.js';
 
 type Data = {
 	players: [string, string];
@@ -94,4 +94,5 @@ const game = "Middleground",
 	"onMessage": noop as (player: string, word: string) => void ,
 	"onRoomMessage": (data: Data) => showUI(data, room.messageAdmin)
       };
-games.set(game, gameObj);
+
+addGame(game, gameObj);
