@@ -174,7 +174,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		}],
 		[broadcastMessageAdmin, ({from, data}: {from: string; data: any}) => games.get(game)?.onMessage?.(from, data)],
 		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
-		[broadcastMessageRoom, (data: any) => games.get(game = data.game)?.onRoomMessage(data.data)]
+		[broadcastMessageRoom, (d: {game: string; data: any}) => games.get(game = d.game)?.onRoomMessage(d.data)],
 	] as [number, (data: any) => any][]) {
 		rpc.await(id, true).then(fn);
 	}
