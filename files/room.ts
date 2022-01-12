@@ -144,6 +144,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			username = "";
 			admin = "";
 			game = "";
+			start();
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
 		"messageUser": (to: string, data: any) => rpc.request("message", {to, data}),
