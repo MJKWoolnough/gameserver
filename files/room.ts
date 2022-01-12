@@ -87,8 +87,9 @@ room = {} as {
 	messageRoom: (data: any) => Promise<void>;
 	username: () => string;
 	getTime: () => number;
-},
-ready = pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
+};
+
+pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
 	const users = new NodeArray<UserNode>(ul()),
 	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
