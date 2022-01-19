@@ -88,7 +88,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		rooms.sort(noSort);
 		makeElement(clearElement(document.body), [
 			h1("Game Server"),
-			username,
+			usernameInput,
 			error,
 			makeElement(rooms[node], {"id": "roomList"}),
 			button({"onclick": () => {
