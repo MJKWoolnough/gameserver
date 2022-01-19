@@ -1,5 +1,5 @@
 import type {UserNode} from './room.js';
-import {clearElement, makeElement} from './lib/dom.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import {br, button, div, input, label, li} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import {addGame, room} from './room.js';
@@ -40,7 +40,7 @@ const game = "Texas Hold'Em",
 			options.remove();
 		}}, "Done")
 	      ]);
-	makeElement(document.body, options);
+	amendNode(document.body, options);
       },
       playerSort = ({user: a}: UserNode, {user: b}: UserNode) => a in players ? b in players ? players[a][0] - players[b][0] : -1 : 0;
 
@@ -49,7 +49,7 @@ const game = "Texas Hold'Em",
 addGame(game, {
 	"onAdmin": () => {
 		const starting = input({"id": "starting", "type": "number", "min": 5, "value": 20});
-		makeElement(clearElement(document.body), {"id": "holdem"}, [
+		clearNode(document.body, {"id": "holdem"}, [
 			room.users()[node],
 			label({"for": "starting"}, "Starting Amount: "),
 			starting,

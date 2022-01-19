@@ -1,4 +1,4 @@
-import {clearElement, makeElement} from './lib/dom.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
 import RPC from './lib/rpc_ws.js';
@@ -39,13 +39,13 @@ const {protocol, host} = window.location,
 				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
 			}
 		}
-		makeElement(clearElement(document.body), [
+		clearNode(document.body, [
 			h1("Choose Game"),
 			gameList[node]
 		]);
 	},
 	"onRoomMessage": () => {
-		makeElement(clearElement(document.body), h1("Waiting for Game"));
+		clearNode(document.body, h1("Waiting for Game"));
 	}
       }]]),
       broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
@@ -78,7 +78,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 	      rooms = new NodeArray<RoomNode>(ul()),
 	      usernameInput = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", usernameInput.value)}),
 	      error = span({"id": "error"}),
-	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => makeElement(error, e.message))}, r)),
+	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => amendNode(error, e.message))}, r)),
 	      start = () => {
 		if (new URLSearchParams(window.location.search).has("monitor")) {
 			room.join("default", "");
@@ -86,11 +86,11 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		}
 		rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 		rooms.sort(noSort);
-		makeElement(clearElement(document.body), [
+		clearNode(document.body, [
 			h1("Game Server"),
 			usernameInput,
 			error,
-			makeElement(rooms[node], {"id": "roomList"}),
+			amendNode(rooms[node], {"id": "roomList"}),
 			button({"onclick": () => {
 				const roomName = prompt("Please enter new Room name");
 				if (roomName && roomName.length <= 100) {
@@ -128,7 +128,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 						users.push({user, [node]: uf(user)});
 					}
 					if (!admin) {
-						setTimeout(() => makeElement(document.body, becomeAdmin), 0);
+						setTimeout(() => amendNode(document.body, becomeAdmin), 0);
 					}
 					games.get(game = g)?.onRoomMessage?.(data);
 				}
@@ -146,7 +146,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			username = "";
 			admin = "";
 			game = "";
-			makeElement(clearElement(document.body), h1("Leaving..."))
+			clearNode(document.body, h1("Leaving..."))
 			rpc.request("leaveRoom").then(start);
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
@@ -161,7 +161,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		[broadcastAdminNone, () => {
 			admin = "";
 			if (username) {
-				makeElement(clearElement(document.body), becomeAdmin);
+				clearNode(document.body, becomeAdmin);
 			}
 		}],
 		[broadcastAdmin, (a: string) => {
@@ -180,7 +180,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 	] as [number, (data: any) => any][]) {
 		rpc.await(id, true).then(fn);
 	}
-	return rpc.request("time").then(t => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then(r => {
+	return rpc.request("time").then((t: number) => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then((r: string[]) => {
 		for (const room of r) {
 			rooms.push({room, [node]: roomFormatter(room)});
 		}

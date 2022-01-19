@@ -1,5 +1,5 @@
 import type {Question} from './otdb.js';
-import {clearElement, makeElement} from './lib/dom.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
 import otdb from './otdb.js';
@@ -41,10 +41,10 @@ const game = "Quiz",
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
 			clearInterval(si);
-			makeElement(time, "0");
+			amendNode(time, "0");
 			fn?.();
 		} else {
-			makeElement(time, remaining + "");
+			amendNode(time, remaining + "");
 		}
 	      },
 	      si = setInterval(setTime, 1000);
@@ -58,7 +58,7 @@ const game = "Quiz",
 
 addGame(game, {
 	"onAdmin": () => {
-		makeElement(clearElement(document.body), h1("Creating OpenTrivia Database Connection"));
+		clearNode(document.body, h1("Creating OpenTrivia Database Connection"));
 		otdb().then(o => {
 			let round = 0;
 			const roundStart = () => {
@@ -66,7 +66,7 @@ addGame(game, {
 				      cats = new Set<number>(),
 				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
 				      playerScores = new Map<string, number>();
-				makeElement(clearElement(document.body), div({"id": "quizOptions"}, [
+				clearNode(document.body, div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
 					label({"for": "timer"}, "Timer (s): "),
 					timer,
@@ -121,7 +121,7 @@ addGame(game, {
 								for (const [u, a] of answers) {
 									playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
 								}
-								makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
+								clearNode(document.body, div({"id": "quizQuestion"}, [
 									h1(`Round ${round} - Question ${num}`),
 									h2(question),
 									h2(correct_answer),
@@ -130,7 +130,7 @@ addGame(game, {
 							      };
 							num++;
 							room.messageRoom({round, num, question, "answers": answerList, endTime});
-							makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
+							clearNode(document.body, div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
 								div(ul(answerList.map((answer, n) => li([
@@ -148,13 +148,13 @@ addGame(game, {
 								scoreArr.push({name, score, [node]: li([span(name), span(score + "")])});
 							}
 							room.messageRoom({round, "scores": scores});
-							makeElement(clearElement(document.body), div({"id": "quizScores"}, [
+							clearNode(document.body, div({"id": "quizScores"}, [
 								h1(`Round ${round}`),
 								scoreArr[node],
 								button({"onclick": roundStart}, "Next Round")
 							]));
 						      };
-						makeElement(clearElement(document.body), h1("Loading Questions..."));
+						clearNode(document.body, h1("Loading Questions..."));
 						getQs();
 					}}, "Start")
 				]));
@@ -170,12 +170,12 @@ addGame(game, {
 				const score = data.scores[name];
 				scores.push({name, score, [node]: li([span(name), span(score + "")])});
 			}
-			makeElement(clearElement(document.body), div({"id": "quizScores"}, [
+			clearNode(document.body, div({"id": "quizScores"}, [
 				h1(`Round ${data.round}`),
 				scores[node]
 			]));
 		} else if (isAnswerMessage(data)) {
-			makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
+			clearNode(document.body, div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				h2(data.correct_answer),
@@ -187,7 +187,7 @@ addGame(game, {
 				      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
 				      label({"for": `answer_${n}`}, answer)
 			      ]))));
-			makeElement(clearElement(document.body), div({"id": "quizQuestion"}, [
+			clearNode(document.body, div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				answer,

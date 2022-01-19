@@ -1,4 +1,4 @@
-import {clearElement, makeElement} from './lib/dom.js';
+import {clearNode} from './lib/dom.js';
 import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import {addGame, room} from './room.js';
@@ -13,7 +13,7 @@ const game = "Middleground",
       users = new Set<string>(),
       showUI = (data: Data, fn: (word: string) => void) => {
 	const word = input({"type": "text", "placeholder": "Word Here"});
-	return makeElement(clearElement(document.body), {"id": "mg"}, [
+	return clearNode(document.body, {"id": "mg"}, [
 		h1(game),
 		div(data.players[0]),
 		div(data.players[1]),
@@ -38,7 +38,7 @@ const game = "Middleground",
 		      data = {players, words},
 		      selectUsers = () => {
 			words.splice(0, words.length);
-			makeElement(clearElement(document.body), {"id": "mgSelect"}, [
+			clearNode(document.body, {"id": "mgSelect"}, [
 				room.users()[node],
 				button({"onclick": () => {
 					if (users.size === 2) {
@@ -65,7 +65,7 @@ const game = "Middleground",
 				if (newWords[0] && newWords[1]) {
 					gameObj.onMessage = noop;
 					room.messageRoom({players, words, "checking": true});
-					makeElement(clearElement(document.body), [
+					clearNode(document.body, [
 						h1("Is there a match?"),
 						button({"onclick": selectUsers}, "Yes"),
 						button({"onclick": startGame}, "No"),

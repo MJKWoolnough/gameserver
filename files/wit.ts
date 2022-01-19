@@ -1,4 +1,4 @@
-import {clearElement, makeElement} from './lib/dom.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import {button, canvas, div, h1, img} from './lib/html.js';
 import {addGame, room} from './room.js';
 
@@ -19,7 +19,7 @@ const game = "What is That?",
 	if (witTitle) {
 		on = boxNum;
 		ctx.drawImage(i, 0, 0, c.width = width, c.height = height);
-		makeElement(document.body, makeElement(title, witTitle));
+		amendNode(document.body, clearNode(title, witTitle));
 	} else {
 		if (on < boxNum) {
 			on++;
@@ -58,12 +58,12 @@ addGame(game, {
 			if (step === boxes.length) {
 			      data["title"] = shuffledFiles[image][0];
 			}
-			makeElement(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
+			clearNode(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
 			room.messageRoom(data);
 		      },
 		      progress = div();
 		sendStatus();
-		makeElement(clearElement(document.body), div({"id": "wit"}, [
+		clearNode(document.body, div({"id": "wit"}, [
 			h1(game),
 			progress,
 			button({"onclick": () => {
@@ -102,7 +102,7 @@ addGame(game, {
 			drawImage();
 		}
 		if (!c.parentNode) {
-			makeElement(clearElement(document.body), div({"id": "witImg"}, c));
+			clearNode(document.body, div({"id": "witImg"}, c));
 		}
 	}
 });
