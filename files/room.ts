@@ -1,7 +1,7 @@
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
-import RPC from './lib/rpc_ws.js';
+import RPC from './lib/rpc.js';
 
 type RoomNode = {
 	room: string;
@@ -178,7 +178,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
 		[broadcastMessageRoom, (d: {game: string; data: any}) => games.get(game = d.game)?.onRoomMessage(d.data)],
 	] as [number, (data: any) => any][]) {
-		rpc.await(id, true).then(fn);
+		rpc.subscribe(id).then(fn);
 	}
 	return rpc.request("time").then((t: number) => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then((r: string[]) => {
 		for (const room of r) {
