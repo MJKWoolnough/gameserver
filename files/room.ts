@@ -114,7 +114,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 			users.splice(0, users.length);
 			admin = username = "";
 			game = "";
-			return rpc.request("joinRoom", {room, user}).then((resp: any) => {
+			return rpc.request("joinRoom", {room, user}).then(resp => {
 				if (!user) {
 					const {game: g, data} = resp;
 					games.get(game = g)?.onRoomMessage?.(data);
@@ -180,7 +180,7 @@ pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc
 	] as [number, (data: any) => any][]) {
 		rpc.subscribe(id).then(fn);
 	}
-	return rpc.request("time").then((t: number) => timeShift = t - Date.now() / 1000).then(() => rpc.request("listRooms").then((r: string[]) => {
+	return rpc.request<number>("time").then(t => timeShift = t - Date.now() / 1000).then(() => rpc.request<string[]>("listRooms").then(r => {
 		for (const room of r) {
 			rooms.push({room, [node]: roomFormatter(room)});
 		}
