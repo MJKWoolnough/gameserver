@@ -30,8 +30,7 @@ type Game = {
 
 let timeShift = 0;
 
-const {protocol, host} = window.location,
-      games = new Map<string, Game>([["", {
+const games = new Map<string, Game>([["", {
 	"onAdmin": () => {
 		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
 		for (const game of games.keys()) {
@@ -68,7 +67,7 @@ room = {} as {
 
 declare const pageLoad: Promise<void>;
 
-pageLoad.then(() => RPC(`ws${protocol.slice(4)}//${host}/socket`, 1.1)).then(rpc => {
+pageLoad.then(() => RPC("/socket", 1.1)).then(rpc => {
 	const users = new NodeArray<UserNode>(ul()),
 	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
