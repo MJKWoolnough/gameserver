@@ -67,7 +67,7 @@ room = {} as {
 
 declare const pageLoad: Promise<void>;
 
-pageLoad.then(() => RPC("/socket", 1.1)).then(rpc => {
+pageLoad.then(() => RPC("/socket")).then(rpc => {
 	const users = new NodeArray<UserNode>(ul()),
 	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
