@@ -65,7 +65,7 @@ let categories: [string, number][] | null = null,
     imported: Promise<QuestionData[]> | null = null;
 
 const counts: [number, number][] = [],
-      params = {"response": "json"},
+      params = {"response": "json"} as const,
       fields = ["category", "type", "difficulty", "question", "correct_answer"],
       errors = ["", "No Results", "Invalid Parameter", "Token Not Found", "Token Empty"],
       reject = (reason: string) => Promise.reject(reason),
@@ -86,7 +86,7 @@ class otdbNet {
 	getQuestions(filter: QuestionFilter = {"amount": 1}): Promise<Question[]> {
 		filter.category = filter.category === undefined ? -1 : this.#counts.has(filter.category) ? filter.category : -1;
 		const amount = Math.min(Math.max(filter.amount, 1), 50, this.#counts.get(filter.category) || 0);
-		return amount === 0 ? filter.autoReset ? this.reset().then(() => this.getQuestions(filter)) : Promise.resolve([]) : (HTTPRequest(`https://opentdb.com/api.php?amount=${amount}${filter.category !== -1 ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params) as Promise<QuestionResponse>).then(({response_code, results}) => {
+		return amount === 0 ? filter.autoReset ? this.reset().then(() => this.getQuestions(filter)) : Promise.resolve([]) : HTTPRequest<QuestionResponse>(`https://opentdb.com/api.php?amount=${amount}${filter.category !== -1 ? `&category=${filter.category}` : ""}${filter.difficulty ? `&difficulty=${filter.difficulty}` : ""}${filter.type ? `&type=${filter.type}` : ""}&encode=base64`, params).then(({response_code, results}) => {
 			switch (response_code) {
 			case 0:
 				this.#counts.set(-1, this.#counts.get(-1)! - results.length);
@@ -113,7 +113,7 @@ class otdbNet {
 		});
 	}
 	reset() {
-		return (HTTPRequest(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params) as Promise<TokenResponse>).then(token => {
+		return HTTPRequest<TokenResponse>(`https://opentdb.com/api_token.php?command=reset&token=${this.#sessionID}`, params).then(token => {
 			if (token.response_code !== 0) {
 				return reject("could not retrieve token");
 			}
@@ -183,13 +183,13 @@ export default (): Promise<OTDB> => (imported ?? (imported = import("data/otdb.j
 })))
 .then(qs => new otdbLocal(qs.concat()))
 .catch(() => (categories ? Promise.resolve() : Promise.all([
-	(HTTPRequest("https://opentdb.com/api_category.php", params) as Promise<CategoryResponse>).then(cats => categories = cats.trivia_categories.map(c => [c.name, c.id])),
-	(HTTPRequest("https://opentdb.com/api_count_global.php", params) as Promise<CategoryCountResponse>).then(catCounts => {
+	HTTPRequest<CategoryResponse>("https://opentdb.com/api_category.php", params).then(cats => categories = cats.trivia_categories.map(c => [c.name, c.id])),
+	HTTPRequest<CategoryCountResponse>("https://opentdb.com/api_count_global.php", params).then(catCounts => {
 		counts.push([-1, catCounts.overall.total_num_of_verified_questions]);
 		for (const [id, {total_num_of_verified_questions}] of Object.entries(catCounts.categories)) {
 			counts.push([parseInt(id), total_num_of_verified_questions]);
 		}
 	})
 ]))
-.then(() => HTTPRequest("https://opentdb.com/api_token.php?command=request", params) as Promise<TokenResponse>)
+.then(() => HTTPRequest<TokenResponse>("https://opentdb.com/api_token.php?command=request", params))
 .then(token => token.response_code ? reject(token.response_message) : new otdbNet(token.token, new Map(categories), new Map(counts))));
