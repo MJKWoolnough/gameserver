@@ -1,7 +1,8 @@
+import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, li, span, ul} from './lib/html.js';
 import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
-import RPC from './lib/rpc.js';
+import {RPC} from './lib/rpc.js';
 
 type RoomNode = {
 	room: string;
@@ -67,8 +68,9 @@ room = {} as {
 
 declare const pageLoad: Promise<void>;
 
-pageLoad.then(() => RPC("/socket")).then(rpc => {
-	const users = new NodeArray<UserNode>(ul()),
+pageLoad.then(() => WS("/socket")).then(ws => {
+	const rpc = new RPC(ws),
+	      users = new NodeArray<UserNode>(ul()),
 	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
 		admin = username;
