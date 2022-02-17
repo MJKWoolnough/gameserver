@@ -1,5 +1,5 @@
 import type {Question} from './otdb.js';
-import {amendNode, clearNode} from './lib/dom.js';
+import {clearNode} from './lib/dom.js';
 import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
 import otdb from './otdb.js';
@@ -41,10 +41,10 @@ const game = "Quiz",
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
 			clearInterval(si);
-			amendNode(time, "0");
+			clearNode(time, "0");
 			fn?.();
 		} else {
-			amendNode(time, remaining + "");
+			clearNode(time, remaining + "");
 		}
 	      },
 	      si = setInterval(setTime, 1000);
