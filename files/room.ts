@@ -79,7 +79,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 	      rooms = new NodeArray<RoomNode>(ul()),
 	      usernameInput = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", usernameInput.value)}),
 	      error = span({"id": "error"}),
-	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => amendNode(error, e.message))}, r)),
+	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => clearNode(error, e.message))}, r)),
 	      start = () => {
 		if (new URLSearchParams(window.location.search).has("monitor")) {
 			room.join("default", "");
