@@ -73,10 +73,10 @@ addGame(game, {
 	"userFormatter": user => li({"onclick": function(this: HTMLLIElement) {
 		if (user in players) {
 			delete players[user];
-			this.classList.toggle("no", false);
+			amendNode(this, {"class": ["!no"]});
 		} else {
 			players[user] = [0, 0];
-			this.classList.toggle("no", true);
+			amendNode(this, {"class": ["no"]});
 		}
 	}}, user)
 });
