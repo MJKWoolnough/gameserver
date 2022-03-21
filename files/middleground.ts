@@ -1,4 +1,4 @@
-import {clearNode} from './lib/dom.js';
+import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, label, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
 import {addGame, room} from './room.js';
@@ -21,7 +21,7 @@ const game = "Middleground",
 			word,
 			input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
 				const {checked} = this;
-				word.toggleAttribute("disabled", checked);
+				amendNode(word, {"disabled": checked});
 				fn(checked ? word.value : "");
 			}}),
 			label({"for": "confirm"})
