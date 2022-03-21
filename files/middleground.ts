@@ -83,7 +83,7 @@ const game = "Middleground",
 	},
 	"userFormatter": (username: string) => li({"onclick": function(this: HTMLInputElement) {
 		const toSet = !users.has(username);
-		this.classList.toggle("selected", toSet)
+		amendNode(this, {"class": {"selected": toSet}});
 		if (toSet) {
 			users.add(username);
 		} else {
