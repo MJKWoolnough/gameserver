@@ -97,7 +97,7 @@ addGame(game, {
 		if (message.url !== url) {
 			url = message.url;
 			on = 1;
-			i = img({"src": message.url, "onload": drawImage});
+			i = img({"src": url, "onload": drawImage});
 		} else if (!st || witTitle) {
 			drawImage();
 		}
