@@ -27,7 +27,7 @@ type Game = {
 	onMessageTo?: (data: any) => void;
 	onUserLeave?: (username: string) => void;
 	userFormatter?: (username: string) => HTMLLIElement;
-};
+}
 
 let timeShift = 0;
 
