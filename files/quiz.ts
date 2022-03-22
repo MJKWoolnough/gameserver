@@ -1,9 +1,9 @@
 import type {Question} from './otdb.js';
 import {clearNode} from './lib/dom.js';
-import {br, button, div, h1, h2, input, label, li, span, ul} from './lib/html.js';
+import {br, button, div, h1, h2, input, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
 import otdb from './otdb.js';
-import {addGame, room} from './room.js';
+import {addGame, addLabel, room} from './room.js';
 
 type QuestionMessage = {
 	round: number;
@@ -62,25 +62,20 @@ addGame(game, {
 		otdb().then(o => {
 			let round = 0;
 			const roundStart = () => {
-				const timer = input({"id": "timer", "type": "number", "min": 0, "value": 0}),
+				const timer = input({"type": "number", "min": 0, "value": 0}),
 				      cats = new Set<number>(),
-				      numberQs = input({"id": "numberQs", "type": "number", "min": 1, "max": 50, "value": 10}),
+				      numberQs = input({"type": "number", "min": 1, "max": 50, "value": 10}),
 				      playerScores = new Map<string, number>();
 				clearNode(document.body, div({"id": "quizOptions"}, [
 					h1(`Round ${++round}`),
-					label({"for": "timer"}, "Timer (s): "),
-					timer,
+					addLabel("Timer (s): ", timer),
 					br(),
-					label({"for": "numberQs"}, "Number of Questions: "),
-					numberQs,
+					addLabel("Number of Questions: ", numberQs),
 					br(),
 					h2("Categories"),
-					ul(Array.from(o.categories.entries()).sort((a, b) => stringSort(a[0], b[0])).map(([cat, id]) => li([
-						input({"id": `cat_${id}`, "type": "checkbox", "onclick": function(this: HTMLInputElement) {
-							cats[this.checked ? "add" : "delete"](id);
-						}}),
-						label({"for": `cat_${id}`}, cat)
-					]))),
+					ul(Array.from(o.categories.entries()).sort((a, b) => stringSort(a[0], b[0])).map(([cat, id]) => li(addLabel(input({"type": "checkbox", "onclick": function(this: HTMLInputElement) {
+						cats[this.checked ? "add" : "delete"](id);
+					}}), cat)))),
 					button({"onclick": () => {
 						let num = 0;
 						const t = parseInt(timer.value) || 0,
@@ -129,10 +124,7 @@ addGame(game, {
 							clearNode(document.body, div({"id": "quizQuestion"}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
-								div(ul(answerList.map((answer, n) => li([
-								      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}),
-								      label({"for": `answer_${n}`}, answer)
-								])))),
+								div(ul(answerList.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}), answer))))),
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
@@ -179,10 +171,7 @@ addGame(game, {
 			]));
 		} else {
 			const isSpectator = room.username() === "",
-			      answer = div(ul(data.answers.map((answer, n) => li([
-				      input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}),
-				      label({"for": `answer_${n}`}, answer)
-			      ]))));
+			      answer = div(ul(data.answers.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}), answer)))));
 			clearNode(document.body, div({"id": "quizQuestion"}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
