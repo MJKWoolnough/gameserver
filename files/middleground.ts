@@ -1,7 +1,7 @@
 import {amendNode, clearNode} from './lib/dom.js';
-import {button, div, h1, input, label, li, ul} from './lib/html.js';
+import {button, div, h1, input, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import {addGame, room} from './room.js';
+import {addGame, addLabel, room} from './room.js';
 
 type Data = {
 	players: [string, string];
@@ -19,12 +19,11 @@ const game = "Middleground",
 		div(data.players[1]),
 		!data.checking && data.players.includes(room.username()) ? [
 			word,
-			input({"id": "confirm", "type": "checkbox", "onchange": function (this: HTMLInputElement) {
+			addLabel(input({"type": "checkbox", "onchange": function (this: HTMLInputElement) {
 				const {checked} = this;
 				amendNode(word, {"disabled": checked});
 				fn(checked ? word.value : "");
-			}}),
-			label({"for": "confirm"})
+			}}), "")
 		] : [],
 		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
 	]);
