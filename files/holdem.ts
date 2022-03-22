@@ -1,8 +1,8 @@
 import type {UserNode} from './room.js';
 import {amendNode, clearNode} from './lib/dom.js';
-import {br, button, div, input, label, li} from './lib/html.js';
+import {br, button, div, input, li} from './lib/html.js';
 import {node} from './lib/nodes.js';
-import {addGame, room} from './room.js';
+import {addGame, addLabel, room} from './room.js';
 
 let limitType = 0,
     minimumBet = 2,
@@ -13,24 +13,19 @@ const game = "Texas Hold'Em",
       players: Record<string, [number, number]> = {},
       setStatus = () => room.messageRoom({limitType, minimumBet, ante, community, players}),
       options = () => {
-	const minimumBetValue = input({"id": "minimum", "type": "number", "min": 1, "value": 2}),
-	      anteValue = input({"id": "ante", "type": "number", "min": 0, "value": 0}),
-	      limit = input({"id": "limit", "name": "limit", "type": "radio", "checked": true}),
-	      potLimit = input({"id": "potLimit", "name": "limit", "type": "radio"}),
-	      noLimit = input({"id": "noLimit", "name": "limit", "type": "radio"}),
+	const minimumBetValue = input({"type": "number", "min": 1, "value": 2}),
+	      anteValue = input({"type": "number", "min": 0, "value": 0}),
+	      limit = input({"name": "limit", "type": "radio", "checked": true}),
+	      potLimit = input({"name": "limit", "type": "radio"}),
+	      noLimit = input({"name": "limit", "type": "radio"}),
 	      options = div({"id": "holdemOptions"}, [
-		label({"for": "minimum"}, "Minimum Bet: "),
-		minimumBetValue,
+		addLabel("Minimum Bet: ", minimumBetValue),
 		br(),
-		label({"for": "ante"}, "Ante: "),
-		anteValue,
+		addLabel("Ante: ", anteValue),
 		br(),
-		limit,
-		label({"for": "limit"}, "Limit"),
-		potLimit,
-		label({"for": "potLimit"}, "Pot Limit"),
-		noLimit,
-		label({"for": "noLimit"}, "No Limit"),
+		addLabel(limit, "Limit"),
+		addLabel(potLimit, "Pot Limit"),
+		addLabel(noLimit, "No Limit"),
 		br(),
 		button({"onclick": () => {
 			minimumBet = parseInt(minimumBetValue.value) || 1;
@@ -48,11 +43,10 @@ const game = "Texas Hold'Em",
 
 addGame(game, {
 	"onAdmin": () => {
-		const starting = input({"id": "starting", "type": "number", "min": 5, "value": 20});
+		const starting = input({"type": "number", "min": 5, "value": 20});
 		clearNode(document.body, {"id": "holdem"}, [
 			room.users()[node],
-			label({"for": "starting"}, "Starting Amount: "),
-			starting,
+			addLabel("Starting Amount: ", starting),
 			br(),
 			button({"onclick": () => {
 				const amount = parseInt(starting.value) || 5;
