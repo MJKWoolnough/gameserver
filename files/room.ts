@@ -1,6 +1,7 @@
+import type {Children, Props} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
-import {button, div, h1, input, li, span, ul} from './lib/html.js';
+import {button, div, h1, input, label, li, span, ul} from './lib/html.js';
 import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
 import {RPC} from './lib/rpc.js';
 
@@ -27,6 +28,15 @@ type Game = {
 	onMessageTo?: (data: any) => void;
 	onUserLeave?: (username: string) => void;
 	userFormatter?: (username: string) => HTMLLIElement;
+}
+
+type Input = HTMLInputElement | HTMLButtonElement | HTMLTextAreaElement | HTMLSelectElement;
+
+type LProps = Exclude<Props, NamedNodeMap>;
+
+interface Labeller {
+        (name: Children, input: Input, props?: LProps): Children;
+        (input: Input, name: Children, props?: LProps): Children;
 }
 
 let timeShift = 0;
@@ -64,7 +74,14 @@ room = {} as {
 	messageRoom: (data: any) => Promise<void>;
 	username: () => string;
 	getTime: () => number;
-};
+},
+addLabel: Labeller = (() => {
+        let next = 0;
+        return (name: Children | Input, input: Input | Children, props: Exclude<Props, NamedNodeMap> = {}) => {
+                const iProps = {"id": props["for"] = `ID_${next++}`};
+                return name instanceof HTMLInputElement || name instanceof HTMLButtonElement || name instanceof HTMLTextAreaElement || name instanceof HTMLSelectElement ? [amendNode(name, iProps), label(props, input)] : [label(props, name), amendNode(input as Input, iProps)];
+        };
+})();
 
 declare const pageLoad: Promise<void>;
 
