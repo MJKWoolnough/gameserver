@@ -125,7 +125,7 @@ best5Hand = (cards: Cards): Win => {
 		}
 		if (count >= 5) {
 			const min = s * 13,
-			      max = (s + 1) * 13;
+			      max = min + 13;
 			for (const c of myCards) {
 				if (c < min || c >= max) {
 					myCards.delete(c);
