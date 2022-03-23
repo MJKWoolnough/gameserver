@@ -54,9 +54,10 @@ addGame(game, {
 		      sendStatus = () => {
 			image = ((image % l) + l) % l;
 			step = Math.max(Math.min(step, boxes.length), 0);
-			const data: any = {"url": shuffledFiles[image][1], step};
+			const [title, url] = shuffledFiles[image],
+			      data: any = {url, step};
 			if (step === boxes.length) {
-			      data["title"] = shuffledFiles[image][0];
+			      data["title"] = title;
 			}
 			clearNode(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
 			room.messageRoom(data);
