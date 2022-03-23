@@ -77,7 +77,7 @@ room = {} as {
 },
 addLabel: Labeller = (() => {
         let next = 0;
-        return (name: Children | Input, input: Input | Children, props: Exclude<Props, NamedNodeMap> = {}) => {
+        return (name: Children | Input, input: Input | Children, props: LProps = {}) => {
                 const iProps = {"id": props["for"] = `ID_${next++}`};
                 return name instanceof HTMLInputElement || name instanceof HTMLButtonElement || name instanceof HTMLTextAreaElement || name instanceof HTMLSelectElement ? [amendNode(name, iProps), label(props, input)] : [label(props, name), amendNode(input as Input, iProps)];
         };
