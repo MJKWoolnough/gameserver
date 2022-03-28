@@ -81,9 +81,9 @@ const game = "Middleground",
 		selectUsers();
 	},
 	"userFormatter": (username: string) => li({"onclick": function(this: HTMLInputElement) {
-		const toSet = !users.has(username);
-		amendNode(this, {"class": {"selected": toSet}});
-		users[toSet ? "add" : "delete"](username);
+		const selected = !users.has(username);
+		amendNode(this, {"class": {selected}});
+		users[selected ? "add" : "delete"](username);
 	}}, username),
 	"onUserLeave": (username: string) => users.delete(username),
 	"onMessage": noop as (player: string, word: string) => void ,
