@@ -35,7 +35,7 @@ type Difficulty = "easy" | "medium" | "hard";
 
 type Type = "multiple" | "boolean";
 
-export type QuestionFilter = {
+type QuestionFilter = {
 	amount: number;
 	category?: number;
 	difficulty?: Difficulty;
@@ -43,7 +43,7 @@ export type QuestionFilter = {
 	autoReset?: boolean;
 }
 
-export type Question = {
+type Question = {
 	category: string;
 	type: Type;
 	difficulty: Difficulty;
@@ -52,7 +52,7 @@ export type Question = {
 	incorrect_answers: string[];
 }
 
-export interface OTDB {
+interface OTDB {
 	categories: ReadonlyMap<string, number>;
 	getQuestions: (filter: QuestionFilter) => Promise<Question[]>;
 	reset: () => Promise<void>;
