@@ -52,12 +52,6 @@ type Question = {
 	incorrect_answers: string[];
 }
 
-interface OTDB {
-	categories: ReadonlyMap<string, number>;
-	getQuestions: (filter: QuestionFilter) => Promise<Question[]>;
-	reset: () => Promise<void>;
-}
-
 type QuestionData = [0, 0 | 1 | 2, number, string, 0 | 1] | [1, 0 | 1 | 2, number, string, string, ...string[]];
 
 let imported: Promise<QuestionData[]> | null = null;
@@ -67,7 +61,7 @@ const types = ["boolean", "multiple"] as Type[],
       booleans = ["False", "True"],
       iCats: string[] = [];
 
-class otdbLocal {
+class OTDB {
 	#questions: Set<QuestionData>;
 	categories: ReadonlyMap<string, number>;
 	constructor(data: QuestionData[]) {
@@ -118,13 +112,13 @@ class otdbLocal {
 	}
 }
 
-const otdb = (): Promise<OTDB> => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => {
+const otdb = () => (imported ?? (imported = import("data/otdb.js").then(({qs, cats}) => {
 	for (const cat of cats) {
 		iCats.push(atob(cat));
 	}
 	return qs;
       })))
-      .then(qs => new otdbLocal(qs.concat())),
+      .then(qs => new OTDB(qs.concat())),
       game = "Quiz",
       showAnswerCountdown = 10,
       countDown = (endTime: number, fn?: () => void) => {
