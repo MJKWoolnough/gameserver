@@ -159,9 +159,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 			go?.onAdmin()
 		},
 		"leave": () => {
-			username = "";
-			admin = "";
-			game = "";
+			username = admin = game = "";
 			clearNode(document.body, h1("Leaving..."))
 			rpc.request("leaveRoom").then(start);
 		},
