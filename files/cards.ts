@@ -62,10 +62,10 @@ cards = svg({"style": {"width": 0, "height": 0}}, [
 			      stroke = suit % 2 === 0 ? "#f00" : "#000";
 			return g({"id": `card_${n}`}, [
 				use({"href": "#card"}),
-				use({"href": `#num_${num}`, "transform": "translate(2, 10) scale(0.5)", stroke}),
-				use({"href": `#num_${num}`, "transform": "rotate(180, 125, 175) translate(2, 10) scale(0.5)", stroke}),
-				use({"href": `#suit_${suit}`, "transform": "translate(6, 55) scale(0.4)"}),
-				use({"href": `#suit_${suit}`, "transform": "rotate(180, 125, 175) translate(6, 55) scale(0.4)"}),
+				["", "rotate(180, 125, 175) "].map(rotate => [
+					use({"href": `#num_${num}`, "transform": `${rotate}translate(2, 10) scale(0.5)`, stroke}),
+					use({"href": `#suit_${suit}`, "transform": `${rotate}translate(6, 55) scale(0.4)`}),
+				]),
 				num === 0 ? use({"href": `#suit_${suit}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#suit_${suit}`, "transform": `scale(0.7) translate(${(placement[0] + +(placement[1] > 175)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#num_${num}`, "transform": "translate(53, 91) scale(2)", stroke})
 			]);
 		})
