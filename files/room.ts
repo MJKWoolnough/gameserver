@@ -139,8 +139,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 					const {"admin": a, "users": u, data: {game: g = "", data = {}} = {}} = resp,
 					      uf = games.get(game)?.userFormatter ?? li;
 					admin = a;
-					username = user;
-					users.push({user, [node]: uf(user)});
+					users.push({user, [node]: uf(username = user)});
 					for (const user of u) {
 						users.push({user, [node]: uf(user)});
 					}
