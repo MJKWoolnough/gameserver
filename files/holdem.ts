@@ -54,7 +54,7 @@ addGame(game, {
 				for (const player in players) {
 					players[player] = [num++, amount];
 				}
-				if (num > 1) {
+				if (num) {
 					setStatus();
 				}
 			}}, "Deal")
