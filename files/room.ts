@@ -130,8 +130,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 		},
 		"join": (room: string, user: string) => {
 			users.splice(0, users.length);
-			admin = username = "";
-			game = "";
+			game = admin = username = "";
 			return rpc.request("joinRoom", {room, user}).then(resp => {
 				if (!user) {
 					const {game: g, data} = resp;
