@@ -49,17 +49,17 @@ addGame(game, {
 	"onAdmin": () => import('./data/wit_data.js').then(({files}) => {
 		let image = 0, step = 0;
 		const sFiles = files.concat(),
-		      l = sFiles.length,
-		      shuffledFiles = Array.from({"length": l}, () => sFiles.splice(Math.floor(Math.random() * sFiles.length), 1)[0]),
+		      length = sFiles.length,
+		      shuffledFiles = Array.from({length}, () => sFiles.splice(Math.floor(Math.random() * sFiles.length), 1)[0]),
 		      sendStatus = () => {
-			image = ((image % l) + l) % l;
+			image = ((image % length) + length) % length;
 			step = Math.max(Math.min(step, boxes.length), 0);
 			const [title, url] = shuffledFiles[image],
 			      data: any = {url, step};
 			if (step === boxes.length) {
 			      data["title"] = title;
 			}
-			clearNode(progress, `Image: ${image + 1}/${l} - Step ${step + 1}/${boxes.length + 1}`);
+			clearNode(progress, `Image: ${image + 1}/${length} - Step ${step + 1}/${boxes.length + 1}`);
 			room.messageRoom(data);
 		      },
 		      progress = div();
