@@ -35,8 +35,8 @@ type Input = HTMLInputElement | HTMLButtonElement | HTMLTextAreaElement | HTMLSe
 type LProps = Exclude<Props, NamedNodeMap>;
 
 interface Labeller {
-        (name: Children, input: Input, props?: LProps): Children;
-        (input: Input, name: Children, props?: LProps): Children;
+	(name: Children, input: Input, props?: LProps): Children;
+	(input: Input, name: Children, props?: LProps): Children;
 }
 
 let timeShift = 0;
