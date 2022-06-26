@@ -190,7 +190,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 		}],
 		[broadcastMessageAdmin, ({from, data}: {from: string; data: any}) => games.get(game)?.onMessage?.(from, data)],
 		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
-		[broadcastMessageRoom, (d: {game: string; data: any}) => games.get(game = d.game)?.onRoomMessage(d.data)],
+		[broadcastMessageRoom, (d: {game: string; data: any}) => games.get(game = d.game)?.onRoomMessage(d.data)]
 	] as [number, (data: any) => any][]) {
 		rpc.subscribe(id).then(fn);
 	}
