@@ -2,7 +2,7 @@ import type {Children, Props} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, label, li, span, ul} from './lib/html.js';
-import {node, NodeArray, noSort, stringSort} from './lib/nodes.js';
+import {NodeArray, node, noSort, stringSort} from './lib/nodes.js';
 import {RPC} from './lib/rpc.js';
 
 type RoomNode = {
