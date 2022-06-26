@@ -160,7 +160,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 		},
 		"leave": () => {
 			username = admin = game = "";
-			clearNode(document.body, h1("Leaving..."))
+			clearNode(document.body, h1("Leaving..."));
 			rpc.request("leaveRoom").then(start);
 		},
 		"messageAdmin": (data: any) => rpc.request("message", data),
