@@ -25,7 +25,7 @@ const game = "Middleground",
 				fn(checked ? word.value : "");
 			}}), "")
 		] : [],
-		ul(data.words.map(([a, b]) => li([div(a), div(b)]))),
+		ul(data.words.map(([a, b]) => li([div(a), div(b)])))
 	]);
       },
       noop = () => {},
@@ -70,7 +70,7 @@ const game = "Middleground",
 						button({"onclick": startGame}, "No"),
 						div(players[0]),
 						div(players[1]),
-						ul(words.map(([a, b]) => li([div(a), div(b)]))),
+						ul(words.map(([a, b]) => li([div(a), div(b)])))
 					]);
 				}
 			      };
