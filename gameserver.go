@@ -368,7 +368,6 @@ var (
 	errAdminExists     = errors.New("admin exists")
 	errNotUser         = errors.New("not user")
 	errNotInRoom       = errors.New("not in room")
-	errNotAdmin        = errors.New("not admin")
 	errNoUser          = errors.New("no user")
 	errMessageTooBig   = errors.New("message too big")
 	errNameTooLong     = errors.New("name too long")
