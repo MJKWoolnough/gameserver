@@ -2,6 +2,7 @@ import type {Children, PropsObject} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, label, li, span, ul} from './lib/html.js';
+import pageLoad from './lib/load.js';
 import {NodeArray, node, noSort, stringSort} from './lib/nodes.js';
 import {RPC} from './lib/rpc.js';
 
@@ -80,8 +81,6 @@ addLabel: Labeller = (() => {
 		return name instanceof HTMLInputElement || name instanceof HTMLButtonElement || name instanceof HTMLTextAreaElement || name instanceof HTMLSelectElement ? [amendNode(name, iProps), label(props, input)] : [label(props, name), amendNode(input as Input, iProps)];
 	};
 })();
-
-declare const pageLoad: Promise<void>;
 
 pageLoad.then(() => WS("/socket")).then(ws => {
 	const rpc = new RPC(ws),
