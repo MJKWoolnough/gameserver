@@ -1,4 +1,4 @@
-import {render} from './lib/css.js';
+import {id, render} from './lib/css.js';
 import type {Children, PropsObject} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
@@ -33,11 +33,6 @@ type Game = {
 }
 
 type Input = HTMLInputElement | HTMLButtonElement | HTMLTextAreaElement | HTMLSelectElement;
-
-interface Labeller {
-	(name: Children, input: Input, props?: PropsObject): Children;
-	(input: Input, name: Children, props?: PropsObject): Children;
-}
 
 let timeShift = 0;
 
@@ -75,13 +70,10 @@ room = {} as {
 	username: () => string;
 	getTime: () => number;
 },
-addLabel: Labeller = (() => {
-	let next = 0;
-	return (name: Children | Input, input: Input | Children, props: PropsObject = {}) => {
-		const iProps = {"id": props["for"] = `ID_${next++}`};
-		return name instanceof HTMLInputElement || name instanceof HTMLButtonElement || name instanceof HTMLTextAreaElement || name instanceof HTMLSelectElement ? [amendNode(name, iProps), label(props, input)] : [label(props, name), amendNode(input as Input, iProps)];
-	};
-})();
+addLabel = (name: Children | Input, input: Input | Children, props: PropsObject = {}) => {
+	const iProps = {"id": props["for"] = id()};
+	return name instanceof HTMLInputElement || name instanceof HTMLButtonElement || name instanceof HTMLTextAreaElement || name instanceof HTMLSelectElement ? [amendNode(name, iProps), label(props, input)] : [label(props, name), amendNode(input as Input, iProps)];
+};
 
 pageLoad.then(() => WS("/socket")).then(ws => {
 	const rpc = new RPC(ws),
