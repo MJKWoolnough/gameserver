@@ -1,3 +1,4 @@
+import {add, ids} from './lib/css.js';
 import {clearNode} from './lib/dom.js';
 import {br, button, div, h1, h2, input, li, span, ul} from './lib/html.js';
 import {NodeArray, node, stringSort} from './lib/nodes.js';
@@ -59,7 +60,113 @@ let imported: Promise<QuestionData[]> | null = null;
 const types = ["boolean", "multiple"] as Type[],
       difficulties = ["easy", "medium", "hard"] as Difficulty[],
       booleans = ["False", "True"],
-      iCats: string[] = [];
+      iCats: string[] = [],
+      [quizOptionsID, quizQuestionID, quizScoresID, countdownID] = ids(4);
+add(`#${quizOptionsID}`, {
+	"text-align": "center",
+	">label": {
+		"display": "inline-block",
+		"width": "9em",
+		"text-align": "right",
+		"font-size": "1.5em"
+	},
+	">input": {
+		"box-sizing": "border-box",
+		"width": "calc(100% - 10em)",
+		"text-align": "center",
+		"font-size": "2em",
+		"[type=checkbox]": {
+			"min-height": "1.5em"
+		}
+	},
+	" ul": {
+		"display": "grid",
+		"grid-gap": "2px",
+		"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
+		" input": {
+			"display": "none"
+		}
+	},
+	" li": {
+		"label, input:checked:active:hover+label": {
+			"font-size": "2em",
+			"box-sizing": "border-box",
+			"min-height": "3em",
+			"height": "100%",
+			"text-align": "center",
+			"display": "flex",
+			"align-items": "center",
+			"justify-content": "center",
+			"border": "1vmax outset #00a",
+			"background-color": "#009"
+		},
+		" input:checked+label, input:not(checked):active:hover+label": {
+			"background-color": "#090",
+			"border-color": "#0a0",
+			"border-style": "inset"
+		}
+	},
+	" button": {
+		"box-sizing": "border-box",
+		"width": "100%",
+		"height": "4em",
+		"background-color": "#900",
+		"border-width": "1vmax",
+		"border-color": "#a00",
+		"font-size": "2em",
+		"color": "#fff"
+	}
+});
+add(`#${quizQuestionID}`, {
+	"li input": {
+		"display": "none"
+	},
+	"h1,h2": {
+		"text-align": "center",
+		"font-size": "3em"
+	},
+	" label": {
+		"background-color": "#008",
+		"border": "1vmax outset #00a",
+		"height": "2em",
+		"width": "100%",
+		"text-align": "center",
+		"display": "flex",
+		"align-items": "center",
+		"justify-content": "center",
+		"font-size": "3em",
+		":hover": {
+			"background-color": "#228"
+		}
+	},
+	"input": {
+		":active+label:hover": {
+			"border-style": "inset"
+		},
+		":checked+label": {
+			"background-color": "#080",
+			"border": "1vmax inset #0a0"
+		}
+	}
+});
+add(`#${quizQuestionID} button, #${quizScoresID} button`, {
+	"width": "100%",
+	"height": "3em",
+	"font-size": "2em",
+	"background-color": "#800",
+	"border-color": "#900",
+	"border-width": "1vmax",
+	"color": "#fff"
+});
+add(`#${countdownID}`, {
+	"text-align": "center",
+	"font-size": "3em"
+});
+add(`#${quizScoresID} li span`, {
+	"display": "inline-block",
+	"width": "50%",
+	"font-size": "2em"
+});
 
 class OTDB {
 	#questions: Set<QuestionData>;
@@ -122,7 +229,7 @@ const otdb = () => (imported ?? (imported = import("data/otdb.js").then(({qs, ca
       game = "Quiz",
       showAnswerCountdown = 10,
       countDown = (endTime: number, fn?: () => void) => {
-	const time = div({"id": "countdown"}),
+	const time = div({"id": countdownID}),
 	      setTime = () => {
 		const remaining = endTime - room.getTime();
 		if (remaining <= 0) {
@@ -152,7 +259,7 @@ addGame(game, {
 				      cats = new Set<number>(),
 				      numberQs = input({"type": "number", "min": 1, "max": 50, "value": 10}),
 				      playerScores = new Map<string, number>();
-				clearNode(document.body, div({"id": "quizOptions"}, [
+				clearNode(document.body, div({"id": quizOptionsID}, [
 					h1(`Round ${++round}`),
 					addLabel("Timer (s): ", timer),
 					br(),
@@ -198,7 +305,7 @@ addGame(game, {
 								for (const [u, a] of answers) {
 									playerScores.set(u, (playerScores.get(u) || 0) + (a === correct_answer ? 1 : 0));
 								}
-								clearNode(document.body, div({"id": "quizQuestion"}, [
+								clearNode(document.body, div({"id": quizQuestionID}, [
 									h1(`Round ${round} - Question ${num}`),
 									h2(question),
 									h2(correct_answer),
@@ -207,7 +314,7 @@ addGame(game, {
 							      };
 							num++;
 							room.messageRoom({round, num, question, "answers": answerList, endTime});
-							clearNode(document.body, div({"id": "quizQuestion"}, [
+							clearNode(document.body, div({"id": quizQuestionID}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
 								div(ul(answerList.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}), answer))))),
@@ -222,7 +329,7 @@ addGame(game, {
 								scoreArr.push({name, score, [node]: li([span(name), span(score + "")])});
 							}
 							room.messageRoom({round, "scores": scores});
-							clearNode(document.body, div({"id": "quizScores"}, [
+							clearNode(document.body, div({"id": quizScoresID}, [
 								h1(`Round ${round}`),
 								scoreArr[node],
 								button({"onclick": roundStart}, "Next Round")
@@ -244,12 +351,12 @@ addGame(game, {
 				const score = data.scores[name];
 				scores.push({name, score, [node]: li([span(name), span(score + "")])});
 			}
-			clearNode(document.body, div({"id": "quizScores"}, [
+			clearNode(document.body, div({"id": quizScoresID}, [
 				h1(`Round ${data.round}`),
 				scores[node]
 			]));
 		} else if (isAnswerMessage(data)) {
-			clearNode(document.body, div({"id": "quizQuestion"}, [
+			clearNode(document.body, div({"id": quizQuestionID}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				h2(data.correct_answer),
@@ -258,7 +365,7 @@ addGame(game, {
 		} else {
 			const isSpectator = room.username() === "",
 			      answer = div(ul(data.answers.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}), answer)))));
-			clearNode(document.body, div({"id": "quizQuestion"}, [
+			clearNode(document.body, div({"id": quizQuestionID}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
 				answer,
