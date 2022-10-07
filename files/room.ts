@@ -1,3 +1,4 @@
+import {render} from './lib/css.js';
 import type {Children, PropsObject} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
@@ -101,6 +102,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 		}
 		rooms.sort((a, b) => a.room === "default" ? -1 : b.room === "default" ? 1 : stringSort(a.room, b.room));
 		rooms.sort(noSort);
+		amendNode(document.head, render());
 		clearNode(document.body, [
 			h1("Game Server"),
 			usernameInput,
