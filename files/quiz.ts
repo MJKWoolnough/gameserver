@@ -317,7 +317,7 @@ addGame(game, {
 							clearNode(document.body, div({"id": quizQuestionID}, [
 								h1(`Round ${round} - Question ${num}`),
 								h2(question),
-								div(ul(answerList.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": () => answers.set(username, answer)}), answer))))),
+								div(ul(answerList.map(answer => li(addLabel(input({"type": "radio", "name": "answers", "onclick": () => answers.set(username, answer)}), answer))))),
 								endTime ? countDown(endTime, sendAnswer) : button({"onclick": sendAnswer}, "End Question")
 							]));
 						      },
@@ -364,7 +364,7 @@ addGame(game, {
 			]));
 		} else {
 			const isSpectator = room.username() === "",
-			      answer = div(ul(data.answers.map((answer, n) => li(addLabel(input({"type": "radio", "name": "answers", "id": `answer_${n}`, "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}), answer)))));
+			      answer = div(ul(data.answers.map(answer => li(addLabel(input({"type": "radio", "name": "answers", "onclick": isSpectator ? undefined : () => room.messageAdmin(answer)}), answer)))));
 			clearNode(document.body, div({"id": quizQuestionID}, [
 				h1(`Round ${data.round} - Question ${data.num}`),
 				h2(data.question),
