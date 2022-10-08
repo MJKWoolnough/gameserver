@@ -1,4 +1,4 @@
-import {id, render} from './lib/css.js';
+import {add, id, ids, render} from './lib/css.js';
 import type {Children, PropsObject} from './lib/dom.js';
 import {WS} from './lib/conn.js';
 import {amendNode, clearNode} from './lib/dom.js';
@@ -38,7 +38,7 @@ let timeShift = 0;
 
 const games = new Map<string, Game>([["", {
 	"onAdmin": () => {
-		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": "gameList"}), (a, b) => stringSort(a.game, b.game));
+		const gameList = new NodeArray<{game: string, [node]: HTMLLIElement}>(ul({"id": gameListID}), (a, b) => stringSort(a.game, b.game));
 		for (const game of games.keys()) {
 			if (game) {
 				gameList.push({game, [node]: li(button({"onclick": () => room.adminGame(game)}, game))});
@@ -53,7 +53,76 @@ const games = new Map<string, Game>([["", {
 		clearNode(document.body, h1("Waiting for Game"));
 	}
       }]]),
-      broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9;
+      broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9,
+      [usernameID, roomListID, gameListID, errorID, becomeAdminID] = ids(5);
+
+add("body", {
+	"color": "#fff",
+	"background-color": "#000",
+	"user-select": "none",
+	"margin": 0
+});
+add("h1,input::placeholder", {
+	"text-align": "center"
+});
+add(`#${usernameID}`, {
+	"font-size": "3em",
+	"width": "100%",
+	"box-sizing": "border-box"
+});
+add("ul", {
+	"padding": 0,
+	"list-style": "none"
+});
+add(`#${roomListID},#${gameListID}`, {
+	"display": "grid",
+	"grid-gap": "2px",
+	"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
+	">li>button": {
+		"text-align": "center",
+		"height": "25vh",
+		"width": "100%",
+		"background-color": "#080",
+		"cursor": "pointer",
+		"border-color": "#0a0",
+		"font-size": "3em",
+		"border-width": "1vmax",
+		"box-sizing": "border-box",
+		":hover": {
+			"background-color": "#090",
+		}
+	}
+});
+add(`#${roomListID} + button`, {
+	"width": "100%",
+	"height": "25vh",
+	"background-color": "#800",
+	"border-color": "#a00",
+	"font-size": "3em",
+	"border-width": "1vmax",
+	"box-sizing": "border-box",
+	":hover": {
+		"background-color": "#900"
+	}
+});
+add(`#${errorID}`, {
+	"color": "#f00"
+});
+add(`#${becomeAdminID}`, {
+	"position": "absolute",
+	"top": 0,
+	"left": 0,
+	"background-color": "rgba(63, 0, 0, 0.75)",
+	"cursor": "pointer",
+	"right": 0,
+	"bottom": 0,
+	">h1": {
+		"display": "flex",
+		"align-items": "center",
+		"justify-content": "center",
+		"height": "100%"
+	}
+});
 
 export const addGame = (name: string, game: Game) => games.has(name) || games.set(name, game),
 room = {} as {
@@ -78,14 +147,14 @@ addLabel = (name: Children | Input, input: Input | Children, props: PropsObject 
 pageLoad.then(() => WS("/socket")).then(ws => {
 	const rpc = new RPC(ws),
 	      users = new NodeArray<UserNode>(ul()),
-	      becomeAdmin = div({"id": "becomeAdmin", "onclick": () => rpc.request("adminRoom").then(() => {
+	      becomeAdmin = div({"id": becomeAdminID, "onclick": () => rpc.request("adminRoom").then(() => {
 		becomeAdmin.remove();
 		admin = username;
 		games.get(game)?.onAdmin();
 	      })}, h1("Admin not present. Click/Tap here to become Admin for this Room")),
 	      rooms = new NodeArray<RoomNode>(ul()),
-	      usernameInput = input({"type": "text", "id": "username", "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", usernameInput.value)}),
-	      error = span({"id": "error"}),
+	      usernameInput = input({"type": "text", "id": usernameID, "maxlength": 100, "placeholder": "Spectate or Enter Username Here", "value": window.localStorage.getItem("username") ?? "", "onchange": () => window.localStorage.setItem("username", usernameInput.value)}),
+	      error = span({"id": errorID}),
 	      roomFormatter = (r: string) => li(button({"onclick": () => room.join(r, usernameInput.value).catch((e: Error) => clearNode(error, e.message))}, r)),
 	      start = () => {
 		if (new URLSearchParams(window.location.search).has("monitor")) {
@@ -99,7 +168,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 			h1("Game Server"),
 			usernameInput,
 			error,
-			amendNode(rooms[node], {"id": "roomList"}),
+			amendNode(rooms[node], {"id": roomListID}),
 			button({"onclick": () => {
 				const roomName = prompt("Please enter new Room name");
 				if (roomName && roomName.length <= 100) {
