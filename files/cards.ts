@@ -1,3 +1,4 @@
+import {ids} from './lib/css.js';
 import {defs, g, path, pattern, rect, svg, use} from './lib/svg.js';
 
 const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40], [100, 145], [100, 250]], [[60, 40], [60, 250], [140, 40], [140, 250]], [[60, 40], [60, 250], [140, 40], [140, 250], [100, 145]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250]], [[60, 40], [60, 145], [60, 250], [140, 40], [140, 145], [140, 250], [100, 92.5]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75]], [[60, 40], [60, 110], [60, 180], [60, 250], [140, 40], [140, 110], [140, 180], [140, 250], [100, 75], [100, 215]]],
@@ -21,7 +22,11 @@ const symbolPlaces: [number, number][][] = [[[100, 40], [100, 250]], [[100, 40],
 	for (let i = num; i < 52; i += 13) {
 		s.delete(i);
 	}
-      };
+      },
+      numIDs = ids(13),
+      suitIDs = ids(4),
+      cardIDs = ids(52),
+      [cardID, backPatternID, cardBackID] = ids(3);
 
 type Cards = number[];
 
@@ -35,7 +40,7 @@ cards = svg({"style": {"width": 0, "height": 0}}, [
 			"M25,84 q10,-10 7,-20 c-25,10 -32,-5 -32,-13 0,-20 20,-20 22,-17 -10,-10 0,-28 14,-28 14,0 24,18 14,28 2,-3 22,-3 22,17 0,8 -7,23 -32,13 q-3,10 7,20 z",
 			"M36,28 a1,1 0,0,0 -35.5,2 c0,15 30,38 35.5,49 c5.5,-11 35.5,-34 35.5,-49 a1,1 0,0,0 -35.5,-2",
 			"M25,84 q10,-10 7,-20 c-5,10 -29,5 -29,-14 c0,-20 30,-38 33,-50 c3,12 33,30 33,50 c0,19 -24,24 -29,14 q-3,10 7,20 z"
-		].map((d, n) => path({"id": `suit_${n}`, d, "fill": n % 2 == 0 ? "#f00" : "#000"})),
+		].map((d, n) => path({"id": suitIDs[n], d, "fill": n % 2 == 0 ? "#f00" : "#000"})),
 		[
 			"M10,76 v-2.5 l25,-64 l25,64 v2.5 M22,50 h26",
 			"M58,76 h-35 q-6,0 -6,-6 c0,-20 35,-20 35,-35 a4,5 0,0,0 -35,-5 v1",
@@ -50,29 +55,29 @@ cards = svg({"style": {"width": 0, "height": 0}}, [
 			"M25,8 h40 M45,8 v50 a1,1 0,0,1 -30,0",
 			"M36,10 a3,4 0,0,0 0,64 a3,4 0,0,0 0,-64 M36,48 c10,0 20,25 30,25",
 			"M20,5 v75 M20,48 l33,-39 v-4 M30,42 l25,33 v4"
-		].map((d, n) => path({d, "id": `num_${n}`, "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"})),
-		rect({"id": "card", "width": 250, "height": 350, "rx": 15, "fill": "#fff", "stroke": "#000"}),
-		pattern({"id": "backPattern", "patternUnits": "userSpaceOnUse", "width": 10, "height": 10}, path({"d": "M0,0 l10,10 M10,0 l-10,10", "stroke": "#f00", "fill": "none"})),
-		g({"id": "cardBack"}, [
-			use({"href": "#card"}),
-			rect({"x": 10, "y": 10, "width": 230, "height": 330, "fill": "url(#backPattern)", "stroke": "#f00"})
+		].map((d, n) => path({d, "id": numIDs[n], "fill": "none", "stroke-width": 12, "stroke-linejoin": "bevel"})),
+		rect({"id": cardID, "width": 250, "height": 350, "rx": 15, "fill": "#fff", "stroke": "#000"}),
+		pattern({"id": backPatternID, "patternUnits": "userSpaceOnUse", "width": 10, "height": 10}, path({"d": "M0,0 l10,10 M10,0 l-10,10", "stroke": "#f00", "fill": "none"})),
+		g({"id": cardBackID}, [
+			use({"href": `#${cardID}`}),
+			rect({"x": 10, "y": 10, "width": 230, "height": 330, "fill": `url(#${backPatternID})`, "stroke": "#f00"})
 		]),
 		Array.from({"length": 52}, (_, n) => {
 			const [suit, num] = cardSuitNum(n),
 			      stroke = suit % 2 === 0 ? "#f00" : "#000";
-			return g({"id": `card_${n}`}, [
-				use({"href": "#card"}),
+			return g({"id": cardIDs[n]}, [
+				use({"href": `#${cardID}`}),
 				["", "rotate(180, 125, 175) "].map(rotate => [
-					use({"href": `#num_${num}`, "transform": `${rotate}translate(2, 10) scale(0.5)`, stroke}),
-					use({"href": `#suit_${suit}`, "transform": `${rotate}translate(6, 55) scale(0.4)`})
+					use({"href": `#${numIDs[num]}`, "transform": `${rotate}translate(2, 10) scale(0.5)`, stroke}),
+					use({"href": `#${suitIDs[suit]}`, "transform": `${rotate}translate(6, 55) scale(0.4)`})
 				]),
-				num === 0 ? use({"href": `#suit_${suit}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#suit_${suit}`, "transform": `scale(0.7) translate(${(placement[0] + +(placement[1] > 175)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#num_${num}`, "transform": "translate(53, 91) scale(2)", stroke})
+				num === 0 ? use({"href": `#${suitIDs[suit]}`, "transform": "translate(53, 91) scale(2)"}) : num < 10 ? symbolPlaces[num - 1].map(placement => use({"href": `#${suitIDs[suit]}`, "transform": `scale(0.7) translate(${(placement[0] + +(placement[1] > 175)) / 0.7}, ${placement[1] / 0.7})` + (placement[1] > 175 ? " rotate(180, 36, 42)" : "")})) : use({"href": `#${numIDs[num]}`, "transform": "translate(53, 91) scale(2)", stroke})
 			]);
 		})
 	])
 ]),
-cardSymbol = (id: number) => svg({viewBox}, use({"href": "#card_" + id})),
-cardBack = () => svg({viewBox}, use({"href": "#cardBack"})),
+cardSymbol = (id: number) => svg({viewBox}, use({"href": `#${cardIDs[id]}`})),
+cardBack = () => svg({viewBox}, use({"href": `#${cardBackID}`})),
 shuffledDeck = (n = 1): number[] => {
 	const l = {"length": Math.floor(n) * 52},
 	      deck = Array.from(l, (_, n) => n % 52);
