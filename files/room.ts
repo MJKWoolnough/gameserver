@@ -93,7 +93,7 @@ add(`#${roomListID},#${gameListID}`, {
 		}
 	}
 });
-add(`#${roomListID} + button`, {
+add(`#${roomListID}+button`, {
 	"width": "100%",
 	"height": "25vh",
 	"background-color": "#800",
