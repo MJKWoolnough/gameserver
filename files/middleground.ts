@@ -1,4 +1,4 @@
-import {add, ids, query} from './lib/css.js';
+import {add, at, ids} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, li, ul} from './lib/html.js';
 import {node} from './lib/nodes.js';
@@ -179,7 +179,7 @@ add(`#${mgID}`, {
 		"box-sizing": "border-box"
 	}
 });
-query("@media (orientation: portrait)", {
+at("@media (orientation: portrait)", {
 	[`#${mgID}`]: {
 		" button": {
 			"width": "100%",
