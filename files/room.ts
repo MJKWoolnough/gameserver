@@ -252,7 +252,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 		[broadcastMessageUser, (data: any) => games.get(game)?.onMessageTo?.(data)],
 		[broadcastMessageRoom, (d: {game: string; data: any}) => games.get(game = d.game)?.onRoomMessage(d.data)]
 	] as [number, (data: any) => any][]) {
-		rpc.subscribe(id).then(fn);
+		rpc.subscribe(id).when(fn);
 	}
 	return rpc.request<number>("time").then(t => timeShift = t - Date.now() / 1000).then(() => rpc.request<string[]>("listRooms").then(r => {
 		for (const room of r) {
