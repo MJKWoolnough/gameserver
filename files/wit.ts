@@ -1,4 +1,4 @@
-import {add, ids, query} from './lib/css.js';
+import {add, at, ids} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, canvas, div, h1, img} from './lib/html.js';
 import {addGame, room} from './room.js';
@@ -69,7 +69,7 @@ add(`#${witID}`, {
 		"font-size": "2em"
 	}
 });
-query("@media (orientation: portrait)", {
+at("@media (orientation: portrait)", {
 	[`#${witID} .${bigID}`]: {
 		"width": "100%",
 		"height": "30vh"
