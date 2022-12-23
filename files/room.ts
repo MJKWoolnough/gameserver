@@ -204,7 +204,7 @@ pageLoad.then(() => WS("/socket")).then(ws => {
 						users.push({user, [node]: uf(user)});
 					}
 					if (!admin) {
-						setTimeout(() => amendNode(document.body, becomeAdmin), 0);
+						setTimeout(amendNode, 0, document.body, becomeAdmin);
 					}
 					games.get(game = g)?.onRoomMessage?.(data);
 				}
