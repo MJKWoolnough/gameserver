@@ -182,7 +182,7 @@ add(`#${mgID}`, {
 at("@media (orientation: portrait)", {
 	[`#${mgID}`]: {
 		" button": {
-			"width": "100%",
+			"width": "100%"
 		},
 		" input": {
 			"width": "100%"
