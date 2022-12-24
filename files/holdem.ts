@@ -66,7 +66,7 @@ add(`#${holdemOptionsID}`, {
 	},
 	" input": {
 		"[type=radio]": {
-			"display": "none",
+			"display": "none"
 		},
 		"+label": {
 			"display": "block",
