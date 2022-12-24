@@ -89,7 +89,7 @@ add(`#${roomListID},#${gameListID}`, {
 		"border-width": "1vmax",
 		"box-sizing": "border-box",
 		":hover": {
-			"background-color": "#090",
+			"background-color": "#090"
 		}
 	}
 });
