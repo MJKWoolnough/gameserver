@@ -1,6 +1,6 @@
-import {add, id, ids, render} from './lib/css.js';
 import type {Children, PropsObject} from './lib/dom.js';
 import {WS} from './lib/conn.js';
+import {add, id, ids, render} from './lib/css.js';
 import {amendNode, clearNode} from './lib/dom.js';
 import {button, div, h1, input, label, li, span, ul} from './lib/html.js';
 import pageLoad from './lib/load.js';
