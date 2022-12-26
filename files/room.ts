@@ -56,71 +56,73 @@ const games = new Map<string, Game>([["", {
       broadcastRoomAdd = -1, broadcastRoomRemove = -2, broadcastAdminNone = -3, broadcastAdmin = -4, broadcastUserJoin = -5, broadcastUserLeave = -6, broadcastMessageAdmin = -7, broadcastMessageUser = -8, broadcastMessageRoom = -9,
       [usernameID, roomListID, gameListID, errorID, becomeAdminID] = ids(5);
 
-add("body", {
-	"color": "#fff",
-	"background-color": "#000",
-	"user-select": "none",
-	"margin": 0
-});
-add("h1,input::placeholder", {
-	"text-align": "center"
-});
-add(`#${usernameID}`, {
-	"font-size": "3em",
-	"width": "100%",
-	"box-sizing": "border-box"
-});
-add("ul", {
-	"padding": 0,
-	"list-style": "none"
-});
-add(`#${roomListID},#${gameListID}`, {
-	"display": "grid",
-	"grid-gap": "2px",
-	"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
-	">li>button": {
-		"text-align": "center",
-		"height": "25vh",
+add({
+	"body": {
+		"color": "#fff",
+		"background-color": "#000",
+		"user-select": "none",
+		"margin": 0
+	},
+	"h1,input::placeholder": {
+		"text-align": "center"
+	},
+	[`#${usernameID}`]: {
+		"font-size": "3em",
 		"width": "100%",
-		"background-color": "#080",
-		"cursor": "pointer",
-		"border-color": "#0a0",
+		"box-sizing": "border-box"
+	},
+	"ul": {
+		"padding": 0,
+		"list-style": "none"
+	},
+	[`#${roomListID},#${gameListID}`]: {
+		"display": "grid",
+		"grid-gap": "2px",
+		"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
+		">li>button": {
+			"text-align": "center",
+			"height": "25vh",
+			"width": "100%",
+			"background-color": "#080",
+			"cursor": "pointer",
+			"border-color": "#0a0",
+			"font-size": "3em",
+			"border-width": "1vmax",
+			"box-sizing": "border-box",
+			":hover": {
+				"background-color": "#090"
+			}
+		}
+	},
+	[`#${roomListID}+button`]: {
+		"width": "100%",
+		"height": "25vh",
+		"background-color": "#800",
+		"border-color": "#a00",
 		"font-size": "3em",
 		"border-width": "1vmax",
 		"box-sizing": "border-box",
 		":hover": {
-			"background-color": "#090"
+			"background-color": "#900"
 		}
-	}
-});
-add(`#${roomListID}+button`, {
-	"width": "100%",
-	"height": "25vh",
-	"background-color": "#800",
-	"border-color": "#a00",
-	"font-size": "3em",
-	"border-width": "1vmax",
-	"box-sizing": "border-box",
-	":hover": {
-		"background-color": "#900"
-	}
-});
-add(`#${errorID}`, {
-	"color": "#f00"
-});
-add(`#${becomeAdminID}`, {
-	"position": "absolute",
-	"top": 0,
-	"left": 0,
-	"background-color": "rgba(63, 0, 0, 0.75)",
-	"cursor": "pointer",
-	"right": 0,
-	"bottom": 0,
-	">h1": {
-		"display": "flex",
-		"align-items": "center",
-		"justify-content": "center",
-		"height": "100%"
+	},
+	[`#${errorID}`]: {
+		"color": "#f00"
+	},
+	[`#${becomeAdminID}`]: {
+		"position": "absolute",
+		"top": 0,
+		"left": 0,
+		"background-color": "rgba(63, 0, 0, 0.75)",
+		"cursor": "pointer",
+		"right": 0,
+		"bottom": 0,
+		">h1": {
+			"display": "flex",
+			"align-items": "center",
+			"justify-content": "center",
+			"height": "100%"
+		}
 	}
 });
 
