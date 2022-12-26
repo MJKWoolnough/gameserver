@@ -92,91 +92,93 @@ const game = "Middleground",
       },
       [mgSelectID, mgID, selectedID] = ids(3);
 
-add(`#${mgSelectID}`, {
-	" ul": {
-		"display": "grid",
-		"grid-gap": "2px",
-		"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))"
-	},
-	" li": {
-		"box-sizing": "border-box",
-		"display": "flex",
-		"align-items": "center",
-		"justify-content": "center",
-		"text-align": "center",
-		"width": "100%",
-		"height": "100%",
-		"cursor": "pointer",
-		"font-size": "3em",
-		"background-color": "#080",
-		"border": "1vmax outset #0a0",
-		":active:hover": {
-			"border-style": "inset"
+add({
+	[`#${mgSelectID}`]: {
+		" ul": {
+			"display": "grid",
+			"grid-gap": "2px",
+			"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))"
 		},
-		".selected": {
-			"background-color": "#008",
-			"border-color": "#00a"
-		}
-	},
-	" button": {
-		"width": "100%",
-		"box-sizing": "border-box",
-		"font-size": "3em",
-		"text-align": "center",
-		"background-color": "#800",
-		"border-color": "#a00",
-		"border-width": "1vmax",
-		"color": "#fff"
-	}
-});
-add(`#${mgID}`, {
-	" h1": {
-		"font-size": "3em"
-	},
-	" div": {
-		"width": "50%",
-		"display": "inline-block",
-		"text-align": "center",
-		"font-size": "3em"
-	},
-	" input": {
-		"width": "calc(100% - 5em)",
-		"box-sizing": "border-box",
-		"font-size": "3em",
-		"text-align": "center",
-		"[type=checkbox]": {
-			"display": "none"
-		},
-		":checked + label:after": {
-			"content": `"Ready!"`,
-			"background-color": "#080",
-			"border-color": "#0a0"
-		}
-	},
-	" label": {
-		":after": {
+		" li": {
 			"box-sizing": "border-box",
-			"content": `"Ready?"`,
-			"display": "inline-block",
-			"width": "5em",
-			"font-size": "23em",
-			"background-color": "#800",
-			"border": "1vmax outset #a00",
-			"text-align": "center"
+			"display": "flex",
+			"align-items": "center",
+			"justify-content": "center",
+			"text-align": "center",
+			"width": "100%",
+			"height": "100%",
+			"cursor": "pointer",
+			"font-size": "3em",
+			"background-color": "#080",
+			"border": "1vmax outset #0a0",
+			":active:hover": {
+				"border-style": "inset"
+			},
+			".selected": {
+				"background-color": "#008",
+				"border-color": "#00a"
+			}
 		},
-		":active:hover:after": {
-			"border-style": "inset"
+		" button": {
+			"width": "100%",
+			"box-sizing": "border-box",
+			"font-size": "3em",
+			"text-align": "center",
+			"background-color": "#800",
+			"border-color": "#a00",
+			"border-width": "1vmax",
+			"color": "#fff"
 		}
 	},
-	" button": {
-		"background-color": "#008",
-		"border-color": "#00a",
-		"border-width": "1vmax",
-		"font-size": "3em",
-		"text-align": "center",
-		"color": "#fff",
-		"width": "50%",
-		"box-sizing": "border-box"
+	[`#${mgID}`]: {
+		" h1": {
+			"font-size": "3em"
+		},
+		" div": {
+			"width": "50%",
+			"display": "inline-block",
+			"text-align": "center",
+			"font-size": "3em"
+		},
+		" input": {
+			"width": "calc(100% - 5em)",
+			"box-sizing": "border-box",
+			"font-size": "3em",
+			"text-align": "center",
+			"[type=checkbox]": {
+				"display": "none"
+			},
+			":checked + label:after": {
+				"content": `"Ready!"`,
+				"background-color": "#080",
+				"border-color": "#0a0"
+			}
+		},
+		" label": {
+			":after": {
+				"box-sizing": "border-box",
+				"content": `"Ready?"`,
+				"display": "inline-block",
+				"width": "5em",
+				"font-size": "23em",
+				"background-color": "#800",
+				"border": "1vmax outset #a00",
+				"text-align": "center"
+			},
+			":active:hover:after": {
+				"border-style": "inset"
+			}
+		},
+		" button": {
+			"background-color": "#008",
+			"border-color": "#00a",
+			"border-width": "1vmax",
+			"font-size": "3em",
+			"text-align": "center",
+			"color": "#fff",
+			"width": "50%",
+			"box-sizing": "border-box"
+		}
 	}
 });
 at("@media (orientation: portrait)", {
