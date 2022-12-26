@@ -62,110 +62,112 @@ const types = ["boolean", "multiple"] as Type[],
       booleans = ["False", "True"],
       iCats: string[] = [],
       [quizOptionsID, quizQuestionID, quizScoresID, countdownID] = ids(4);
-add(`#${quizOptionsID}`, {
-	"text-align": "center",
-	">label": {
-		"display": "inline-block",
-		"width": "9em",
-		"text-align": "right",
-		"font-size": "1.5em"
-	},
-	">input": {
-		"box-sizing": "border-box",
-		"width": "calc(100% - 10em)",
+add({
+	[`#${quizOptionsID}`]: {
 		"text-align": "center",
-		"font-size": "2em",
-		"[type=checkbox]": {
-			"min-height": "1.5em"
-		}
-	},
-	" ul": {
-		"display": "grid",
-		"grid-gap": "2px",
-		"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
-		" input": {
-			"display": "none"
-		}
-	},
-	" li": {
-		"label, input:checked:active:hover+label": {
-			"font-size": "2em",
+		">label": {
+			"display": "inline-block",
+			"width": "9em",
+			"text-align": "right",
+			"font-size": "1.5em"
+		},
+		">input": {
 			"box-sizing": "border-box",
-			"min-height": "3em",
-			"height": "100%",
+			"width": "calc(100% - 10em)",
+			"text-align": "center",
+			"font-size": "2em",
+			"[type=checkbox]": {
+				"min-height": "1.5em"
+			}
+		},
+		" ul": {
+			"display": "grid",
+			"grid-gap": "2px",
+			"grid-template-columns": "repeat(auto-fit, minmax(20em, 1fr))",
+			" input": {
+				"display": "none"
+			}
+		},
+		" li": {
+			"label, input:checked:active:hover+label": {
+				"font-size": "2em",
+				"box-sizing": "border-box",
+				"min-height": "3em",
+				"height": "100%",
+				"text-align": "center",
+				"display": "flex",
+				"align-items": "center",
+				"justify-content": "center",
+				"border": "1vmax outset #00a",
+				"background-color": "#009"
+			},
+			" input:checked+label, input:not(checked):active:hover+label": {
+				"background-color": "#090",
+				"border-color": "#0a0",
+				"border-style": "inset"
+			}
+		},
+		" button": {
+			"box-sizing": "border-box",
+			"width": "100%",
+			"height": "4em",
+			"background-color": "#900",
+			"border-width": "1vmax",
+			"border-color": "#a00",
+			"font-size": "2em",
+			"color": "#fff"
+		}
+	},
+	[`#${quizQuestionID}`]: {
+		"li input": {
+			"display": "none"
+		},
+		"h1,h2": {
+			"text-align": "center",
+			"font-size": "3em"
+		},
+		" label": {
+			"background-color": "#008",
+			"border": "1vmax outset #00a",
+			"height": "2em",
+			"width": "100%",
 			"text-align": "center",
 			"display": "flex",
 			"align-items": "center",
 			"justify-content": "center",
-			"border": "1vmax outset #00a",
-			"background-color": "#009"
+			"font-size": "3em",
+			":hover": {
+				"background-color": "#228"
+			}
 		},
-		" input:checked+label, input:not(checked):active:hover+label": {
-			"background-color": "#090",
-			"border-color": "#0a0",
-			"border-style": "inset"
+		"input": {
+			":active+label:hover": {
+				"border-style": "inset"
+			},
+			":checked+label": {
+				"background-color": "#080",
+				"border": "1vmax inset #0a0"
+			}
 		}
 	},
-	" button": {
-		"box-sizing": "border-box",
+	[`#${quizQuestionID} button, #${quizScoresID} button`]: {
 		"width": "100%",
-		"height": "4em",
-		"background-color": "#900",
-		"border-width": "1vmax",
-		"border-color": "#a00",
+		"height": "3em",
 		"font-size": "2em",
+		"background-color": "#800",
+		"border-color": "#900",
+		"border-width": "1vmax",
 		"color": "#fff"
-	}
-});
-add(`#${quizQuestionID}`, {
-	"li input": {
-		"display": "none"
 	},
-	"h1,h2": {
+	[`#${countdownID}`]: {
 		"text-align": "center",
 		"font-size": "3em"
 	},
-	" label": {
-		"background-color": "#008",
-		"border": "1vmax outset #00a",
-		"height": "2em",
-		"width": "100%",
-		"text-align": "center",
-		"display": "flex",
-		"align-items": "center",
-		"justify-content": "center",
-		"font-size": "3em",
-		":hover": {
-			"background-color": "#228"
-		}
-	},
-	"input": {
-		":active+label:hover": {
-			"border-style": "inset"
-		},
-		":checked+label": {
-			"background-color": "#080",
-			"border": "1vmax inset #0a0"
-		}
+	[`#${quizScoresID} li span`]: {
+		"display": "inline-block",
+		"width": "50%",
+		"font-size": "2em"
 	}
-});
-add(`#${quizQuestionID} button, #${quizScoresID} button`, {
-	"width": "100%",
-	"height": "3em",
-	"font-size": "2em",
-	"background-color": "#800",
-	"border-color": "#900",
-	"border-width": "1vmax",
-	"color": "#fff"
-});
-add(`#${countdownID}`, {
-	"text-align": "center",
-	"font-size": "3em"
-});
-add(`#${quizScoresID} li span`, {
-	"display": "inline-block",
-	"width": "50%",
-	"font-size": "2em"
 });
 
 class OTDB {
