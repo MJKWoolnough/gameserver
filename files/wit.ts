@@ -37,36 +37,63 @@ const game = "What is That?",
       },
       [witID, bigID, witImgID, witTitleID] = ids(4);
 
-add(`#${witID}`, {
-	" button": {
-		"width": "100%",
-		"height": "10vh",
-		"border-width": "1vmax",
-		"font-size": "2vmax",
-		":nth-of-type(1)": {
-			"background-color": "#f80",
-			"border-color": "#f90"
+add({
+	[`#${witID}`]: {
+		" button": {
+			"width": "100%",
+			"height": "10vh",
+			"border-width": "1vmax",
+			"font-size": "2vmax",
+			":nth-of-type(1)": {
+				"background-color": "#f80",
+				"border-color": "#f90"
+			},
+			"nth-of-type(2)": {
+				"background-color": "#aa0",
+				"border-color": "#bb0"
+			},
+			":nth-of-type(3)": {
+				"background-color": "#08f",
+				"border-color": "#09f"
+			},
+			":nth-of-type(4)": {
+				"background-color": "#080",
+				"border-color": "#090"
+			}
 		},
-		"nth-of-type(2)": {
-			"background-color": "#aa0",
-			"border-color": "#bb0"
+		[` .${bigID}`]: {
+			"height": "40vh",
+			"width": "50%"
 		},
-		":nth-of-type(3)": {
-			"background-color": "#08f",
-			"border-color": "#09f"
-		},
-		":nth-of-type(4)": {
-			"background-color": "#080",
-			"border-color": "#090"
+		" div": {
+			"text-align": "center",
+			"font-size": "2em"
 		}
 	},
-	[` .${bigID}`]: {
-		"height": "40vh",
-		"width": "50%"
+	[`#${witImgID}`]: {
+		"cursor": "none",
+		"width": "100vw",
+		"height": "100vh",
+		"display": "flex",
+		"align-items": "center",
+		"justify-content": "center",
+		" canvas": {
+			"image-rendering": "pixelated",
+			"max-width": "100%",
+			"max-height": "100%",
+			"width": "100%",
+			"object-fit": "contain"
+		}
 	},
-	" div": {
+	[`#${witTitleID}`]: {
+		"position": "absolute",
+		"bottom": 0,
+		"left": 0,
+		"right": 0,
 		"text-align": "center",
-		"font-size": "2em"
+		"color": "#fff",
+		"text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
+		"font-size": "5em"
 	}
 });
 at("@media (orientation: portrait)", {
@@ -74,31 +101,6 @@ at("@media (orientation: portrait)", {
 		"width": "100%",
 		"height": "30vh"
 	}
-});
-add(`#${witImgID}`, {
-	"cursor": "none",
-	"width": "100vw",
-	"height": "100vh",
-	"display": "flex",
-	"align-items": "center",
-	"justify-content": "center",
-	" canvas": {
-		"image-rendering": "pixelated",
-		"max-width": "100%",
-		"max-height": "100%",
-		"width": "100%",
-		"object-fit": "contain"
-	}
-});
-add(`#${witTitleID}`, {
-	"position": "absolute",
-	"bottom": 0,
-	"left": 0,
-	"right": 0,
-	"text-align": "center",
-	"color": "#fff",
-	"text-shadow": "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
-	"font-size": "5em"
 });
 
 let title: HTMLDivElement,
