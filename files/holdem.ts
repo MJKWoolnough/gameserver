@@ -41,99 +41,101 @@ const game = "Texas Hold'Em",
       playerSort = ({user: a}: UserNode, {user: b}: UserNode) => a in players ? b in players ? players[a][0] - players[b][0] : -1 : 0,
       [holdemOptionsID, holdemID, noID] = ids(3);
 
-add(`#${holdemOptionsID}`, {
-	"position": "absolute",
-	"top": 0,
-	"left": 0,
-	"bottom": 0,
-	"right": 0,
-	"overflow-y": "auto",
-	"background-color": "#000",
-	" label": {
-		"display": "inline-block",
-		"width": "8em",
-		"font-size": "2em",
-		"text-align": "right",
-		"+input": {
-			"box-sizing": "border-box",
-			"width": "calc(100% - 8em)",
+add({
+	[`#${holdemOptionsID}`]: {
+		"position": "absolute",
+		"top": 0,
+		"left": 0,
+		"bottom": 0,
+		"right": 0,
+		"overflow-y": "auto",
+		"background-color": "#000",
+		" label": {
+			"display": "inline-block",
+			"width": "8em",
 			"font-size": "2em",
+			"text-align": "right",
+			"+input": {
+				"box-sizing": "border-box",
+				"width": "calc(100% - 8em)",
+				"font-size": "2em",
+				"text-align": "center",
+				"background-color": "#000",
+				"color": "#fff",
+				"border-style": "solid"
+			}
+		},
+		" input": {
+			"[type=radio]": {
+				"display": "none"
+			},
+			"+label": {
+				"display": "block",
+				"border": "1vmax outset #00a",
+				"background-color": "#008",
+				"width": "calc(100% - 2vmax)",
+				"text-align": "center",
+				"font-size": "2em",
+				":hover": {
+					"background-color": "#009"
+				}
+			},
+			":checked,:active:hover": {
+				"+label": {
+					"border-style": "inset",
+					"background-color": "#006",
+					"border-color": "#007"
+				}
+			}
+		},
+		" button": {
+			"color": "#fff",
+			"font-size": "2em",
+			"background-color": "#800",
+			"border-color": "#900",
+			"width": "100%",
+			"height": "3em",
+			"border-width": "1vmax",
+			"box-sizing": "border-box"
+		}
+	},
+	[`#${holdemID}`]: {
+		"ul li": {
+			"width": "100%",
+			"background-color": "#0a0",
+			"color": "#fff",
 			"text-align": "center",
+			"font-size": "2em",
+			"cursor": "pointer",
+			[`.${noID}`]: {
+				"background-color": "#a00"
+			}
+		},
+		" label": {
+			"display": "inline-block",
+			"width": "8em",
+			"font-size": "2em",
+			"text-align": "right"
+		},
+		" input": {
+			"width": "calc(100% - 10em)",
+			"box-sizing": "border-box",
 			"background-color": "#000",
 			"color": "#fff",
-			"border-style": "solid"
-		}
-	},
-	" input": {
-		"[type=radio]": {
-			"display": "none"
-		},
-		"+label": {
-			"display": "block",
-			"border": "1vmax outset #00a",
-			"background-color": "#008",
-			"width": "calc(100% - 2vmax)",
-			"text-align": "center",
+			"border-color": "#fff",
 			"font-size": "2em",
-			":hover": {
-				"background-color": "#009"
-			}
+			"text-align": "center"
 		},
-		":checked,:active:hover": {
-			"+label": {
-				"border-style": "inset",
-				"background-color": "#006",
-				"border-color": "#007"
-			}
+		" button": {
+			"width": "100%",
+			"border-width": "1vmax",
+			"height": "3em",
+			"border-color": "#900",
+			"background-color": "#800",
+			"color": "#fff",
+			"font-size": "2em",
+			"box-sizing": "border-box"
 		}
-	},
-	" button": {
-		"color": "#fff",
-		"font-size": "2em",
-		"background-color": "#800",
-		"border-color": "#900",
-		"width": "100%",
-		"height": "3em",
-		"border-width": "1vmax",
-		"box-sizing": "border-box"
-	}
-});
-add(`#${holdemID}`, {
-	"ul li": {
-		"width": "100%",
-		"background-color": "#0a0",
-		"color": "#fff",
-		"text-align": "center",
-		"font-size": "2em",
-		"cursor": "pointer",
-		[`.${noID}`]: {
-			"background-color": "#a00"
-		}
-	},
-	" label": {
-		"display": "inline-block",
-		"width": "8em",
-		"font-size": "2em",
-		"text-align": "right"
-	},
-	" input": {
-		"width": "calc(100% - 10em)",
-		"box-sizing": "border-box",
-		"background-color": "#000",
-		"color": "#fff",
-		"border-color": "#fff",
-		"font-size": "2em",
-		"text-align": "center"
-	},
-	" button": {
-		"width": "100%",
-		"border-width": "1vmax",
-		"height": "3em",
-		"border-color": "#900",
-		"background-color": "#800",
-		"color": "#fff",
-		"font-size": "2em",
-		"box-sizing": "border-box"
 	}
 });
 
